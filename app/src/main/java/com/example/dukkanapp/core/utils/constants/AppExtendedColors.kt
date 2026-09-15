@@ -3,9 +3,10 @@ package com.example.dukkanapp.core.utils.constants
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 
 @Immutable
-data class DukkanExtendedColors(
+data class AppExtendedColors(
     val success: Color,
     val onSuccess: Color,
     val successContainer: Color,
@@ -23,7 +24,7 @@ data class DukkanExtendedColors(
     val favorite: Color,
 )
 
-internal val LightExtendedColors = DukkanExtendedColors(
+internal val LightExtendedColors = AppExtendedColors(
     success = Color(0xFF15803D),
     onSuccess = Color(0xFFFFFFFF),
     successContainer = Color(0xFFDCFCE7),
@@ -41,7 +42,7 @@ internal val LightExtendedColors = DukkanExtendedColors(
     favorite = Color(0xFFE11D48),
 )
 
-internal val DarkExtendedColors= DukkanExtendedColors(
+internal val DarkExtendedColors= AppExtendedColors(
     success = Color(0xFF86EFAC),
     onSuccess = Color(0xFF052E16),
     successContainer = Color(0xFF166534),
@@ -59,6 +60,36 @@ internal val DarkExtendedColors= DukkanExtendedColors(
     favorite = Color(0xFFFB7185),
 )
 
-internal val LocalDukkanExtentedColors = staticCompositionLocalOf {
+internal val LocalAppExtendedColors = staticCompositionLocalOf {
     LightExtendedColors
-} 
+}
+
+fun lerp(
+    start: AppExtendedColors,
+    stop:AppExtendedColors,
+    fraction: Float
+): AppExtendedColors= AppExtendedColors(
+    success = lerp(start.success, stop.success, fraction),
+    onSuccess = lerp(start.onSuccess, stop.onSuccess, fraction),
+    successContainer = lerp(start.successContainer, stop.successContainer, fraction),
+    onSuccessContainer = lerp(
+        start.onSuccessContainer,
+        stop.onSuccessContainer,
+        fraction,
+    ),
+    warning = lerp(start.warning, stop.warning, fraction),
+    onWarning = lerp(start.onWarning, stop.onWarning, fraction),
+    warningContainer = lerp(start.warningContainer, stop.warningContainer, fraction),
+    onWarningContainer = lerp(
+        start.onWarningContainer,
+        stop.onWarningContainer,
+        fraction,
+    ),
+    info = lerp(start.info, stop.info, fraction),
+    onInfo = lerp(start.onInfo, stop.onInfo, fraction),
+    infoContainer = lerp(start.infoContainer, stop.infoContainer, fraction),
+    onInfoContainer = lerp(start.onInfoContainer, stop.onInfoContainer, fraction),
+    sale = lerp(start.sale, stop.sale, fraction),
+    onSale = lerp(start.onSale, stop.onSale, fraction),
+    favorite = lerp(start.favorite, stop.favorite, fraction),
+)
