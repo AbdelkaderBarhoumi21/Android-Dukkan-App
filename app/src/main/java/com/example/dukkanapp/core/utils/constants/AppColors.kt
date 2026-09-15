@@ -54,7 +54,7 @@ private val White = Color(0xFFFFFFFF)
 private val Black = Color(0xFF000000)
 
 
-internal val DukkanLightColorScheme = lightColorScheme(
+internal val AppLightColorScheme = lightColorScheme(
     primary = Blue700,
     onPrimary = White,
     primaryContainer = Blue100,
@@ -91,7 +91,7 @@ internal val DukkanLightColorScheme = lightColorScheme(
     onErrorContainer = Red950,
 )
 
-internal val DukkanDarkColorScheme = darkColorScheme(
+internal val AppDarkColorScheme = darkColorScheme(
     primary = Blue300,
     onPrimary = Blue950,
     primaryContainer = Blue900,
