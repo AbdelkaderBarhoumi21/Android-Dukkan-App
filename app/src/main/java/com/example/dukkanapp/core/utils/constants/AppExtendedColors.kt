@@ -42,7 +42,7 @@ internal val LightExtendedColors = AppExtendedColors(
     favorite = Color(0xFFE11D48),
 )
 
-internal val DarkExtendedColors= AppExtendedColors(
+internal val DarkExtendedColors = AppExtendedColors(
     success = Color(0xFF86EFAC),
     onSuccess = Color(0xFF052E16),
     successContainer = Color(0xFF166534),
@@ -66,9 +66,9 @@ internal val LocalAppExtendedColors = staticCompositionLocalOf {
 
 fun lerp(
     start: AppExtendedColors,
-    stop:AppExtendedColors,
+    stop: AppExtendedColors,
     fraction: Float
-): AppExtendedColors= AppExtendedColors(
+): AppExtendedColors = AppExtendedColors(
     success = lerp(start.success, stop.success, fraction),
     onSuccess = lerp(start.onSuccess, stop.onSuccess, fraction),
     successContainer = lerp(start.successContainer, stop.successContainer, fraction),
