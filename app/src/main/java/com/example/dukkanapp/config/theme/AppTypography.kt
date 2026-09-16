@@ -6,8 +6,30 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-private val AppFontFamily = FontFamily.SansSerif
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontStyle
+import com.example.dukkanapp.R
 
+private val AppFontFamily = FontFamily(
+    Font(R.font.konnect_hairline, FontWeight.Thin),
+    Font(R.font.konnect_hairline_italic, FontWeight.Thin, FontStyle.Italic),
+    Font(R.font.konnect_thin, FontWeight.ExtraLight),
+    Font(R.font.konnect_thin_italic, FontWeight.ExtraLight, FontStyle.Italic),
+    Font(R.font.konnect_light, FontWeight.Light),
+    Font(R.font.konnect_light_italic, FontWeight.Light, FontStyle.Italic),
+    Font(R.font.konnect_regular, FontWeight.Normal),
+    Font(R.font.konnect_italic, FontWeight.Normal, FontStyle.Italic),
+    Font(R.font.konnect_medium, FontWeight.Medium),
+    Font(R.font.konnect_medium_italic, FontWeight.Medium, FontStyle.Italic),
+    Font(R.font.konnect_semi_bold, FontWeight.SemiBold),
+    Font(R.font.konnect_semi_bold_italic, FontWeight.SemiBold, FontStyle.Italic),
+    Font(R.font.konnect_bold, FontWeight.Bold),
+    Font(R.font.konnect_bold_italic, FontWeight.Bold, FontStyle.Italic),
+    Font(R.font.konnect_extra_bold, FontWeight.ExtraBold),
+    Font(R.font.konnect_extra_bold_italic, FontWeight.ExtraBold, FontStyle.Italic),
+    Font(R.font.konnect_black, FontWeight.Black),
+    Font(R.font.konnect_black_italic, FontWeight.Black, FontStyle.Italic)
+)
 internal val AppTypography=  Typography(
     displayLarge = TextStyle(
         fontFamily = AppFontFamily,
