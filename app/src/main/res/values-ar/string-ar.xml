@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">تطبيق دكان</string>
+    <string name="language_selection_title">اختر اللغة</string>
+    <string name="language_selection_subtitle">اختر لغتك المفضلة أدناه. هذا يساعدنا على خدمتك بشكل أفضل.</string>
+    <string name="language_selection_you_selected">لقد اخترت</string>
+    <string name="language_selection_all_languages">جميع اللغات</string>
+    <string name="language_selection_search_hint">بحث</string>
+    <string name="action_continue">متابعة</string>
+    <string name="cd_back">رجوع</string>
+</resources>

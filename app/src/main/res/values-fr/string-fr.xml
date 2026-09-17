@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Dukkan App</string>
+    <string name="language_selection_title">Choisissez la langue</string>
+    <string name="language_selection_subtitle">Sélectionnez votre langue préférée ci-dessous. Cela nous aide à mieux vous servir.</string>
+    <string name="language_selection_you_selected">Vous avez sélectionné</string>
+    <string name="language_selection_all_languages">Toutes les langues</string>
+    <string name="language_selection_search_hint">Rechercher</string>
+    <string name="action_continue">Continuer</string>
+    <string name="cd_back">Retour</string>
+</resources>
