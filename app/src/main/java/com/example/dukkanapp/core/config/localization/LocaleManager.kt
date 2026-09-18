@@ -1,4 +1,4 @@
-package com.example.dukkanapp.config.localization
+package com.example.dukkanapp.core.config.localization
 
 import androidx.core.os.LocaleListCompat
 import androidx.appcompat.app.AppCompatDelegate

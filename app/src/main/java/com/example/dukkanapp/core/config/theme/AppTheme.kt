@@ -1,4 +1,4 @@
-package com.example.dukkanapp.config.theme
+package com.example.dukkanapp.core.config.theme
 
 
 import AppDarkColorScheme

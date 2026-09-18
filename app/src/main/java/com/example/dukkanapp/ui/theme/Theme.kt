@@ -10,7 +10,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.example.dukkanapp.config.theme.AppTypography
+import com.example.dukkanapp.core.config.theme.AppTypography
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,

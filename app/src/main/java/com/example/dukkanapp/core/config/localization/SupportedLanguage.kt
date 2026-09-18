@@ -1,4 +1,4 @@
-package com.example.dukkanapp.config.localization
+package com.example.dukkanapp.core.config.localization
 
 data class SupportedLanguage(
     val code: String,       // BCP-47 tag, e.g. "en", "fr", "ar"
