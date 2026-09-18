@@ -12,5 +12,5 @@ class LocaleManager @Inject constructor() {
         AppCompatDelegate.setApplicationLocales(localList)
     }
 
-    fun currentLocalTag(): String? = AppCompatDelegate.getApplicationLocales().toLanguageTags().takeIf { it.isNotBlank() }
+    fun currentLocaleTag(): String? = AppCompatDelegate.getApplicationLocales().toLanguageTags().takeIf { it.isNotBlank() }
 }
