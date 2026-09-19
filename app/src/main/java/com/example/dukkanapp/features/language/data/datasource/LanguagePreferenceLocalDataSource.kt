@@ -13,7 +13,7 @@ class LanguagePreferenceLocalDataSource @Inject constructor(
 ) {
     private val languageKey = stringPreferencesKey("selected_language_code")
     val savedLanguageCode: Flow<String?> = dataStore.data.map { prefs -> prefs[languageKey] }
-    suspend fun savedLanguageCode(code: String) {
+    suspend fun saveLanguageCode(code: String) {
         dataStore.edit { it[languageKey] = code }
     }
 }

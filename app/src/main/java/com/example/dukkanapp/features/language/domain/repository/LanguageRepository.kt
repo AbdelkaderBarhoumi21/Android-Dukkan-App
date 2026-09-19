@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface LanguageRepository {
     fun getSupportedLanguages(): List<LanguageModel>
     val selectedLanguageCode: Flow<String>
-    suspend fun selectLanguage(coe: String)
+    suspend fun selectLanguage(code: String)
 }
