@@ -1,8 +1,5 @@
 package com.example.dukkanapp.core.config.theme
 
-
-import AppDarkColorScheme
-import AppLightColorScheme
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -12,37 +9,44 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalContext
+import com.example.dukkanapp.core.utils.constants.AppDarkColorScheme
 import com.example.dukkanapp.core.utils.constants.AppExtendedColors
+import com.example.dukkanapp.core.utils.constants.AppLightColorScheme
 import com.example.dukkanapp.core.utils.constants.AppShapes
 import com.example.dukkanapp.core.utils.constants.DarkExtendedColors
 import com.example.dukkanapp.core.utils.constants.LightExtendedColors
 import com.example.dukkanapp.core.utils.constants.LocalAppExtendedColors
 
-object AppTheme{
-    val extendedColors: AppExtendedColors @Composable @ReadOnlyComposable get()= LocalAppExtendedColors.current
+object AppTheme {
+    val extendedColors: AppExtendedColors
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalAppExtendedColors.current
 }
+
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean=false,
-    content:@Composable () -> Unit
-){
-    val context=LocalContext.current
-    val colorScheme = when{
+    dynamicColor: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    val context = LocalContext.current
+    val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if(darkTheme){
+            if (darkTheme) {
                 dynamicDarkColorScheme(context)
-            }else{
+            } else {
                 dynamicLightColorScheme(context)
             }
         }
+
         darkTheme -> AppDarkColorScheme
         else -> AppLightColorScheme
     }
 
-    val extendedColors = if(darkTheme){
+    val extendedColors = if (darkTheme) {
         DarkExtendedColors
-    }else{
+    } else {
         LightExtendedColors
     }
 
@@ -56,8 +60,4 @@ fun AppTheme(
             content = content
         )
     }
-
-
-
-
 }

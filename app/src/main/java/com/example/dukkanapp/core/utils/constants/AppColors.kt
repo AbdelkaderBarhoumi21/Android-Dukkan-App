@@ -1,3 +1,5 @@
+package com.example.dukkanapp.core.utils.constants
+
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
@@ -127,4 +129,3 @@ internal val AppDarkColorScheme = darkColorScheme(
     errorContainer = Red800,
     onErrorContainer = Red50,
 )
-

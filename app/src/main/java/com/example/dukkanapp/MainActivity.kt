@@ -16,15 +16,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            LanguageSelectionScreen(
-                onBack = {},
-                onContinue = {}
-            )
-
+            AppTheme {
+                LanguageSelectionScreen(
+                    onBack = { },
+                    onContinue = {}
+                )
+            }
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
