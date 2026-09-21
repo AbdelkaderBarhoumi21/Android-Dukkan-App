@@ -2,6 +2,7 @@ package com.example.dukkanapp.features.language.presentation.components
 
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,7 +22,7 @@ import com.example.dukkanapp.features.language.presentation.logic.LanguageSelect
 
 
 @Composable
-fun LanguageSelectionScreen(
+fun LanguageSelectionScreenContent(
     state: LanguageSelectionUiState,
     onEvent: (LanguageSelectionEvent) -> Unit,
     onBack: () -> Unit,
@@ -33,7 +34,9 @@ fun LanguageSelectionScreen(
             AppPrimaryButton(
                 text = stringResource(R.string.action_continue),
                 onClick = onContinue,
-                modifier = Modifier.padding(AppDimens.SpaceMd),
+                modifier = Modifier
+                    .padding(AppDimens.SpaceMd)
+                    .fillMaxWidth(),
             )
         },
     ) { padding ->
@@ -100,11 +103,11 @@ fun LanguageSelectionScreen(
 
 @Preview(name = "English", locale = "en")
 @Preview(name = "French", locale = "fr")
-@Preview(name = "Arabic (RTL)", locale = "ar")
+@Preview(name = "Arabic", locale = "ar")
 @Composable
 private fun LanguageSelectionScreenPreview() {
     AppTheme {
-        LanguageSelectionScreen(
+        LanguageSelectionScreenContent(
             state = LanguageSelectionUiState(
                 selectedCode = "ar",
                 languages = emptyList(), // swap in fake LanguageUiModel list to preview real rows

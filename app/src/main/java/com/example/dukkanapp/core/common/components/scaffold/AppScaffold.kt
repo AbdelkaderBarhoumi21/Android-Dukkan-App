@@ -49,7 +49,7 @@ fun AppScaffold(
                             onClick = onNavigateBack,
                             modifier = Modifier
                                 .padding(start = AppDimens.SpaceXs)
-                                .size(AppDimens.IconLg)
+                                .size(AppDimens.iconLg)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
                         ) {

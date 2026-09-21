@@ -24,16 +24,13 @@ object AppDimens {
     val ScreenHorizontalPadding = 16.dp
     val circleButtonSize = 24.dp
     val ButtonHeight = 52.dp
-    val TextFieldMinHeight = 56.dp
+    val TextFieldMinHeight = 48.dp
     val ProductImageHeight = 180.dp
     val BottomBarHeight = 80.dp
     val TouchTargetMin = 48.dp
-    val IconSm = 16.dp
-    val IconMd = 24.dp
-    val IconLg = 32.dp
     val BorderWidth = 1.dp
 
-    // Image size
+    // Image & Icon size
     val flagSize = 37.dp
     val iconXs = 16.dp
     val iconSm = 20.dp
