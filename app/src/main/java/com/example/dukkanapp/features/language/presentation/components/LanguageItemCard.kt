@@ -49,7 +49,7 @@ fun LanguageItemCard(
                 }
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = AppDimens.SpaceMd, vertical = AppDimens.SpaceSm)
+            .padding(horizontal = AppDimens.SpaceXs, vertical = AppDimens.SpaceXs)
 
     ) {
         Image(

@@ -1,7 +1,8 @@
 package com.example.dukkanapp.features.language.presentation.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -29,24 +30,28 @@ fun LanguageSearchField(
         onValueChange = onQueryChange,
         modifier = modifier
             .fillMaxWidth()
-            .height(AppDimens.TextFieldMinHeight),
+            .heightIn(AppDimens.TextFieldMinHeight),
+
         placeholder = {
             Text(
                 text = stringResource(R.string.language_selection_search_hint),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+
+                )
         },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(AppDimens.iconSm)
             )
         },
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         shape = RoundedCornerShape(percent = 50),
+
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.outline,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
