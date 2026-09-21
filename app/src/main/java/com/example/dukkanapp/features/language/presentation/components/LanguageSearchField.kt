@@ -30,28 +30,25 @@ fun LanguageSearchField(
         onValueChange = onQueryChange,
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(AppDimens.TextFieldMinHeight),
-
+            .heightIn(min = AppDimens.TextFieldMinHeight), // floor, not a hard clip — never cuts off content
         placeholder = {
             Text(
                 text = stringResource(R.string.language_selection_search_hint),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-
-                )
+            )
         },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(AppDimens.iconSm)
+                modifier = Modifier.size(AppDimens.iconSm), // smaller icon shrinks the field's natural size a bit
             )
         },
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         shape = RoundedCornerShape(percent = 50),
-
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.outline,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
