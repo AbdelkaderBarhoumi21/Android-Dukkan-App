@@ -23,8 +23,8 @@ object AppDimens {
     // Reusable component measurements
     val ScreenHorizontalPadding = 16.dp
     val circleButtonSize = 24.dp
-    val ButtonHeight = 52.dp
-    val TextFieldMinHeight = 48.dp
+    val ButtonHeight = 45.dp
+    val TextFieldMinHeight = 56.dp
     val ProductImageHeight = 180.dp
     val BottomBarHeight = 80.dp
     val TouchTargetMin = 48.dp

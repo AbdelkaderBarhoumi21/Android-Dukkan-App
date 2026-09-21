@@ -2,7 +2,6 @@ package com.example.dukkanapp.features.language.presentation.components
 
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,7 +35,7 @@ fun LanguageSelectionScreenContent(
                 onClick = onContinue,
                 modifier = Modifier
                     .padding(AppDimens.SpaceMd)
-                    .fillMaxWidth(),
+
             )
         },
     ) { padding ->
@@ -48,7 +47,7 @@ fun LanguageSelectionScreenContent(
             item {
                 Text(
                     text = stringResource(R.string.language_selection_title),
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.titleLarge,
                 )
             }
             item {

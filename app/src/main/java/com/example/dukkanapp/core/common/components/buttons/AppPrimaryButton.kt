@@ -1,11 +1,15 @@
 package com.example.dukkanapp.core.common.components.buttons
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
 fun AppPrimaryButton(
@@ -17,8 +21,12 @@ fun AppPrimaryButton(
     Button(
         onClick = onClick,
         enabled = isEnabled,
-        modifier = modifier,
-        shape = MaterialTheme.shapes.large,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(
+                AppDimens.ButtonHeight
+            ),
+        shape = RoundedCornerShape(percent = 50),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
