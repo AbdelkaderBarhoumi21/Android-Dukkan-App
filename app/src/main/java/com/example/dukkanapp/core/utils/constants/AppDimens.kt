@@ -12,7 +12,7 @@ object AppDimens {
     val SpaceXl = 32.dp
     val Space2Xl = 48.dp
 
-    // Corner radii
+    // Corner radius
     val RadiusXs = 4.dp
     val RadiusSm = 8.dp
     val RadiusMd = 12.dp
@@ -32,4 +32,7 @@ object AppDimens {
     val IconMd = 24.dp
     val IconLg = 32.dp
     val BorderWidth = 1.dp
+
+    // Image size
+    val flagSize = 37.dp
 }
