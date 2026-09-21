@@ -35,4 +35,10 @@ object AppDimens {
 
     // Image size
     val flagSize = 37.dp
+    val iconXs = 16.dp
+    val iconSm = 20.dp
+    val iconMd = 24.dp
+    val iconLg = 32.dp
+    val iconXl = 48.dp
+    val iconXxl = 64.dp
 }

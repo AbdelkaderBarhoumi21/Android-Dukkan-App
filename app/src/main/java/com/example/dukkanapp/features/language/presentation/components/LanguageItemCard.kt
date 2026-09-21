@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,5 +60,12 @@ fun LanguageItemCard(
                 .clip(CircleShape)
         )
         Spacer(Modifier.width(AppDimens.SpaceSm))
+        Text(
+            text = language.displayName,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+        LanguageSelectionIndicator(isSelected = isSelected)
     }
 }

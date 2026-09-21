@@ -1,0 +1,117 @@
+package com.example.dukkanapp.features.language.presentation.components
+
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.dukkanapp.R
+import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
+import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
+import com.example.dukkanapp.core.config.theme.AppTheme
+import com.example.dukkanapp.core.utils.constants.AppDimens
+import com.example.dukkanapp.features.language.presentation.logic.LanguageSelectionEvent
+import com.example.dukkanapp.features.language.presentation.logic.LanguageSelectionUiState
+
+
+@Composable
+fun LanguageSelectionScreen(
+    state: LanguageSelectionUiState,
+    onEvent: (LanguageSelectionEvent) -> Unit,
+    onBack: () -> Unit,
+    onContinue: () -> Unit,
+) {
+    AppScaffold(
+        onNavigateBack = onBack,
+        bottomBar = {
+            AppPrimaryButton(
+                text = stringResource(R.string.action_continue),
+                onClick = onContinue,
+                modifier = Modifier.padding(AppDimens.SpaceMd),
+            )
+        },
+    ) { padding ->
+        LazyColumn(
+            contentPadding = padding,
+            verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs),
+            modifier = Modifier.padding(horizontal = AppDimens.ScreenHorizontalPadding),
+        ) {
+            item {
+                Text(
+                    text = stringResource(R.string.language_selection_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+            }
+            item {
+                Text(
+                    text = stringResource(R.string.language_selection_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            item {
+                Text(
+                    text = stringResource(R.string.language_selection_you_selected),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+            }
+            state.selectedLanguage?.let { selected ->
+                item(key = "selected_${selected.code}") {
+                    LanguageItemCard(
+                        language = selected,
+                        isSelected = true,
+                        isHighlightedStyle = true,
+                        onClick = {},
+                    )
+                }
+            }
+
+            item {
+                Text(
+                    text = stringResource(R.string.language_selection_all_languages),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+            }
+            item {
+                LanguageSearchField(
+                    query = state.query,
+                    onQueryChange = { onEvent(LanguageSelectionEvent.OnQueryChanged(it)) },
+                )
+            }
+
+            items(state.filteredLanguages, key = { it.code }) { language ->
+                LanguageItemCard(
+                    language = language,
+                    isSelected = language.code == state.selectedCode,
+                    isHighlightedStyle = false,
+                    onClick = { onEvent(LanguageSelectionEvent.OnLanguageSelected(language.code)) },
+                )
+            }
+        }
+    }
+}
+
+@Preview(name = "English", locale = "en")
+@Preview(name = "French", locale = "fr")
+@Preview(name = "Arabic (RTL)", locale = "ar")
+@Composable
+private fun LanguageSelectionScreenPreview() {
+    AppTheme {
+        LanguageSelectionScreen(
+            state = LanguageSelectionUiState(
+                selectedCode = "ar",
+                languages = emptyList(), // swap in fake LanguageUiModel list to preview real rows
+            ),
+            onEvent = {},
+            onBack = {},
+            onContinue = {},
+        )
+    }
+}
