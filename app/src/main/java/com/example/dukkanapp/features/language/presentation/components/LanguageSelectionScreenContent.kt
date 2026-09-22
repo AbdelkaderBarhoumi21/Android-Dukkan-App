@@ -1,7 +1,8 @@
 package com.example.dukkanapp.features.language.presentation.components
 
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -41,7 +42,7 @@ fun LanguageSelectionScreenContent(
     ) { padding ->
         LazyColumn(
             contentPadding = padding,
-            verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs),
+
             modifier = Modifier.padding(horizontal = AppDimens.ScreenHorizontalPadding),
         ) {
             item {
@@ -51,11 +52,17 @@ fun LanguageSelectionScreenContent(
                 )
             }
             item {
+                Spacer(Modifier.height(AppDimens.SpaceSm))
+            }
+            item {
                 Text(
                     text = stringResource(R.string.language_selection_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            }
+            item {
+                Spacer(Modifier.height(AppDimens.SpaceLg))
             }
 
             item {
@@ -63,6 +70,9 @@ fun LanguageSelectionScreenContent(
                     text = stringResource(R.string.language_selection_you_selected),
                     style = MaterialTheme.typography.titleSmall,
                 )
+            }
+            item {
+                Spacer(Modifier.height(AppDimens.SpaceSm))
             }
             state.selectedLanguage?.let { selected ->
                 item(key = "selected_${selected.code}") {
@@ -74,12 +84,19 @@ fun LanguageSelectionScreenContent(
                     )
                 }
             }
+            item {
+                Spacer(Modifier.height(AppDimens.SpaceLg))
+            }
+
 
             item {
                 Text(
                     text = stringResource(R.string.language_selection_all_languages),
                     style = MaterialTheme.typography.titleSmall,
                 )
+            }
+            item {
+                Spacer(Modifier.height(AppDimens.SpaceSm))
             }
             item {
                 LanguageSearchField(
@@ -94,6 +111,7 @@ fun LanguageSelectionScreenContent(
                     isSelected = language.code == state.selectedCode,
                     isHighlightedStyle = false,
                     onClick = { onEvent(LanguageSelectionEvent.OnLanguageSelected(language.code)) },
+                    modifier = Modifier.padding(vertical = AppDimens.Space2Xs)
                 )
             }
         }
