@@ -4,31 +4,31 @@ import androidx.compose.ui.unit.dp
 
 object AppDimens {
     // Spacing: one 4 dp scale
-    val Space2Xs = 4.dp
-    val SpaceXs = 8.dp
-    val SpaceSm = 12.dp
-    val SpaceMd = 16.dp
-    val SpaceLg = 24.dp
-    val SpaceXl = 32.dp
-    val Space2Xl = 48.dp
+    val space2Xs = 4.dp
+    val spaceXs = 8.dp
+    val spaceSm = 12.dp
+    val spaceMd = 16.dp
+    val spaceLg = 24.dp
+    val spaceXl = 32.dp
+    val space2Xl = 48.dp
 
     // Corner radius
-    val RadiusXs = 4.dp
-    val RadiusSm = 8.dp
-    val RadiusMd = 12.dp
-    val RadiusLg = 16.dp
-    val RadiusXl = 24.dp
-    val RadiusFull = 999.dp
+    val radiusXs = 4.dp
+    val radiusSm = 8.dp
+    val radiusMd = 12.dp
+    val radiusLg = 16.dp
+    val radiusXl = 24.dp
+    val radiusFull = 999.dp
 
     // Reusable component measurements
-    val ScreenHorizontalPadding = 16.dp
+    val screenHorizontalPadding = 16.dp
     val circleButtonSize = 24.dp
-    val ButtonHeight = 45.dp
-    val TextFieldMinHeight = 45.dp
-    val ProductImageHeight = 180.dp
-    val BottomBarHeight = 80.dp
-    val TouchTargetMin = 48.dp
-    val BorderWidth = 1.dp
+    val buttonHeight = 45.dp
+    val textFieldMinHeight = 45.dp
+    val productImageHeight = 180.dp
+    val bottomBarHeight = 80.dp
+    val touchTargetMin = 48.dp
+    val borderWidth = 1.dp
 
     // Image & Icon size
     val flagSize = 37.dp

@@ -35,7 +35,7 @@ fun LanguageSelectionScreenContent(
                 text = stringResource(R.string.action_continue),
                 onClick = onContinue,
                 modifier = Modifier
-                    .padding(horizontal = AppDimens.SpaceMd, vertical = AppDimens.SpaceLg)
+                    .padding(horizontal = AppDimens.spaceMd, vertical = AppDimens.spaceLg)
 
             )
         },
@@ -43,7 +43,7 @@ fun LanguageSelectionScreenContent(
         LazyColumn(
             contentPadding = padding,
 
-            modifier = Modifier.padding(horizontal = AppDimens.ScreenHorizontalPadding),
+            modifier = Modifier.padding(horizontal = AppDimens.screenHorizontalPadding),
         ) {
             item {
                 Text(
@@ -52,7 +52,7 @@ fun LanguageSelectionScreenContent(
                 )
             }
             item {
-                Spacer(Modifier.height(AppDimens.SpaceSm))
+                Spacer(Modifier.height(AppDimens.spaceSm))
             }
             item {
                 Text(
@@ -62,7 +62,7 @@ fun LanguageSelectionScreenContent(
                 )
             }
             item {
-                Spacer(Modifier.height(AppDimens.SpaceLg))
+                Spacer(Modifier.height(AppDimens.spaceLg))
             }
 
             item {
@@ -72,7 +72,7 @@ fun LanguageSelectionScreenContent(
                 )
             }
             item {
-                Spacer(Modifier.height(AppDimens.SpaceSm))
+                Spacer(Modifier.height(AppDimens.spaceSm))
             }
             state.selectedLanguage?.let { selected ->
                 item(key = "selected_${selected.code}") {
@@ -85,7 +85,7 @@ fun LanguageSelectionScreenContent(
                 }
             }
             item {
-                Spacer(Modifier.height(AppDimens.SpaceLg))
+                Spacer(Modifier.height(AppDimens.spaceLg))
             }
 
 
@@ -96,7 +96,7 @@ fun LanguageSelectionScreenContent(
                 )
             }
             item {
-                Spacer(Modifier.height(AppDimens.SpaceSm))
+                Spacer(Modifier.height(AppDimens.spaceSm))
             }
             item {
                 LanguageSearchField(
@@ -111,7 +111,7 @@ fun LanguageSelectionScreenContent(
                     isSelected = language.code == state.selectedCode,
                     isHighlightedStyle = false,
                     onClick = { onEvent(LanguageSelectionEvent.OnLanguageSelected(language.code)) },
-                    modifier = Modifier.padding(vertical = AppDimens.Space2Xs)
+                    modifier = Modifier.padding(vertical = AppDimens.space2Xs)
                 )
             }
         }

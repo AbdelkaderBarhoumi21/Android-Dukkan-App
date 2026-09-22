@@ -30,7 +30,7 @@ fun LanguageSearchField(
         onValueChange = onQueryChange,
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = AppDimens.TextFieldMinHeight), // floor, not a hard clip — never cuts off content
+            .heightIn(min = AppDimens.textFieldMinHeight), // floor, not a hard clip — never cuts off content
         placeholder = {
             Text(
                 text = stringResource(R.string.language_selection_search_hint),

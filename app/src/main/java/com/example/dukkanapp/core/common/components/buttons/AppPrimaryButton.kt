@@ -24,7 +24,7 @@ fun AppPrimaryButton(
         modifier = modifier
             .fillMaxWidth()
             .height(
-                AppDimens.ButtonHeight
+                AppDimens.buttonHeight
             ),
         shape = RoundedCornerShape(percent = 50),
         colors = ButtonDefaults.buttonColors(

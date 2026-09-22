@@ -35,10 +35,11 @@ fun LanguageItemCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(if (isHighlightedStyle) RoundedCornerShape(percent = 50) else MaterialTheme.shapes.small)
+            .clickable(onClick = onClick)
             .then(
                 if (isHighlightedStyle) {
                     Modifier.border(
-                        width = AppDimens.BorderWidth,
+                        width = AppDimens.borderWidth,
                         color = MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(percent = 50)
                     )
@@ -48,8 +49,7 @@ fun LanguageItemCard(
                     Modifier
                 }
             )
-            .clickable(onClick = onClick)
-            .padding(horizontal = AppDimens.SpaceXs, vertical = AppDimens.SpaceXs)
+            .padding(horizontal = AppDimens.spaceXs, vertical = AppDimens.spaceXs)
 
     ) {
         Image(
@@ -59,7 +59,7 @@ fun LanguageItemCard(
                 .size(AppDimens.flagSize)
                 .clip(CircleShape)
         )
-        Spacer(Modifier.width(AppDimens.SpaceSm))
+        Spacer(Modifier.width(AppDimens.spaceSm))
         Text(
             text = language.displayName,
             style = MaterialTheme.typography.bodyLarge,

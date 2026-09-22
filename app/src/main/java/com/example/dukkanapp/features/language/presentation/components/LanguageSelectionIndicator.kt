@@ -32,7 +32,7 @@ fun LanguageSelectionIndicator(
             modifier = Modifier
                 .size(AppDimens.iconSm)
                 .border(
-                    width = AppDimens.BorderWidth,
+                    width = AppDimens.borderWidth,
                     color = MaterialTheme.colorScheme.outline,
                     shape = CircleShape
                 )

@@ -48,7 +48,7 @@ fun AppScaffold(
                         IconButton(
                             onClick = onNavigateBack,
                             modifier = Modifier
-                                .padding(start = AppDimens.SpaceMd)
+                                .padding(start = AppDimens.spaceMd)
                                 .size(AppDimens.iconLg)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
