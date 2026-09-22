@@ -46,10 +46,7 @@ class LanguageSelectionViewModel @Inject constructor(
                     selectLanguage(event.code)
                 }
             }
-
-            is LanguageSelectionEvent.OnContinueClicked -> viewModelScope.launch {
-                selectLanguage(_state.value.selectedCode)
-            }
+            
         }
     }
 

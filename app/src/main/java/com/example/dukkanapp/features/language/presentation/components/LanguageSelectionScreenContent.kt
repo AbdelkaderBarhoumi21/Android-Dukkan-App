@@ -34,7 +34,7 @@ fun LanguageSelectionScreenContent(
                 text = stringResource(R.string.action_continue),
                 onClick = onContinue,
                 modifier = Modifier
-                    .padding(AppDimens.SpaceMd)
+                    .padding(horizontal = AppDimens.SpaceMd, vertical = AppDimens.SpaceLg)
 
             )
         },
