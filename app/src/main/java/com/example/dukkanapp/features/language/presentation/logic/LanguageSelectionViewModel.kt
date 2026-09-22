@@ -40,7 +40,13 @@ class LanguageSelectionViewModel @Inject constructor(
     fun onEvent(event: LanguageSelectionEvent) {
         when (event) {
             is LanguageSelectionEvent.OnQueryChanged -> _state.update { it.copy(query = event.query) }
-            is LanguageSelectionEvent.OnLanguageSelected -> _state.update { it.copy(selectedCode = event.code) }
+            is LanguageSelectionEvent.OnLanguageSelected -> {
+                _state.update { it.copy(selectedCode = event.code) }
+                viewModelScope.launch {
+                    selectLanguage(event.code)
+                }
+            }
+
             is LanguageSelectionEvent.OnContinueClicked -> viewModelScope.launch {
                 selectLanguage(_state.value.selectedCode)
             }
