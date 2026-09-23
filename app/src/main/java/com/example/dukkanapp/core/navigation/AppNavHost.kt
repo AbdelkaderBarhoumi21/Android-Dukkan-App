@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dukkanapp.features.language.presentation.screens.LanguageSelectionScreen
+import com.example.dukkanapp.features.onboarding.presentation.screens.OnboardingScreen
 
 @Composable
 fun AppNavHost() {
@@ -30,6 +31,12 @@ fun AppNavHost() {
         }
 
         // 2. Onboarding Screen
-
+        composable<AppRoutes.Onboarding> {
+            OnboardingScreen(
+                onGetStarted = {
+                    // We will handle navigating to the Home screen here later
+                }
+            )
+        }
     }
 }
