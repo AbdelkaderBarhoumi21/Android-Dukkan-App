@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.dukkanapp.core.config.theme.AppTheme
+import com.example.dukkanapp.core.navigation.AppNavHost
 import com.example.dukkanapp.features.language.presentation.screens.LanguageSelectionScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,10 +18,8 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                LanguageSelectionScreen(
-                    onBack = { },
-                    onContinue = {}
-                )
+                // The NavHost now handles showing the correct screen
+                AppNavHost()
             }
         }
     }
