@@ -29,6 +29,8 @@ object AppDimens {
     val bottomBarHeight = 80.dp
     val touchTargetMin = 48.dp
     val borderWidth = 1.dp
+    val onboardingIllustrationHeight = 280.dp
+    val pagerIndicatorSize = 8.dp
 
     // Image & Icon size
     val flagSize = 37.dp
