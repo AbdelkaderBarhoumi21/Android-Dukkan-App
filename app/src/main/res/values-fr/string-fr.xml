@@ -7,4 +7,15 @@
     <string name="language_selection_search_hint">Rechercher</string>
     <string name="action_continue">Continuer</string>
     <string name="cd_back">Retour</string>
+    <string name="onboarding_discover_title">Découvrez nos produits</string>
+    <string name="onboarding_discover_subtitle">Parcourez des milliers de produits, de la mode à la tech. Trouvez ce que vous aimez, sans effort.</string>
+    <string name="onboarding_checkout_title">Paiement sans tracas</string>
+    <string name="onboarding_checkout_subtitle">Paiements fluides et livraison rapide. Commencez à acheter plus intelligemment dès aujourd\'hui.</string>
+    <string name="onboarding_shopping_title">Shopping facile et agréable</string>
+    <string name="onboarding_shopping_subtitle">Commencez vos achats maintenant et profitez d\'un monde de commodité !</string>
+    <string name="action_next">Suivant</string>
+    <string name="action_get_started">Commencer</string>
+    <string name="onboarding_already_have_account">Vous avez déjà un compte ?</string>
+    <string name="action_log_in">Se connecter</string>
+    <string name="cd_pager_indicator">Page %1$d sur %2$d</string>
 </resources>

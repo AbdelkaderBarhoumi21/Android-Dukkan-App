@@ -7,4 +7,15 @@
     <string name="language_selection_search_hint">Search</string>
     <string name="action_continue">Continue</string>
     <string name="cd_back">Back</string>
+    <string name="onboarding_discover_title">Discover Our Products</string>
+    <string name="onboarding_discover_subtitle">Browse thousands of products, from fashion to tech. Find what you love, effortlessly.</string>
+    <string name="onboarding_checkout_title">Hassle-Free Checkout</string>
+    <string name="onboarding_checkout_subtitle">Seamless payments and speedy delivery. Start shopping smarter today.</string>
+    <string name="onboarding_shopping_title">Easy and Happy Shopping</string>
+    <string name="onboarding_shopping_subtitle">Start shopping now and enjoy a world of convenience!</string>
+    <string name="action_next">Next</string>
+    <string name="action_get_started">Get Started</string>
+    <string name="onboarding_already_have_account">Already have an account?</string>
+    <string name="action_log_in">Log In</string>
+    <string name="cd_pager_indicator">Page %1$d of %2$d</string>
 </resources>
