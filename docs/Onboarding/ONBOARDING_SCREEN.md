@@ -1,11 +1,89 @@
 # Onboarding Screen — HorizontalPager (Compose)
 
-This document is the full implementation blueprint for the Dukkan onboarding flow.
-Copy every file as written. Do not skip a file. Do not invent extra colors or a
-new theme: the mock is only for **layout**. Colors, type, and the primary button
-already come from `AppTheme` and `AppPrimaryButton`.
+### The big picture
 
-Package root:
+`HorizontalPager` shows pages and lets the user swipe between them. To know which page is showing, it uses a `PagerState`. That is all the pager does. Everything else in the onboarding file (ViewModel, effects, sync) exists because your screen also has other things that depend on the current page: the dots and the button label.
+
+### Start with the simplest version (no ViewModel)
+
+kotlin
+
+```kotlin
+@Composable
+fun SimplePager() {
+    val pages = listOf("Discover", "Checkout", "Shopping")
+    val pagerState = rememberPagerState(pageCount = { pages.size })
+    val scope = rememberCoroutineScope()
+
+    Column {
+        HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
+            Text(pages[page])                       // the UI of each page
+        }
+        Text("Page ${pagerState.currentPage + 1} of ${pages.size}")
+        Button(onClick = {
+            if (pagerState.currentPage < pages.lastIndex) {
+                scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+            }
+        }) { Text("Next") }
+    }
+}
+```
+
+This works. The swipe works, the Next button works, and the text updates. `pagerState.currentPage` is the only page number, so there is **nothing to sync**.
+
+### Role of each piece
+
+| Piece                         | Role                                                         | Flutter equivalent                |
+| ----------------------------- | ------------------------------------------------------------ | --------------------------------- |
+| `HorizontalPager`             | Draws the pages and handles the swipe                        | `PageView.builder`                |
+| `PagerState`                  | Knows the current page and can scroll to another             | `PageController`                  |
+| `currentPage`                 | The page number showing now                                  | `controller.page.round()`         |
+| `animateScrollToPage(i)`      | Slides to page `i` (needs a coroutine)                       | `animateToPage(i)`                |
+| `snapshotFlow`                | Turns "this value changed" into a stream you can react to    | a listener or `Stream`            |
+| `LaunchedEffect`              | Runs a coroutine tied to the screen's life, and restarts when its key changes | `initState` / `didUpdateWidget`   |
+| ViewModel `state.currentPage` | The screen's saved copy of the page, used by the dots and button label | the page field in your Bloc state |
+
+### Why the onboarding version needs two owners
+
+In your file the dots and the button label ("Next" or "Get Started") read from the ViewModel, not from the pager. So there are two copies of the page number, and each change must be passed to the other side:
+
+text
+
+```text
+SWIPE   pager changes first  ->  snapshotFlow  ->  event to ViewModel
+NEXT    ViewModel changes first  ->  LaunchedEffect(state.currentPage)  ->  animateScrollToPage
+```
+
+### Swipe vs. Next button
+
+|                                  | Swipe                                      | Next button                           |
+| -------------------------------- | ------------------------------------------ | ------------------------------------- |
+| What moves the pages             | The user's finger. The pager moves itself. | Your code calls `animateScrollToPage` |
+| Who learns the new page first    | The pager                                  | The ViewModel                         |
+| Which sync runs                  | Pager to ViewModel (`snapshotFlow`)        | ViewModel to pager (`LaunchedEffect`) |
+| Is `animateScrollToPage` called? | No                                         | Yes                                   |
+
+For a swipe, `currentPage` changes when the page is about halfway across and snaps, not at the first touch.
+
+### Why not update the pager directly from the button?
+
+You can, and the simple version above does exactly that. The onboarding file does not, because of a design choice, not a Compose rule:
+
+1. **The button decides nothing.** It only sends `OnNextClicked`, like a Bloc event. The ViewModel owns the rules: what the next page is, whether it is the last page, and which label to show.
+2. **The rules live in one place.** If the button moved the pager itself, the ViewModel would still need to be told separately, and you would have two places deciding the page.
+3. **The ViewModel stays testable.** It holds a plain `Int`, so you can test "Next on the last page" without any UI.
+
+The cost is the extra `LaunchedEffect` and the `if` check. For a small screen with no ViewModel logic, the simple version is better.
+
+### Conclusion: what to remember
+
+1. `HorizontalPager` shows pages, and `PagerState` remembers the current one.
+2. `PagerState` is a UI object and lives in the composable. The ViewModel only stores the number.
+3. If nothing else depends on the page, use the pager alone.
+4. If other UI depends on the page (dots, button text), you have two copies and need two syncs.
+5. **Pager to ViewModel:** `snapshotFlow { pagerState.currentPage }` inside a `LaunchedEffect`.
+6. **ViewModel to pager:** `LaunchedEffect(state.currentPage)` that calls `animateScrollToPage`.
+7. The `if (pagerState.currentPage != state.currentPage)` check stops the two syncs from repeating each other.
 
 ```text
 com.example.dukkanapp
@@ -468,6 +546,75 @@ sealed interface OnboardingEvent {
 `OnGetStarted` and `OnLogin` are **navigation**. They stay as screen lambdas,
 same as `onContinue` on language selection.
 
+
+
+Ran a command
+
+### What `OnboardingEvent` is
+
+It is a **list of messages the screen can send to the ViewModel**. It is the same as a Bloc event in Flutter: the UI never changes the state itself, it only says "this happened" and the ViewModel decides what to do.
+
+kotlin
+
+```kotlin
+sealed interface OnboardingEvent {
+    data class OnPageChanged(val page: Int) : OnboardingEvent
+    object OnNextClicked : OnboardingEvent
+}
+```
+
+The equivalent in Dart is:
+
+dart
+
+```dart
+abstract class OnboardingEvent {}
+class PageChanged extends OnboardingEvent { final int page; ... }
+class NextClicked extends OnboardingEvent {}
+```
+
+### The two events
+
+**`OnPageChanged(page)`** means "the user swiped, and the pager is now on this page."
+
+- It carries data, the page number, so it is a `data class`.
+- It is sent by the `snapshotFlow` effect.
+- The ViewModel saves that number in `state.currentPage`.
+
+**`OnNextClicked`** means "the user tapped the Next button."
+
+- It carries nothing, so it is a plain `object`.
+- The ViewModel adds 1 to `state.currentPage`, unless it is already the last page.
+
+### What the ViewModel does with them
+
+kotlin
+
+```kotlin
+when (event) {
+    is OnPageChanged -> currentPage = event.page      // just save what the pager says
+    OnNextClicked    -> currentPage = currentPage + 1 // move forward by one
+}
+```
+
+The real code has two small safety checks. For `OnPageChanged` it keeps the number inside the valid range (`coerceIn`), and it changes nothing if the page is the same as before. For `OnNextClicked` it does nothing on the last page.
+
+### Why `sealed interface`?
+
+`sealed` means these are **the only events that exist**. Because of this, the `when (event)` in the ViewModel must handle every one of them, and if you add a third event and forget to handle it, the compiler gives an error. You cannot forget one.
+
+### Real values
+
+text
+
+```text
+Swipe to page 2      ->  onEvent(OnPageChanged(2))  ->  state.currentPage = 2
+Tap Next on page 0   ->  onEvent(OnNextClicked)     ->  state.currentPage = 1
+Tap Next on last page ->  onEvent(OnNextClicked)    ->  nothing (already last)
+```
+
+The same event class is used for both the swipe and the Next button. It just has two different messages inside.
+
 ### 8.4 `OnboardingViewModel.kt`
 
 **Location:** `app/src/main/java/com/example/dukkanapp/features/onboarding/presentation/logic/OnboardingViewModel.kt`
@@ -519,6 +666,27 @@ class OnboardingViewModel @Inject constructor(
 
 `jakarta.inject.Inject` matches `LanguageSelectionViewModel`. Do not mix it with
 `javax.inject.Inject` in ViewModels.
+
+### `coerceIn`
+
+It **forces a number to stay inside a range**. If the number is too small it becomes the minimum, and if it is too big it becomes the maximum. In Dart this is `clamp`.
+
+kotlin
+
+```kotlin
+event.page.coerceIn(0, 2)     // keep the number between 0 and 2
+```
+
+text
+
+```text
+coerceIn(0, 2)
+  1   ->  1     (inside the range, unchanged)
+  5   ->  2     (too big, becomes the max)
+ -1   ->  0     (too small, becomes the min)
+```
+
+Dart: `page.clamp(0, 2)`.
 
 ### 8.5 `OnboardingPageItem.kt`
 
@@ -592,6 +760,61 @@ fun OnboardingPageItem(
 
 This is the Flutter `build` method: one scaffold, pager, dots, shared button,
 login row.
+
+It only means **where you write the number**. The number is the same, but Flutter and Compose put it in different places.
+
+### Flutter: the count goes on the widget
+
+dart
+
+```dart
+final controller = PageController();          // controller has no idea how many pages
+
+PageView.builder(
+  controller: controller,
+  itemCount: pages.length,                    // count is given here, to the widget
+  itemBuilder: (context, index) => ...,
+)
+```
+
+`PageController` does not know the count. Only the `PageView` widget knows it.
+
+### Compose: the count goes on the state
+
+kotlin
+
+```kotlin
+val pagerState = rememberPagerState(
+    pageCount = { pages.size }                // count is given here, to the state
+)
+
+HorizontalPager(
+    state = pagerState,                       // no count here
+) { page -> ... }
+```
+
+`HorizontalPager` has no `pageCount` parameter. It gets the count through `pagerState`.
+
+### Why is it done this way?
+
+In Compose, `PagerState` does more than a Flutter `PageController`. It holds the scroll position and does the scroll math, so it needs to know how many pages exist. For example:
+
+- `animateScrollToPage(5)` when there are only 3 pages: the state has to know 5 is out of range.
+- Swiping on the last page: the state has to know it is the last one and stop.
+- `currentPage`: the state has to keep it between `0` and `size - 1`.
+
+The `PagerState` does all of these, so it is the object that must know the count.
+
+### Short version
+
+text
+
+```text
+Flutter:  PageView(itemCount)        + PageController (no count)
+Compose:  HorizontalPager (no count) + PagerState(pageCount)
+```
+
+You still write the count once. It just goes inside `rememberPagerState(...)` and not on the pager itself.
 
 **Location:** `app/src/main/java/com/example/dukkanapp/features/onboarding/presentation/components/OnboardingScreenContent.kt`
 
@@ -754,6 +977,61 @@ private fun OnboardingScreenPreview() {
     }
 }
 ```
+
+1. Two separate events happen after a Next tap, and only the second one is ignored.
+   
+   ### Step by step
+
+   3 pages, you are on page 0, and you tap **Next**:
+   
+   text
+   
+   ```text
+   1. Tap Next
+      -> onEvent(OnNextClicked)
+      -> ViewModel: currentPage 0 -> 1        (the state DOES update here)
+   
+   2. The second LaunchedEffect sees state.currentPage = 1
+      -> pager is on 0, so animateScrollToPage(1)
+      -> the pager slides
+   
+   3. The slide finishes, pagerState.currentPage is now 1
+      -> snapshotFlow emits 1
+      -> onEvent(OnPageChanged(1))            <- the pager reports back
+   
+   4. ViewModel gets OnPageChanged(1)
+      -> safePage = 1
+      -> current.currentPage is already 1, so they are equal
+      -> return current, nothing changes      <- the check we are talking about
+   ```
+   
+   So the state updates in **step 1**, from the Next tap. In **step 4** the pager only reports something the ViewModel already knows, so there is nothing new to save.
+   
+   ### Why the pager reports back at all
+   
+   The `snapshotFlow` does not know who moved the pager. It watches `pagerState.currentPage` and sends an event whenever the number changes, whether the cause was a swipe or `animateScrollToPage`. So every Next tap produces two messages:
+   
+   text
+   
+   ```text
+   OnNextClicked     (from the button)
+   OnPageChanged(1)  (from the pager, later)
+   ```
+   
+   The first one changes the state. The second one is an echo, and the check is what ignores it.
+   
+   ### Swipe compared with Next
+   
+   text
+   
+   ```text
+   Swipe:  OnPageChanged(1)  ->  ViewModel 0 -> 1   (this one changes the state)
+   Next:   OnNextClicked     ->  ViewModel 0 -> 1   (this one changes the state)
+           OnPageChanged(1)  ->  ViewModel 1 -> 1   (echo, ignored)
+   ```
+   
+   Without the check, the echo would still work, but you would be asking for a state update with no change. One detail: `StateFlow` already ignores a new value that equals the old one, so the pages would not be redrawn again either way. The check makes that intent visible in the code.
+   
 
 ### 8.7 `OnboardingScreen.kt`
 
