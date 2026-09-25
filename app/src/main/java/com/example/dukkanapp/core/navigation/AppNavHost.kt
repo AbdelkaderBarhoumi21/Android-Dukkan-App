@@ -33,9 +33,8 @@ fun AppNavHost() {
         // 2. Onboarding Screen
         composable<AppRoutes.Onboarding> {
             OnboardingScreen(
-                onGetStarted = {
-                    // We will handle navigating to the Home screen here later
-                }
+                onGetStarted = {},
+                onLogin = {}
             )
         }
     }
