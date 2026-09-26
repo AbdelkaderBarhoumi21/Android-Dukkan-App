@@ -40,6 +40,9 @@ class OnboardingViewModel @Inject constructor(
                     else current.copy(currentPage = current.currentPage + 1)
                 }
             }
+
+            is OnboardingEvent.OnGetStartedClick -> {}
+            is OnboardingEvent.OnLoginClicked -> {}
         }
 
     }
