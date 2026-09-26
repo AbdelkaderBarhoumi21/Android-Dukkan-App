@@ -1,5 +1,8 @@
 package com.example.dukkanapp.features.onboarding.presentation.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,14 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
@@ -40,6 +46,7 @@ fun OnboardingScreenContent(
         initialPage = state.currentPage,
         pageCount = { state.pages.size }
     )
+    // Direction 1: pager -> ViewModel (user swipes)
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collectLatest { page ->
             onEvent(
@@ -48,6 +55,7 @@ fun OnboardingScreenContent(
         }
     }
 
+    // Direction 2: ViewModel -> pager (Next button tapped)
     LaunchedEffect(state.currentPage) {
         if (pagerState.currentPage != state.currentPage) {
             pagerState.animateScrollToPage(state.currentPage)
@@ -56,42 +64,86 @@ fun OnboardingScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .padding(bottom = AppDimens.spaceLg),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(color = MaterialTheme.colorScheme.onPrimary)
+
     ) {
-        AppHorizontalPager(
-            pagerState = pagerState,
+        // ZONE 1: illustration + dots, plain background, swipeable
+        Box(
+            modifier = Modifier.weight(1f)
+        ) {
+            AppHorizontalPager(
+                pagerState = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                OnboardingIllustration(page = state.pages[page])
+
+            }
+
+            AppPagerIndicator(
+                pageCount = state.pages.size,
+                currentPage = state.currentPage,
+                modifier = Modifier
+                    .align(
+                        Alignment.BottomCenter
+                    )
+                    .padding(bottom = AppDimens.spaceLg)
+            )
+        }
+
+        // ZONE 2: rounded card, fixed, NOT inside the pager
+
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
-        ) { page ->
-            OnboardingPageItem(page = state.pages[page])
-        }
-        Spacer(modifier = Modifier.height(AppDimens.spaceXl))
-        AppPagerIndicator(
-            pageCount = state.pages.size,
-            currentPage = state.currentPage
-        )
-        Spacer(modifier = Modifier.height(AppDimens.spaceXl))
+                .background(color = MaterialTheme.colorScheme.background)
+                .border(
+                    width = AppDimens.borderWidth,
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    shape = RoundedCornerShape(
+                        topStart = AppDimens.radiusLg,
+                        topEnd = AppDimens.radiusLg
+                    )
+                )
+                .navigationBarsPadding()
+                .padding(
+                    AppDimens.spaceLg
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(state.pages[state.currentPage].titleRes),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
 
-        AppPrimaryButton(
-            text = stringResource(state.primaryActionRes),
-            onClick = {
-                if (state.isLastPage) {
-                    onGetStarted()
-                } else {
-                    onEvent(OnboardingEvent.OnNextClicked)
+                )
+            Spacer(Modifier.height(AppDimens.spaceSm))
+            Text(
+                text = stringResource(state.pages[state.currentPage].subtitleRes),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+
+            )
+            Spacer(Modifier.height(AppDimens.spaceLg))
+            AppPrimaryButton(
+                text = stringResource(state.primaryActionRes),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    if (state.isLastPage) {
+                        onGetStarted()
+                    } else {
+                        onEvent(OnboardingEvent.OnNextClicked)
+                    }
                 }
-            },
-            modifier = Modifier.padding(horizontal = AppDimens.screenHorizontalPadding)
-        )
-        Spacer(modifier = Modifier.height(AppDimens.spaceMd))
+            )
+            Spacer(Modifier.height(AppDimens.spaceMd))
+            OnboardingAlreadyHaveAccount(
+                onActionClick = { onEvent(OnboardingEvent.OnLoginClicked) },
 
-        OnboardingAlreadyHaveAccount(
-            onActionClick = {}
-        )
+                )
+
+
+        }
 
     }
 }
