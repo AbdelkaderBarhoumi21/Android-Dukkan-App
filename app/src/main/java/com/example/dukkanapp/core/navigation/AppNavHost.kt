@@ -8,21 +8,21 @@ import com.example.dukkanapp.features.language.presentation.screens.LanguageSele
 import com.example.dukkanapp.features.onboarding.presentation.screens.OnboardingScreen
 
 @Composable
-fun AppNavHost() {
+fun AppNavHost(startDestination = AppRoute) {
     val navController = rememberNavController()
     // Start at Language Selection
     NavHost(
         navController = navController,
-        startDestination = AppRoutes.LanguageSelection
+        startDestination = startDestination
     ) {
         // 1. Language Selection Screen
-        composable<AppRoutes.LanguageSelection> {
+        composable<AppRoute.LanguageSelection> {
             LanguageSelectionScreen(
                 onBack = {},
                 onContinue = {
-                    navController.navigate(AppRoutes.Onboarding) {
+                    navController.navigate(AppRoute.Onboarding) {
                         // Navigate to Onboarding and remove LanguageSelection from the backstack
-                        popUpTo(AppRoutes.LanguageSelection) {
+                        popUpTo(AppRoute.LanguageSelection) {
                             inclusive = true
                         }
                     }
@@ -31,11 +31,27 @@ fun AppNavHost() {
         }
 
         // 2. Onboarding Screen
-        composable<AppRoutes.Onboarding> {
+        composable<AppRoute.Onboarding> {
             OnboardingScreen(
-                onGetStarted = {},
-                onLogin = {}
+                onGetStarted = {
+                    navController.navigate(AppRoute.Login) {
+                        popUpTo(AppRoute.Onboarding) { inclusive = true }
+                    }
+                },
+                onLogin = {
+                    navController.navigate(AppRoute.Login) {
+                        popUpTo(AppRoute.Onboarding) { inclusive = true }
+                    }
+                }
             )
+        }
+
+        composable<AppRoute.Login> {
+
+        }
+
+        composable<AppRoute.Home> {
+
         }
     }
 }
