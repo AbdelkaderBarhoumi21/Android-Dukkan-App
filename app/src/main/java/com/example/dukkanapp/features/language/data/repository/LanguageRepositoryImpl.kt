@@ -5,6 +5,7 @@ import com.example.dukkanapp.features.language.data.datasource.PlatformLocaleDat
 import com.example.dukkanapp.features.language.domain.model.LanguageModel
 import com.example.dukkanapp.features.language.domain.repository.LanguageRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -27,6 +28,10 @@ class LanguageRepositoryImpl @Inject constructor(
     override suspend fun selectLanguage(code: String) {
         localDataStore.saveLanguageCode(code = code)
         platformLocaleDataSource.setAppLocal(code)
+    }
+
+    override suspend fun hasSelectedLanguage(): Boolean {
+        return localDataStore.savedLanguageCode.first() != null
     }
 
 
