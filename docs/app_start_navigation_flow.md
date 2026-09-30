@@ -409,6 +409,29 @@ OnboardingScreenContent(
         }
     }
 )
+
+@Composable
+fun OnboardingScreen(
+    onGetStarted: () -> Unit,
+    onLogin: () -> Unit,
+    viewModel: OnboardingViewModel = hiltViewModel()
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    OnboardingScreenContent(
+        state = state,
+        onEvent = { event -> 
+            viewModel.onEvent(event)
+        },
+        onGetStarted = {
+            viewModel.onEvent(OnboardingEvent.OnGetStartedClick)
+            onGetStarted()
+        },
+        onLogin = {
+            viewModel.onEvent(OnboardingEvent.OnLoginClicked)
+            onLogin()
+        }
+    )
+}
 ```
 ```kotlin
 // Inside OnboardingViewModel

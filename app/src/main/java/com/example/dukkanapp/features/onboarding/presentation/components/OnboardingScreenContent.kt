@@ -138,9 +138,8 @@ fun OnboardingScreenContent(
             )
             Spacer(Modifier.height(AppDimens.spaceMd))
             OnboardingAlreadyHaveAccount(
-                onActionClick = { onEvent(OnboardingEvent.OnLoginClicked) },
-
-                )
+                onActionClick = onLogin,
+            )
 
 
         }
