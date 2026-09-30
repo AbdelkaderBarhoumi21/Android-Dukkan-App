@@ -1,156 +1,244 @@
-# App Startup & Navigation Flow Recommended Architecture
+# App Startup & Navigation Flow Implementation Guide
 
-## The "Stepper" vs. "Derived State" Approach
+Based on the optimized architecture, this document contains all the hand-written code you need to copy and paste to implement the derived-state navigation approach.
 
-You mentioned the idea of saving a stepper (e.g., `0 = Language`, `1 = Onboarding`, `2 = Login`). While this sounds intuitive at first, **it is generally not the recommended approach** in modern Android development.
-
-### Why not use a saved integer (stepper)?
-If you save an integer like `step = 2` when the user reaches the Login screen, what happens when the user successfully logs in and later **logs out**? You would have to remember to manually reset `step = 2`. If you add more steps later (e.g., Email Verification), managing this integer becomes a source of bugs.
-
-### The Recommended Way: Derived State from Independent Flags
-Instead of saving "which screen the user should be on", we save **independent facts** about the user:
-1. `hasSelectedLanguage` (Saved permanently in DataStore)
-2. `hasSeenOnboarding` (Saved permanently in DataStore)
-3. `isLoggedIn` (Derived from your Auth Token/Session, usually cleared on logout)
-
-When the app starts, we run a simple `if/else` check (our `ResolveStartDestinationUseCase`) to determine where they should go. This means if a user logs out, `isLoggedIn` becomes false, and the app naturally routes them to `Login` without us having to manually reverse a "stepper".
+Instead of saving a generic "stepper", we save independent facts (`hasSelectedLanguage`, `hasSeenOnboarding`) and derive `isLoggedIn` dynamically. A UseCase decides the start destination upon app launch, and the Android Splash Screen API hides the blank screen during this swift evaluation.
 
 ---
 
-## Complete Implementation Code
+## 1. Setup Splash Screen Dependency
 
-Below is the complete, well-detailed code required to implement this architecture.
+Add the AndroidX Splash Screen API to your app module's dependencies.
 
-### 1. DataStore Preferences (The Saved Facts)
-
-**`LanguagePreferences.kt`**
+**`app/build.gradle.kts`**
 ```kotlin
-package com.example.dukkanapp.core.data.local
+dependencies {
+    // ... other dependencies
+    implementation("androidx.core:core-splashscreen:1.0.1")
+}
+```
+*(Remember to Sync Project with Gradle Files)*
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
+---
+
+## 2. Type-Safe Routes
+
+Make sure your `AppRoute` has all the necessary screens.
+
+**`app/src/main/java/com/example/dukkanapp/core/navigation/AppRoute.kt`**
+```kotlin
+package com.example.dukkanapp.core.navigation
+
+import kotlinx.serialization.Serializable
+
+sealed interface AppRoute {
+    @Serializable
+    data object LanguageSelection : AppRoute
+
+    @Serializable
+    data object Onboarding : AppRoute
+
+    @Serializable
+    data object Login : AppRoute
+
+    @Serializable
+    data object Home : AppRoute
+}
+```
+
+---
+
+## 3. Language Feature Updates
+
+Extend your existing language repository to expose whether a language was ever explicitly selected.
+
+**`app/src/main/java/com/example/dukkanapp/features/language/domain/repository/LanguageRepository.kt`**
+```kotlin
+package com.example.dukkanapp.features.language.domain.repository
+
+import com.example.dukkanapp.features.language.domain.model.LanguageModel
+import kotlinx.coroutines.flow.Flow
+
+interface LanguageRepository {
+    fun getSupportedLanguages(): List<LanguageModel>
+    val selectedLanguageCode: Flow<String>
+    suspend fun selectLanguage(code: String)
+    
+    // NEW: Check if the user has explicitly selected a language
+    suspend fun hasSelectedLanguage(): Boolean
+}
+```
+
+**`app/src/main/java/com/example/dukkanapp/features/language/data/repository/LanguageRepositoryImpl.kt`**
+```kotlin
+package com.example.dukkanapp.features.language.data.repository
+
+import com.example.dukkanapp.features.language.data.datasource.LanguagePreferenceLocalDataSource
+import com.example.dukkanapp.features.language.data.datasource.PlatformLocaleDataSource
+import com.example.dukkanapp.features.language.domain.model.LanguageModel
+import com.example.dukkanapp.features.language.domain.repository.LanguageRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class LanguagePreferences @Inject constructor(
-    private val dataStore: DataStore<Preferences>,
-) {
-    private val SELECTED_LANGUAGE = stringPreferencesKey("selected_language")
+class LanguageRepositoryImpl @Inject constructor(
+    private val localDataStore: LanguagePreferenceLocalDataSource,
+    private val platformLocaleDataSource: PlatformLocaleDataSource
+) : LanguageRepository {
+    override fun getSupportedLanguages(): List<LanguageModel> = listOf(
+        LanguageModel("ar", "العربية"),
+        LanguageModel("en", "English"),
+        LanguageModel("fr", "Français"),
+    )
 
-    val hasSelectedLanguage: Flow<Boolean> =
-        dataStore.data.map { it[SELECTED_LANGUAGE] != null }
+    override val selectedLanguageCode: Flow<String> =
+        localDataStore.savedLanguageCode.map { saved ->
+            saved ?: platformLocaleDataSource.currentLocaleTag() ?: "en"
+        }
 
-    suspend fun hasSelectedLanguageOnce(): Boolean = hasSelectedLanguage.first()
+    override suspend fun selectLanguage(code: String) {
+        localDataStore.saveLanguageCode(code = code)
+        platformLocaleDataSource.setAppLocal(code)
+    }
 
-    suspend fun setLanguage(code: String) {
-        dataStore.edit { it[SELECTED_LANGUAGE] = code }
+    // NEW: Implements the check by looking directly at the raw saved value
+    override suspend fun hasSelectedLanguage(): Boolean {
+        return localDataStore.savedLanguageCode.first() != null
     }
 }
 ```
 
-**`OnboardingPreferences.kt`**
+---
+
+## 4. Onboarding Feature (New Repository)
+
+Create a repository to track whether the user has completed onboarding.
+
+**`app/src/main/java/com/example/dukkanapp/features/onboarding/data/datasource/OnboardingPreferenceLocalDataSource.kt`**
 ```kotlin
-package com.example.dukkanapp.core.data.local
+package com.example.dukkanapp.features.onboarding.data.datasource
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class OnboardingPreferences @Inject constructor(
-    private val dataStore: DataStore<Preferences>,
+class OnboardingPreferenceLocalDataSource @Inject constructor(
+    private val dataStore: DataStore<Preferences>
 ) {
-    private val HAS_SEEN_ONBOARDING = booleanPreferencesKey("has_seen_onboarding")
+    private val hasSeenOnboardingKey = booleanPreferencesKey("has_seen_onboarding")
 
-    val hasSeenOnboarding: Flow<Boolean> =
-        dataStore.data.map { it[HAS_SEEN_ONBOARDING] ?: false }
-
-    suspend fun hasSeenOnboardingOnce(): Boolean = hasSeenOnboarding.first()
+    val hasSeenOnboarding: Flow<Boolean> = dataStore.data.map { prefs -> 
+        prefs[hasSeenOnboardingKey] ?: false 
+    }
 
     suspend fun setOnboardingCompleted() {
-        dataStore.edit { it[HAS_SEEN_ONBOARDING] = true }
+        dataStore.edit { it[hasSeenOnboardingKey] = true }
     }
 }
 ```
 
-### 2. Auth State (The Dynamic Fact)
-
-**`AuthRepository.kt`**
+**`app/src/main/java/com/example/dukkanapp/features/onboarding/domain/repository/OnboardingRepository.kt`**
 ```kotlin
-package com.example.dukkanapp.core.domain.auth
+package com.example.dukkanapp.features.onboarding.domain.repository
 
-import kotlinx.coroutines.flow.Flow
+interface OnboardingRepository {
+    suspend fun hasSeenOnboarding(): Boolean
+    suspend fun setOnboardingCompleted()
+}
+```
+
+**`app/src/main/java/com/example/dukkanapp/features/onboarding/data/repository/OnboardingRepositoryImpl.kt`**
+```kotlin
+package com.example.dukkanapp.features.onboarding.data.repository
+
+import com.example.dukkanapp.features.onboarding.data.datasource.OnboardingPreferenceLocalDataSource
+import com.example.dukkanapp.features.onboarding.domain.repository.OnboardingRepository
+import kotlinx.coroutines.flow.first
+import javax.inject.Inject
+
+class OnboardingRepositoryImpl @Inject constructor(
+    private val localDataSource: OnboardingPreferenceLocalDataSource
+) : OnboardingRepository {
+
+    override suspend fun hasSeenOnboarding(): Boolean {
+        return localDataSource.hasSeenOnboarding.first()
+    }
+
+    override suspend fun setOnboardingCompleted() {
+        localDataSource.setOnboardingCompleted()
+    }
+}
+```
+
+*(Don't forget to bind `OnboardingRepositoryImpl` to `OnboardingRepository` in your Hilt DI module!)*
+
+---
+
+## 5. Auth Feature Placeholder
+
+If you don't have an Auth module yet, create a simple interface that you can implement later.
+
+**`app/src/main/java/com/example/dukkanapp/features/auth/domain/repository/AuthRepository.kt`**
+```kotlin
+package com.example.dukkanapp.features.auth.domain.repository
 
 interface AuthRepository {
-    val isLoggedIn: Flow<Boolean>
-    
-    // Reads the current state once (useful for the splash screen decision)
     suspend fun isLoggedInOnce(): Boolean
 }
 ```
+*(For now, you can mock the implementation to always return `false` until login is built).*
 
-### 3. Navigation Decision Logic
+---
 
-**`StartDestination.kt`**
+## 6. App Startup Orchestration
+
+This logic lives in the `app` module (e.g. `com.example.dukkanapp.startup`) because it needs access to multiple feature modules.
+
+**`app/src/main/java/com/example/dukkanapp/startup/ResolveStartDestinationUseCase.kt`**
 ```kotlin
-package com.example.dukkanapp.core.navigation
+package com.example.dukkanapp.startup
 
-enum class StartDestination(val route: String) {
-    LANGUAGE_SELECTION("language_selection"),
-    ONBOARDING("onboarding"),
-    LOGIN("login"),
-    HOME("home")
-}
-```
-
-**`ResolveStartDestinationUseCase.kt`**
-This is the brain of the operation. It checks the flags in order.
-```kotlin
-package com.example.dukkanapp.core.domain.usecases
-
-import com.example.dukkanapp.core.data.local.LanguagePreferences
-import com.example.dukkanapp.core.data.local.OnboardingPreferences
-import com.example.dukkanapp.core.domain.auth.AuthRepository
-import com.example.dukkanapp.core.navigation.StartDestination
+import com.example.dukkanapp.core.navigation.AppRoute
+import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
+import com.example.dukkanapp.features.language.domain.repository.LanguageRepository
+import com.example.dukkanapp.features.onboarding.domain.repository.OnboardingRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 class ResolveStartDestinationUseCase @Inject constructor(
-    private val languagePreferences: LanguagePreferences,
-    private val onboardingPreferences: OnboardingPreferences,
+    private val languageRepository: LanguageRepository,
+    private val onboardingRepository: OnboardingRepository,
     private val authRepository: AuthRepository,
 ) {
-    suspend operator fun invoke(): StartDestination {
-        val hasSelectedLanguage = languagePreferences.hasSelectedLanguageOnce()
-        val hasSeenOnboarding = onboardingPreferences.hasSeenOnboardingOnce()
-        val isLoggedIn = authRepository.isLoggedInOnce()
+    suspend operator fun invoke(): AppRoute = coroutineScope {
+        // Run reads concurrently for maximum performance during app startup
+        val hasLanguageDeferred = async { languageRepository.hasSelectedLanguage() }
+        val hasOnboardingDeferred = async { onboardingRepository.hasSeenOnboarding() }
+        val isLoggedInDeferred = async { authRepository.isLoggedInOnce() }
 
-        return when {
-            !hasSelectedLanguage -> StartDestination.LANGUAGE_SELECTION
-            !hasSeenOnboarding -> StartDestination.ONBOARDING
-            !isLoggedIn -> StartDestination.LOGIN
-            else -> StartDestination.HOME
+        when {
+            !hasLanguageDeferred.await() -> AppRoute.LanguageSelection
+            !hasOnboardingDeferred.await() -> AppRoute.Onboarding
+            !isLoggedInDeferred.await() -> AppRoute.Login
+            else -> AppRoute.Home
         }
     }
 }
 ```
 
-### 4. App-Level ViewModel
-
-**`AppStartViewModel.kt`**
+**`app/src/main/java/com/example/dukkanapp/startup/AppStartViewModel.kt`**
 ```kotlin
-package com.example.dukkanapp.core.navigation
+package com.example.dukkanapp.startup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dukkanapp.core.domain.usecases.ResolveStartDestinationUseCase
+import com.example.dukkanapp.core.navigation.AppRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -164,8 +252,8 @@ class AppStartViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Null means we are still loading/deciding
-    private val _startDestination = MutableStateFlow<StartDestination?>(null)
-    val startDestination: StateFlow<StartDestination?> = _startDestination.asStateFlow()
+    private val _startDestination = MutableStateFlow<AppRoute?>(null)
+    val startDestination: StateFlow<AppRoute?> = _startDestination.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -175,187 +263,145 @@ class AppStartViewModel @Inject constructor(
 }
 ```
 
-### 5. Navigation Host
+---
 
-**`AppNavHost.kt`**
+## 7. Main Activity & Splash Screen
+
+Use the official Splash Screen API to hold the splash screen until our destination is resolved.
+
+**`app/src/main/java/com/example/dukkanapp/MainActivity.kt`**
 ```kotlin
-package com.example.dukkanapp.core.navigation
+package com.example.dukkanapp
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.dukkanapp.core.config.theme.AppTheme
+import com.example.dukkanapp.core.navigation.AppNavHost
+import com.example.dukkanapp.startup.AppStartViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-@Composable
-fun AppNavHost(
-    appStartViewModel: AppStartViewModel = hiltViewModel()
-) {
-    val startDestination by appStartViewModel.startDestination.collectAsState()
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
 
-    // Show a splash screen or loading indicator while we read DataStore
-    if (startDestination == null) {
-        // SplashScreen() 
-        return
-    }
+    // Get the ViewModel at the activity level to check the destination
+    private val appStartViewModel: AppStartViewModel by viewModels()
 
-    val navController = rememberNavController()
-
-    NavHost(
-        navController = navController, 
-        startDestination = startDestination!!.route
-    ) {
-        composable(StartDestination.LANGUAGE_SELECTION.route) { 
-            // Pass navController to LanguageSelectionScreen so it can navigate and save language
-            // LanguageSelectionScreen(navController) 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        super.onCreate(savedInstanceState)
+        
+        // Keep the splash screen on-screen until the start destination is decided
+        splashScreen.setKeepOnScreenCondition { 
+            appStartViewModel.startDestination.value == null 
         }
-        composable(StartDestination.ONBOARDING.route) { 
-            OnboardingScreen(navController) 
-        }
-        composable(StartDestination.LOGIN.route) { 
-            // LoginScreen(navController) 
-        }
-        composable(StartDestination.HOME.route) { 
-            // HomeScreen(navController) 
-        }
-    }
-}
-```
 
-### 6. Onboarding Feature Updates
-
-**`OnboardingEvent.kt`**
-```kotlin
-package com.example.dukkanapp.features.onboarding.presentation.logic
-
-sealed interface OnboardingEvent {
-    data class OnPageChanged(val page: Int) : OnboardingEvent
-    object OnNextClicked : OnboardingEvent
-    object OnGetStartedClicked : OnboardingEvent
-    object OnLoginClicked : OnboardingEvent
-}
-```
-
-**`OnboardingViewModel.kt`**
-```kotlin
-package com.example.dukkanapp.features.onboarding.presentation.logic
-
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.dukkanapp.core.data.local.OnboardingPreferences
-import com.example.dukkanapp.features.onboarding.domain.usecases.GetOnboardingPagesUseCase
-import com.example.dukkanapp.features.onboarding.presentation.model.toUiModel
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-
-@HiltViewModel
-class OnboardingViewModel @Inject constructor(
-    private val getOnboardingPages: GetOnboardingPagesUseCase,
-    private val onboardingPreferences: OnboardingPreferences,
-) : ViewModel() {
-
-    private val _state = MutableStateFlow(
-        OnboardingUiState(
-            pages = getOnboardingPages().map { it.toUiModel() },
-        )
-    )
-
-    val state: StateFlow<OnboardingUiState> = _state.asStateFlow()
-
-    fun onEvent(event: OnboardingEvent) {
-        when (event) {
-            is OnboardingEvent.OnPageChanged -> {
-                _state.update { current ->
-                    val safePage = event.page.coerceIn(0, current.pages.lastIndex)
-                    if (current.currentPage == safePage) current
-                    else current.copy(currentPage = safePage)
-                }
-            }
-
-            is OnboardingEvent.OnNextClicked -> {
-                _state.update { current ->
-                    if (current.isLastPage) current
-                    else current.copy(currentPage = current.currentPage + 1)
-                }
-            }
-
-            OnboardingEvent.OnGetStartedClicked,
-            OnboardingEvent.OnLoginClicked -> {
-                // Save that the user has completed onboarding!
-                viewModelScope.launch {
-                    onboardingPreferences.setOnboardingCompleted()
+        enableEdgeToEdge()
+        setContent {
+            AppTheme {
+                val destination = appStartViewModel.startDestination.value
+                // Once it's not null, we render the NavHost
+                if (destination != null) {
+                    AppNavHost(startDestination = destination)
                 }
             }
         }
     }
-}
-```
-
-**`OnboardingScreen.kt`**
-```kotlin
-package com.example.dukkanapp.features.onboarding.presentation
-
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.example.dukkanapp.core.navigation.StartDestination
-import com.example.dukkanapp.features.onboarding.presentation.components.OnboardingScreenContent
-import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingEvent
-import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingViewModel
-
-@Composable
-fun OnboardingScreen(
-    navController: NavController,
-    viewModel: OnboardingViewModel = hiltViewModel(),
-) {
-    val state by viewModel.state.collectAsState()
-
-    OnboardingScreenContent(
-        state = state,
-        onEvent = { event ->
-            when (event) {
-                OnboardingEvent.OnGetStartedClicked -> {
-                    viewModel.onEvent(event) // This saves the preference
-                    // Go to Login, remove Onboarding from backstack
-                    navController.navigate(StartDestination.LOGIN.route) {
-                        popUpTo(StartDestination.ONBOARDING.route) { inclusive = true }
-                    }
-                }
-                OnboardingEvent.OnLoginClicked -> {
-                    viewModel.onEvent(event) // This saves the preference
-                    // Go to Login, remove Onboarding from backstack
-                    navController.navigate(StartDestination.LOGIN.route) {
-                        popUpTo(StartDestination.ONBOARDING.route) { inclusive = true }
-                    }
-                }
-                else -> viewModel.onEvent(event) // Handle normal page changes
-            }
-        },
-    )
 }
 ```
 
 ---
 
-### Summary of How This Works
-1. When the app is fresh, it hits the `ResolveStartDestinationUseCase`.
-2. It sees `hasSelectedLanguage` is `false`. It goes to `LANGUAGE_SELECTION`.
-3. User selects language, you save it via `LanguagePreferences`. Navigate to `ONBOARDING`.
-4. User clicks "Get Started". `OnboardingViewModel` calls `setOnboardingCompleted()`. Navigates to `LOGIN`.
-5. User closes the app and reopens.
-6. `ResolveStartDestinationUseCase` runs again.
-   - `hasSelectedLanguage` -> `true`
-   - `hasSeenOnboarding` -> `true`
-   - `isLoggedIn` -> `false`
-7. It goes directly to `LOGIN`.
+## 8. App Navigation Host
 
-This is standard, completely robust, and prevents you from ever dealing with a desynced "stepper" variable.
+Update your `AppNavHost` to accept the calculated `startDestination`.
+
+**`app/src/main/java/com/example/dukkanapp/core/navigation/AppNavHost.kt`**
+```kotlin
+package com.example.dukkanapp.core.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.dukkanapp.features.language.presentation.screens.LanguageSelectionScreen
+import com.example.dukkanapp.features.onboarding.presentation.screens.OnboardingScreen
+
+@Composable
+fun AppNavHost(startDestination: AppRoute) {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController, 
+        startDestination = startDestination
+    ) {
+        composable<AppRoute.LanguageSelection> {
+            LanguageSelectionScreen(
+                onBack = { /* handle back */ },
+                onContinue = {
+                    navController.navigate(AppRoute.Onboarding) {
+                        popUpTo(AppRoute.LanguageSelection) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable<AppRoute.Onboarding> {
+            OnboardingScreen(
+                onFinished = {
+                    navController.navigate(AppRoute.Login) {
+                        popUpTo(AppRoute.Onboarding) { inclusive = true }
+                    }
+                }
+            )
+        }
+        
+        composable<AppRoute.Login> {
+            // LoginScreen()
+        }
+
+        composable<AppRoute.Home> {
+            // HomeScreen()
+        }
+    }
+}
+```
+
+---
+
+## 9. Onboarding Screen Cleanup
+
+Update your `OnboardingScreen.kt` to handle the consolidated routing efficiently.
+
+**`app/src/main/java/com/example/dukkanapp/features/onboarding/presentation/screens/OnboardingScreen.kt`**
+*(Your exact file path might vary depending on how you structured it. Update the events to call `onFinished`)*
+
+```kotlin
+// Inside your OnboardingScreen composable...
+OnboardingScreenContent(
+    state = state,
+    onEvent = { event ->
+        when (event) {
+            // Merge both terminal events into a single branch
+            OnboardingEvent.OnGetStartedClicked,
+            OnboardingEvent.OnLoginClicked -> {
+                viewModel.onEvent(event) // Make sure ViewModel calls setOnboardingCompleted()
+                onFinished() // Bubbles up to AppNavHost to navigate
+            }
+            else -> viewModel.onEvent(event) // Handle normal page changes
+        }
+    }
+)
+```
+```kotlin
+// Inside OnboardingViewModel
+OnboardingEvent.OnGetStartedClicked,
+OnboardingEvent.OnLoginClicked -> {
+    viewModelScope.launch {
+        onboardingRepository.setOnboardingCompleted()
+    }
+}
+```
