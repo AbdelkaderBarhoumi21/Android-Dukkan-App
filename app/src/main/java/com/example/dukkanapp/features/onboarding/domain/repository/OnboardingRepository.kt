@@ -4,4 +4,6 @@ import com.example.dukkanapp.features.onboarding.domain.model.OnboardingPageMode
 
 interface OnboardingRepository {
     fun getPages(): List<OnboardingPageModel>
+    suspend fun hasSeenOnboarding(): Boolean
+    suspend fun setOnboardingCompleted()
 }
