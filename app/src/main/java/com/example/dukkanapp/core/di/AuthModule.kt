@@ -1,0 +1,18 @@
+package com.example.dukkanapp.core.di
+
+import com.example.dukkanapp.features.auth.data.repository.AuthRepositoryImpl
+import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class AuthModule {
+
+    @Binds
+    abstract fun bindAuthRepository(
+        authRepositoryImpl: AuthRepositoryImpl
+    ): AuthRepository
+}
