@@ -8,13 +8,24 @@ Instead of saving a generic "stepper", we save independent facts (`hasSelectedLa
 
 ## 1. Setup Splash Screen Dependency
 
-Add the AndroidX Splash Screen API to your app module's dependencies.
+Add the AndroidX Splash Screen API to your `libs.versions.toml` and app module's dependencies.
+
+**`gradle/libs.versions.toml`**
+```toml
+[versions]
+# ... existing versions
+coreSplashscreen = "1.0.1"
+
+[libraries]
+# ... existing libraries
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
+```
 
 **`app/build.gradle.kts`**
 ```kotlin
 dependencies {
     // ... other dependencies
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation(libs.androidx.core.splashscreen)
 }
 ```
 *(Remember to Sync Project with Gradle Files)*
