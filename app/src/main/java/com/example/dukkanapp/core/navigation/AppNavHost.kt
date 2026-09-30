@@ -8,7 +8,7 @@ import com.example.dukkanapp.features.language.presentation.screens.LanguageSele
 import com.example.dukkanapp.features.onboarding.presentation.screens.OnboardingScreen
 
 @Composable
-fun AppNavHost(startDestination = AppRoute) {
+fun AppNavHost(startDestination: AppRoute) {
     val navController = rememberNavController()
     // Start at Language Selection
     NavHost(
