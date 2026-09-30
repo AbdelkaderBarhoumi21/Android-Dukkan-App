@@ -127,6 +127,7 @@ class LanguageRepositoryImpl @Inject constructor(
 Create a repository to track whether the user has completed onboarding.
 
 **`app/src/main/java/com/example/dukkanapp/features/onboarding/data/datasource/OnboardingPreferenceLocalDataSource.kt`**
+
 ```kotlin
 package com.example.dukkanapp.features.onboarding.data.datasource
 
@@ -211,6 +212,7 @@ interface AuthRepository {
 This logic lives in the `app` module (e.g. `com.example.dukkanapp.startup`) because it needs access to multiple feature modules.
 
 **`app/src/main/java/com/example/dukkanapp/startup/ResolveStartDestinationUseCase.kt`**
+
 ```kotlin
 package com.example.dukkanapp.startup
 
@@ -218,7 +220,7 @@ import com.example.dukkanapp.core.navigation.AppRoute
 import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
 import com.example.dukkanapp.features.language.domain.repository.LanguageRepository
 import com.example.dukkanapp.features.onboarding.domain.repository.OnboardingRepository
-import kotlinx.coroutines.async
+    import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
@@ -244,6 +246,7 @@ class ResolveStartDestinationUseCase @Inject constructor(
 ```
 
 **`app/src/main/java/com/example/dukkanapp/startup/AppStartViewModel.kt`**
+
 ```kotlin
 package com.example.dukkanapp.startup
 

@@ -1,7 +1,9 @@
 package com.example.dukkanapp.features.onboarding.presentation.logic
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.dukkanapp.features.onboarding.domain.usecases.GetOnboardingPagesUseCase
+import com.example.dukkanapp.features.onboarding.domain.usecases.SetOnboardingCompletedUseCase
 import com.example.dukkanapp.features.onboarding.presentation.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -9,10 +11,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
-    private val getOnboardingPages: GetOnboardingPagesUseCase
+    private val getOnboardingPages: GetOnboardingPagesUseCase,
+    private val setOnboardingCompletedUseCase: SetOnboardingCompletedUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -41,8 +45,10 @@ class OnboardingViewModel @Inject constructor(
                 }
             }
 
-            is OnboardingEvent.OnGetStartedClick -> {}
-            is OnboardingEvent.OnLoginClicked -> {}
+            is OnboardingEvent.OnGetStartedClick, is OnboardingEvent.OnLoginClicked -> {
+                viewModelScope.launch { setOnboardingCompletedUseCase() }
+            }
+
         }
 
     }
