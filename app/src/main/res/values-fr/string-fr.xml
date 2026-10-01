@@ -48,4 +48,6 @@
     <string name="login_error_password_short">Le mot de passe doit contenir au moins %1$d caractères</string>
     <string name="login_error_wrong_credentials">E-mail ou mot de passe incorrect</string>
     <string name="login_error_network">Pas de connexion internet. Veuillez réessayer.</string>
+    <string name="or_divider">OU</string>
+
 </resources>

@@ -48,4 +48,5 @@
     <string name="login_error_password_short">يجب ألا تقل كلمة المرور عن %1$d أحرف</string>
     <string name="login_error_wrong_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة</string>
     <string name="login_error_network">لا يوجد اتصال بالإنترنت. يرجى المحاولة مرة أخرى.</string>
+    <string name="or_divider">أو</string>
 </resources>
