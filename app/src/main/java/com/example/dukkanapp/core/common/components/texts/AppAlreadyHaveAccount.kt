@@ -1,4 +1,4 @@
-package com.example.dukkanapp.features.onboarding.presentation.components
+package com.example.dukkanapp.core.common.components.texts
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,7 +18,7 @@ import com.example.dukkanapp.R
 import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
-fun OnboardingAlreadyHaveAccount(
+fun AppAlreadyHaveAccount(
     onActionClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -44,7 +44,11 @@ fun OnboardingAlreadyHaveAccount(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 )
-                .padding(start = AppDimens.space2Xs, top = AppDimens.space2Xs, bottom = AppDimens.space2Xs)
+                .padding(
+                    start = AppDimens.space2Xs,
+                    top = AppDimens.space2Xs,
+                    bottom = AppDimens.space2Xs
+                )
         )
     }
 }
