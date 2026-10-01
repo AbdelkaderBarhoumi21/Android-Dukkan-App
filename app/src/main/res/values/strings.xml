@@ -19,8 +19,8 @@
     <string name="action_log_in">Log In</string>
     <string name="cd_pager_indicator">Page %1$d of %2$d</string>
 
-    <string name="login_title">Welcome back</string>
-    <string name="login_subtitle">Log in to continue shopping</string>
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Please sign in to access your account and resume shopping</string>
 
     <string name="login_email_label">Email address</string>
     <string name="login_email_placeholder">name@example.com</string>

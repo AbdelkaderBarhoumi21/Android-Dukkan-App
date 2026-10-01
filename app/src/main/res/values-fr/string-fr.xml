@@ -19,8 +19,8 @@
     <string name="action_log_in">Se connecter</string>
     <string name="cd_pager_indicator">Page %1$d sur %2$d</string>
 
-    <string name="login_title">Bon retour parmi nous</string>
-    <string name="login_subtitle">Connectez-vous pour continuer vos achats</string>
+    <string name="login_title">Content de vous revoir</string>
+    <string name="login_subtitle">Veuillez vous connecter pour accéder à votre compte et reprendre vos achats</string>
 
     <string name="login_email_label">Adresse e-mail</string>
     <string name="login_email_placeholder">nom@exemple.com</string>

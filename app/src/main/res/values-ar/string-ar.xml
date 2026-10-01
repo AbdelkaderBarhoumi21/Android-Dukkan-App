@@ -19,8 +19,8 @@
     <string name="action_log_in">تسجيل الدخول</string>
     <string name="cd_pager_indicator">الصفحة %1$d من %2$d</string>
 
-    <string name="login_title">مرحباً بعودتك</string>
-    <string name="login_subtitle">سجّل الدخول لمتابعة التسوق</string>
+    <string name="login_title">مرحباً بك مجدداً</string>
+    <string name="login_subtitle">يرجى تسجيل الدخول للوصول إلى حسابك ومتابعة التسوق</string>
 
     <string name="login_email_label">البريد الإلكتروني</string>
     <string name="login_email_placeholder">name@example.com</string>
