@@ -34,7 +34,9 @@
     <string name="login_loading">جارٍ تسجيل الدخول…</string>
 
     <string name="login_or_continue_with">أو تابع باستخدام</string>
-    <string name="login_with_google">المتابعة باستخدام Google</string>
+    <string name="sign_in_with_google">تسجيل الدخول باستخدام Google</string>
+    <string name="continue_with_apple">المتابعة باستخدام Apple</string>
+    <string name="continue_with_email">المتابعة باستخدام البريد الإلكتروني</string>
     <string name="login_as_guest">المتابعة كزائر</string>
 
     <string name="login_no_account">ليس لديك حساب؟</string>

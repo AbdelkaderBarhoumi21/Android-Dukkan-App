@@ -34,7 +34,9 @@
     <string name="login_loading">Connexion en cours…</string>
 
     <string name="login_or_continue_with">Ou continuer avec</string>
-    <string name="login_with_google">Continuer avec Google</string>
+    <string name="sign_in_with_google">Se connecter avec Google</string>
+    <string name="continue_with_apple">Continuer avec Apple</string>
+    <string name="continue_with_email">Continuer avec l\'e-mail</string>
     <string name="login_as_guest">Continuer en tant qu\'invité</string>
 
     <string name="login_no_account">Vous n\'avez pas de compte ?</string>

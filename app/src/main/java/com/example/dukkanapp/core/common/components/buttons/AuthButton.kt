@@ -24,8 +24,8 @@ fun AuthButton(
     text: String,
     icon: Painter,
     onClick: () -> Unit,
-    contentColor: Color,
-    containerColor: Color,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    containerColor: Color = MaterialTheme.colorScheme.surface,
     borderColor: Color? = null,
     iconColor: Color = Color.Unspecified, // don't apply any tint the icon is drawed with the original color(Google logo)
 
@@ -51,7 +51,7 @@ fun AuthButton(
         Spacer(Modifier.width(AppDimens.spaceSm))
         Text(
             text = text,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelLarge,
         )
     }
 }

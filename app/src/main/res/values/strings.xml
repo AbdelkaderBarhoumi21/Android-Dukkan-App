@@ -34,7 +34,9 @@
     <string name="login_loading">Logging in…</string>
 
     <string name="login_or_continue_with">Or continue with</string>
-    <string name="login_with_google">Continue with Google</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="continue_with_apple">Continue with Apple</string>
+    <string name="continue_with_email">Continue with Email</string>
     <string name="login_as_guest">Continue as guest</string>
 
     <string name="login_no_account">Don\'t have an account?</string>

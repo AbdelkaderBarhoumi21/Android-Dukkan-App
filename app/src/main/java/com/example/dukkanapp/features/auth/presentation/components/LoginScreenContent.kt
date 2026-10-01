@@ -15,14 +15,17 @@ import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
 fun LoginScreenContent(
-
-
+    onGoogleClick: () -> Unit,
+    onAppleClick: () -> Unit,
+    onEmailClick: () -> Unit,
+    onAlreadyHaveAccountClick: () -> Unit
 ) {
     AppScaffold { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .padding(horizontal = AppDimens.size2Xs)
         ) {
             LoginBrandHeader(
                 logo = painterResource(R.drawable.ic_app_logo),
@@ -30,6 +33,12 @@ fun LoginScreenContent(
                 subTitle = stringResource(R.string.login_subtitle)
             )
             Spacer(Modifier.height(AppDimens.size2Xl))
+            LoginAuthOptions(
+                onGoogleClick = onGoogleClick,
+                onAppleClick = onAppleClick,
+                onEmailClick = onEmailClick,
+                onAlreadyHaveAccountClick = onAlreadyHaveAccountClick
+            )
         }
 
     }

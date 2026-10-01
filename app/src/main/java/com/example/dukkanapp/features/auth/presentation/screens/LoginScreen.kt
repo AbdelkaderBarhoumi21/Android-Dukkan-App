@@ -5,5 +5,10 @@ import com.example.dukkanapp.features.auth.presentation.components.LoginScreenCo
 
 @Composable
 fun LoginScreen() {
-    LoginScreenContent()
+    LoginScreenContent(
+        onGoogleClick = { /*TODO*/ },
+        onAppleClick = { /*TODO*/ },
+        onEmailClick = { /*TODO*/ },
+        onAlreadyHaveAccountClick = { /*TODO*/ }
+    )
 }
