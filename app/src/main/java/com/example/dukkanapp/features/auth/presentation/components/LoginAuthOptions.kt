@@ -19,7 +19,6 @@ fun LoginAuthOptions(
     onGoogleClick: () -> Unit,
     onAppleClick: () -> Unit,
     onEmailClick: () -> Unit,
-    onAlreadyHaveAccountClick: () -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
