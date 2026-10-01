@@ -18,4 +18,32 @@
     <string name="onboarding_already_have_account">Already have an account?</string>
     <string name="action_log_in">Log In</string>
     <string name="cd_pager_indicator">Page %1$d of %2$d</string>
+
+    <string name="login_title">Welcome back</string>
+    <string name="login_subtitle">Log in to continue shopping</string>
+
+    <string name="login_email_label">Email address</string>
+    <string name="login_email_placeholder">name@example.com</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_show_password">Show password</string>
+    <string name="login_hide_password">Hide password</string>
+
+    <string name="login_remember_me">Remember me</string>
+    <string name="login_forgot_password">Forgot password?</string>
+    <string name="login_button">Log in</string>
+    <string name="login_loading">Logging in…</string>
+
+    <string name="login_or_continue_with">Or continue with</string>
+    <string name="login_with_google">Continue with Google</string>
+    <string name="login_as_guest">Continue as guest</string>
+
+    <string name="login_no_account">Don\'t have an account?</string>
+    <string name="login_sign_up">Sign up</string>
+
+    <string name="login_error_email_empty">Please enter your email</string>
+    <string name="login_error_email_invalid">Enter a valid email address</string>
+    <string name="login_error_password_empty">Please enter your password</string>
+    <string name="login_error_password_short">Password must be at least %1$d characters</string>
+    <string name="login_error_wrong_credentials">Incorrect email or password</string>
+    <string name="login_error_network">No internet connection. Please try again.</string>
 </resources>

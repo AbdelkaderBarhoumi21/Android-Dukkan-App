@@ -18,4 +18,32 @@
     <string name="onboarding_already_have_account">Vous avez déjà un compte ?</string>
     <string name="action_log_in">Se connecter</string>
     <string name="cd_pager_indicator">Page %1$d sur %2$d</string>
+
+    <string name="login_title">Bon retour parmi nous</string>
+    <string name="login_subtitle">Connectez-vous pour continuer vos achats</string>
+
+    <string name="login_email_label">Adresse e-mail</string>
+    <string name="login_email_placeholder">nom@exemple.com</string>
+    <string name="login_password_label">Mot de passe</string>
+    <string name="login_show_password">Afficher le mot de passe</string>
+    <string name="login_hide_password">Masquer le mot de passe</string>
+
+    <string name="login_remember_me">Se souvenir de moi</string>
+    <string name="login_forgot_password">Mot de passe oublié ?</string>
+    <string name="login_button">Se connecter</string>
+    <string name="login_loading">Connexion en cours…</string>
+
+    <string name="login_or_continue_with">Ou continuer avec</string>
+    <string name="login_with_google">Continuer avec Google</string>
+    <string name="login_as_guest">Continuer en tant qu\'invité</string>
+
+    <string name="login_no_account">Vous n\'avez pas de compte ?</string>
+    <string name="login_sign_up">Créer un compte</string>
+
+    <string name="login_error_email_empty">Veuillez saisir votre adresse e-mail</string>
+    <string name="login_error_email_invalid">Saisissez une adresse e-mail valide</string>
+    <string name="login_error_password_empty">Veuillez saisir votre mot de passe</string>
+    <string name="login_error_password_short">Le mot de passe doit contenir au moins %1$d caractères</string>
+    <string name="login_error_wrong_credentials">E-mail ou mot de passe incorrect</string>
+    <string name="login_error_network">Pas de connexion internet. Veuillez réessayer.</string>
 </resources>

@@ -18,4 +18,32 @@
     <string name="onboarding_already_have_account">لديك حساب بالفعل؟</string>
     <string name="action_log_in">تسجيل الدخول</string>
     <string name="cd_pager_indicator">الصفحة %1$d من %2$d</string>
+
+    <string name="login_title">مرحباً بعودتك</string>
+    <string name="login_subtitle">سجّل الدخول لمتابعة التسوق</string>
+
+    <string name="login_email_label">البريد الإلكتروني</string>
+    <string name="login_email_placeholder">name@example.com</string>
+    <string name="login_password_label">كلمة المرور</string>
+    <string name="login_show_password">إظهار كلمة المرور</string>
+    <string name="login_hide_password">إخفاء كلمة المرور</string>
+
+    <string name="login_remember_me">تذكرني</string>
+    <string name="login_forgot_password">نسيت كلمة المرور؟</string>
+    <string name="login_button">تسجيل الدخول</string>
+    <string name="login_loading">جارٍ تسجيل الدخول…</string>
+
+    <string name="login_or_continue_with">أو تابع باستخدام</string>
+    <string name="login_with_google">المتابعة باستخدام Google</string>
+    <string name="login_as_guest">المتابعة كزائر</string>
+
+    <string name="login_no_account">ليس لديك حساب؟</string>
+    <string name="login_sign_up">إنشاء حساب</string>
+
+    <string name="login_error_email_empty">يرجى إدخال البريد الإلكتروني</string>
+    <string name="login_error_email_invalid">أدخل بريداً إلكترونياً صالحاً</string>
+    <string name="login_error_password_empty">يرجى إدخال كلمة المرور</string>
+    <string name="login_error_password_short">يجب ألا تقل كلمة المرور عن %1$d أحرف</string>
+    <string name="login_error_wrong_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة</string>
+    <string name="login_error_network">لا يوجد اتصال بالإنترنت. يرجى المحاولة مرة أخرى.</string>
 </resources>
