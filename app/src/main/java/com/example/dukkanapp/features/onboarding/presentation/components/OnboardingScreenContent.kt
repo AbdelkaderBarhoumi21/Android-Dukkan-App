@@ -38,8 +38,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 fun OnboardingScreenContent(
     state: OnboardingUiState,
     onEvent: (OnboardingEvent) -> Unit,
-    onGetStarted: () -> Unit,
-    onLogin: () -> Unit,
 ) {
     if (state.pages.isEmpty()) return
     val pagerState = rememberPagerState(
@@ -130,7 +128,7 @@ fun OnboardingScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     if (state.isLastPage) {
-                        onGetStarted()
+                        onEvent(OnboardingEvent.OnGetStartedClick)
                     } else {
                         onEvent(OnboardingEvent.OnNextClicked)
                     }
@@ -138,7 +136,7 @@ fun OnboardingScreenContent(
             )
             Spacer(Modifier.height(AppDimens.spaceMd))
             OnboardingAlreadyHaveAccount(
-                onActionClick = onLogin,
+                onActionClick = { onEvent(OnboardingEvent.OnLoginClicked) },
             )
 
 
@@ -178,8 +176,6 @@ private fun OnboardingScreenPreview() {
                 currentPage = 0,
             ),
             onEvent = {},
-            onGetStarted = {},
-            onLogin = {},
         )
     }
 }

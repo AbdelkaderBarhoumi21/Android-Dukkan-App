@@ -34,12 +34,7 @@ fun AppNavHost(startDestination: AppRoute) {
         // 2. Onboarding Screen
         composable<AppRoute.Onboarding> {
             OnboardingScreen(
-                onGetStarted = {
-                    navController.navigate(AppRoute.Login) {
-                        popUpTo(AppRoute.Onboarding) { inclusive = true }
-                    }
-                },
-                onLogin = {
+                onFinished = {
                     navController.navigate(AppRoute.Login) {
                         popUpTo(AppRoute.Onboarding) { inclusive = true }
                     }

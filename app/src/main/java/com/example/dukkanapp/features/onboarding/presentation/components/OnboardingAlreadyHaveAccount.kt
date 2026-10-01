@@ -39,12 +39,12 @@ fun OnboardingAlreadyHaveAccount(
             ),
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier
-                .padding(start = AppDimens.space2Xs)
                 .clickable(
                     onClick = onActionClick,
                     indication = null,
-                    interactionSource = remember { MutableInteractionSource() })
-
+                    interactionSource = remember { MutableInteractionSource() }
+                )
+                .padding(start = AppDimens.space2Xs, top = AppDimens.space2Xs, bottom = AppDimens.space2Xs)
         )
     }
 }

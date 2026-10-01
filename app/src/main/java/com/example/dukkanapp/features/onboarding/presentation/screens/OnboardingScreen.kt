@@ -10,23 +10,22 @@ import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingVi
 
 @Composable
 fun OnboardingScreen(
-    onGetStarted: () -> Unit,
-    onLogin: () -> Unit,
+    onFinished: () -> Unit,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    
     OnboardingScreenContent(
         state = state,
-        onEvent = { event -> viewModel.onEvent(event) },
-        onGetStarted = {
-            viewModel.onEvent(OnboardingEvent.OnGetStartedClick)
-            onGetStarted()
-        },
-        onLogin = {
-            viewModel.onEvent(OnboardingEvent.OnLoginClicked)
-            onLogin()
+        onEvent = { event -> 
+            when (event) {
+                OnboardingEvent.OnGetStartedClick,
+                OnboardingEvent.OnLoginClicked -> {
+                    viewModel.onEvent(event) // Make sure ViewModel saves state
+                    onFinished() // Bubbles up to AppNavHost to navigate to Login
+                }
+                else -> viewModel.onEvent(event) // Handle normal page changes
+            }
         }
-
-
     )
 }
