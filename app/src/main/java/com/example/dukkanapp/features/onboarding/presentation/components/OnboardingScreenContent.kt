@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
+import com.example.dukkanapp.core.common.components.texts.AppAlreadyHaveAccount
 import com.example.dukkanapp.core.common.pager.AppHorizontalPager
 import com.example.dukkanapp.core.common.pager.AppPagerIndicator
 import com.example.dukkanapp.core.config.theme.AppTheme
@@ -135,7 +136,7 @@ fun OnboardingScreenContent(
                 }
             )
             Spacer(Modifier.height(AppDimens.spaceMd))
-            OnboardingAlreadyHaveAccount(
+            AppAlreadyHaveAccount(
                 onActionClick = { onEvent(OnboardingEvent.OnLoginClicked) },
             )
 
