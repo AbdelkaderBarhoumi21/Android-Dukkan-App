@@ -14,16 +14,17 @@ fun OnboardingScreen(
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    
+
     OnboardingScreenContent(
         state = state,
-        onEvent = { event -> 
+        onEvent = { event ->
             when (event) {
                 OnboardingEvent.OnGetStartedClick,
                 OnboardingEvent.OnLoginClicked -> {
                     viewModel.onEvent(event) // Make sure ViewModel saves state
-                    onFinished() // Bubbles up to AppNavHost to navigate to Login
+                    onFinished() // Bubbles up to AppNavHost to navigate to "Login"
                 }
+
                 else -> viewModel.onEvent(event) // Handle normal page changes
             }
         }
