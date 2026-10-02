@@ -49,7 +49,7 @@
     <string name="login_error_wrong_credentials">Incorrect email or password</string>
     <string name="login_error_network">No internet connection. Please try again.</string>
     <string name="or_divider">OR</string>
-    <string name="email_login_title">Let's get shopping</string>
+    <string name="email_login_title">Let\'s get shopping</string>
     <string name="email_login_subtitle">Your favorites, new arrivals and exclusive deals are waiting for you.</string>
 
 </resources>
