@@ -17,13 +17,13 @@ fun AppNavHost(startDestination: AppRoute) {
         startDestination = startDestination
     ) {
         // 1. Language Selection Screen
-        composable<AppRoute.LanguageSelection> {
+        composable<AppRoute.LanguageSelectionScreen> {
             LanguageSelectionScreen(
                 onBack = {},
                 onContinue = {
-                    navController.navigate(AppRoute.Onboarding) {
+                    navController.navigate(AppRoute.OnboardingScreen) {
                         // Navigate to Onboarding and remove LanguageSelection from the backstack
-                        popUpTo(AppRoute.LanguageSelection) {
+                        popUpTo(AppRoute.LanguageSelectionScreen) {
                             inclusive = true
                         }
                     }
@@ -32,24 +32,24 @@ fun AppNavHost(startDestination: AppRoute) {
         }
 
         // 2. Onboarding Screen
-        composable<AppRoute.Onboarding> {
+        composable<AppRoute.OnboardingScreen> {
             OnboardingScreen(
                 onFinished = {
-                    navController.navigate(AppRoute.Login) {
-                        popUpTo(AppRoute.Onboarding) { inclusive = true }
+                    navController.navigate(AppRoute.LoginScreen) {
+                        popUpTo(AppRoute.OnboardingScreen) { inclusive = true }
                     }
                 }
             )
         }
 
-        composable<AppRoute.Login> {
+        composable<AppRoute.LoginScreen> {
             LoginScreen(
 
             )
 
         }
 
-        composable<AppRoute.Home> {
+        composable<AppRoute.HomeScreen> {
 
         }
     }

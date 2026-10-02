@@ -4,14 +4,17 @@ import kotlinx.serialization.Serializable
 
 sealed interface AppRoute {
     @Serializable
-    data object LanguageSelection : AppRoute
+    data object LanguageSelectionScreen : AppRoute
 
     @Serializable
-    data object Onboarding : AppRoute
+    data object OnboardingScreen : AppRoute
 
     @Serializable
-    data object Login : AppRoute
+    data object LoginScreen : AppRoute
 
     @Serializable
-    data object Home : AppRoute
+    data object HomeScreen : AppRoute
+
+    @Serializable
+    data object EmailScreen
 }
