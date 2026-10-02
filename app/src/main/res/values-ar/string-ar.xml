@@ -49,4 +49,6 @@
     <string name="login_error_wrong_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة</string>
     <string name="login_error_network">لا يوجد اتصال بالإنترنت. يرجى المحاولة مرة أخرى.</string>
     <string name="or_divider">أو</string>
+    <string name="email_login_title">هيا نبدأ التسوق</string>
+    <string name="email_login_subtitle">مفضلاتك وأحدث المنتجات وعروض حصرية بانتظارك.</string>
 </resources>
