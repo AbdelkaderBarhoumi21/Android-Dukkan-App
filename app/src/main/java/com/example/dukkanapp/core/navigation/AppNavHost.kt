@@ -44,12 +44,25 @@ fun AppNavHost(startDestination: AppRoute) {
 
         composable<AppRoute.LoginScreen> {
             LoginScreen(
+                onEmailClick = {
+                    navController.navigate(AppRoute.EmailScreen)
+                },
+                onBack = {
+                    navController.popBackStack()
+                },
+                onGoogleClick = {},
+                onAppleClick = {},
+                onAlreadyHaveAccountClick = {}
 
             )
 
         }
 
         composable<AppRoute.HomeScreen> {
+
+        }
+
+        composable<AppRoute.EmailScreen> {
 
         }
     }

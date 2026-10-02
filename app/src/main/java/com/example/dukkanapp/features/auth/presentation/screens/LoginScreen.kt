@@ -4,11 +4,17 @@ import androidx.compose.runtime.Composable
 import com.example.dukkanapp.features.auth.presentation.components.LoginScreenContent
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    onGoogleClick: () -> Unit,
+    onAppleClick: () -> Unit,
+    onEmailClick: () -> Unit,
+    onAlreadyHaveAccountClick: () -> Unit,
+    onBack: () -> Unit,
+) {
     LoginScreenContent(
-        onGoogleClick = { /*TODO*/ },
-        onAppleClick = { /*TODO*/ },
-        onEmailClick = { /*TODO*/ },
-        onAlreadyHaveAccountClick = { /*TODO*/ }
+        onGoogleClick = onGoogleClick,
+        onAppleClick = onAppleClick,
+        onEmailClick = onEmailClick,
+        onAlreadyHaveAccountClick = onAlreadyHaveAccountClick,
     )
 }

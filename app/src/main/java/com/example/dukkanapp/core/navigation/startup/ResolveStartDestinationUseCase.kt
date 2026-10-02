@@ -20,10 +20,10 @@ class ResolveStartDestinationUseCase @Inject constructor(
         val isLoggedInDeferred = async { authRepository.isLoggedIn() }
 
         when {
-            !hasLanguageDeferred.await() -> AppRoute.LanguageSelection
-            !hasOnboardingDeferred.await() -> AppRoute.Onboarding
-            !isLoggedInDeferred.await() -> AppRoute.Login
-            else -> AppRoute.Home
+            !hasLanguageDeferred.await() -> AppRoute.LanguageSelectionScreen
+            !hasOnboardingDeferred.await() -> AppRoute.OnboardingScreen
+            !isLoggedInDeferred.await() -> AppRoute.LoginScreen
+            else -> AppRoute.HomeScreen
         }
     }
 
