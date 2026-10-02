@@ -1,4 +1,4 @@
-package com.example.dukkanapp.features.auth.presentation.components
+package com.example.dukkanapp.features.auth.presentation.components.authoptions
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

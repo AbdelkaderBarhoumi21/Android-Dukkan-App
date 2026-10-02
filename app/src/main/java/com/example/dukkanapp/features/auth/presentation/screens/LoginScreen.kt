@@ -1,7 +1,7 @@
 package com.example.dukkanapp.features.auth.presentation.screens
 
 import androidx.compose.runtime.Composable
-import com.example.dukkanapp.features.auth.presentation.components.LoginScreenContent
+import com.example.dukkanapp.features.auth.presentation.components.authoptions.LoginScreenContent
 
 @Composable
 fun LoginScreen(
