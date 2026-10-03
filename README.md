@@ -40,7 +40,8 @@ Dukkan is a modern, native Android B2C e-commerce application designed to provid
 5. Build and run the app on an Android emulator or a physical device.
 
 ## 📱 Screenshots
-*(Add screenshots here showing the Onboarding, Login, and Home screens)*
-
+<img width="1080" height="2400" alt="Screenshot_20261003_121710" src="https://github.com/user-attachments/assets/ee2d8350-166f-4083-b228-bf906bb804b3" />
+<img width="1080" height="2400" alt="Screenshot_20261003_121721" src="https://github.com/user-attachments/assets/428c5d96-4c18-4629-a093-fb6eb94a3502" />
+<img width="1080" height="2400" alt="Screenshot_20261003_121726" src="https://github.com/user-attachments/assets/8517e773-2dba-466e-a487-536bcbfffadd" />
 ## 🤝 Contributing
 Contributions, issues, and feature requests are welcome!
