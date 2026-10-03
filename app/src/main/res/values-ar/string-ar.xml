@@ -41,9 +41,9 @@
     <string name="email_no_account">ليس لديك حساب؟</string>
     <string name="email_sign_up">إنشاء حساب</string>
 
-    <string name="email_email_placeholder">يرجى إدخال البريد الإلكتروني</string>
+    <string name="email_error_email_empty">يرجى إدخال البريد الإلكتروني</string>
     <string name="email_error_email_invalid">أدخل بريداً إلكترونياً صالحاً</string>
-    <string name="email_password_placeholder">يرجى إدخال كلمة المرور</string>
+    <string name="email_error_password_empty">يرجى إدخال كلمة المرور</string>
     <string name="email_error_password_short">يجب ألا تقل كلمة المرور عن %1$d أحرف</string>
     <string name="email_error_wrong_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة</string>
     <string name="email_error_network">لا يوجد اتصال بالإنترنت. يرجى المحاولة مرة أخرى.</string>

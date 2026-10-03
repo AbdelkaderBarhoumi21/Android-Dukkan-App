@@ -41,9 +41,9 @@
     <string name="email_no_account">Don\'t have an account?</string>
     <string name="email_sign_up">Sign up</string>
 
-    <string name="email_email_placeholder">Please enter your email</string>
+    <string name="email_error_email_empty">Please enter your email</string>
     <string name="email_error_email_invalid">Enter a valid email address</string>
-    <string name="email_password_placeholder">Please enter your password</string>
+    <string name="email_error_password_empty">Please enter your password</string>
     <string name="email_error_password_short">Password must be at least %1$d characters</string>
     <string name="email_error_wrong_credentials">Incorrect email or password</string>
     <string name="email_error_network">No internet connection. Please try again.</string>

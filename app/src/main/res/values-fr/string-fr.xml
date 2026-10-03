@@ -41,9 +41,9 @@
     <string name="email_no_account">Vous n\'avez pas de compte ?</string>
     <string name="email_sign_up">Créer un compte</string>
 
-    <string name="email_email_placeholder">Veuillez saisir votre adresse e-mail</string>
+    <string name="email_error_email_empty">Veuillez saisir votre adresse e-mail</string>
     <string name="email_error_email_invalid">Saisissez une adresse e-mail valide</string>
-    <string name="email_password_placeholder">Veuillez saisir votre mot de passe</string>
+    <string name="email_error_password_empty">Veuillez saisir votre mot de passe</string>
     <string name="email_error_password_short">Le mot de passe doit contenir au moins %1$d caractères</string>
     <string name="email_error_wrong_credentials">E-mail ou mot de passe incorrect</string>
     <string name="email_error_network">Pas de connexion internet. Veuillez réessayer.</string>
