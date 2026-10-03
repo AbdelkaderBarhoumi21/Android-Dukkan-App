@@ -26,6 +26,7 @@ import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.utils.constants.AppDimens
+import com.example.dukkanapp.core.utils.constants.AppValidationConstants
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.auth.presentation.components.authoptions.LoginBrandHeader
 import com.example.dukkanapp.features.auth.presentation.logic.EmailUiState
@@ -82,7 +83,12 @@ fun EmailScreenContent(
                 value = state.password,
                 onValueChange = onPasswordChanged,
                 placeHolder = stringResource(R.string.email_password_label),
-                errorText = state.passwordError?.let { stringResource(it) },
+                errorText = state.passwordError?.let {
+                    stringResource(
+                        it,
+                        AppValidationConstants.MIN_PASSWORD_LENGTH
+                    )
+                },
                 isSuccess = state.isValidPassword,
                 leadingIcon = {
                     Icon(
