@@ -23,7 +23,9 @@
     <string name="login_subtitle">Veuillez vous connecter pour accéder à votre compte et reprendre vos achats</string>
 
     <string name="email_email_label">Adresse e-mail</string>
+    <string name="email_email_placeholder">Adresse e-mail</string>
     <string name="email_password_label">Mot de passe</string>
+    <string name="email_password_placeholder">Mot de passe</string>
     <string name="email_show_password">Afficher le mot de passe</string>
     <string name="email_hide_password">Masquer le mot de passe</string>
 

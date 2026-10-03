@@ -23,7 +23,9 @@
     <string name="login_subtitle">يرجى تسجيل الدخول للوصول إلى حسابك ومتابعة التسوق</string>
 
     <string name="email_email_label">البريد الإلكتروني</string>
+    <string name="email_email_placeholder">البريد الإلكتروني</string>
     <string name="email_password_label">كلمة المرور</string>
+    <string name="email_password_placeholder">كلمة المرور</string>
     <string name="email_show_password">إظهار كلمة المرور</string>
     <string name="email_hide_password">إخفاء كلمة المرور</string>
 
