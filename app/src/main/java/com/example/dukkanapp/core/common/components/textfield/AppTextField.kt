@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import com.example.dukkanapp.core.config.theme.AppTheme
 import com.example.dukkanapp.core.utils.constants.AppDimens
 
 object AppTextFieldDefault {
@@ -26,6 +27,7 @@ object AppTextFieldDefault {
     @Composable
     fun colors(isSuccess: Boolean): TextFieldColors {
         val scheme = MaterialTheme.colorScheme
+        val extendedColors = AppTheme.extendedColors
         val container = scheme.surfaceVariant
         return OutlinedTextFieldDefaults.colors(
             // Background: always the same
@@ -35,7 +37,7 @@ object AppTextFieldDefault {
             errorContainerColor = container,
             // Border: none by default, primary on focus, green on success, red on error
             focusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
-            unfocusedBorderColor = if (isSuccess) MaterialTheme.colorScheme.tertiary else Color.Transparent,
+            unfocusedBorderColor = if (isSuccess) extendedColors.success else Color.Transparent,
             errorBorderColor = scheme.error,
             disabledBorderColor = Color.Transparent,
 
@@ -109,7 +111,8 @@ fun AppTextFiled(
         supportingText = errorText?.let {
             {
                 Text(
-                    text = it
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
         },
