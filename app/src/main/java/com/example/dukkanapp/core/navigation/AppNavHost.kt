@@ -9,6 +9,11 @@ import com.example.dukkanapp.features.auth.presentation.screens.LoginScreen
 import com.example.dukkanapp.features.language.presentation.screens.LanguageSelectionScreen
 import com.example.dukkanapp.features.onboarding.presentation.screens.OnboardingScreen
 
+/*
+   NavHost (AppNavHost)      -> owns navigation only (lambdas: onFinished, onEmailClick...)
+   OnboardingScreen          -> stateful: gets ViewModel, collects state, handles events
+   OnboardingScreenContent   -> stateless: pure UI, takes state + onEvent
+ */
 @Composable
 fun AppNavHost(startDestination: AppRoute) {
     val navController = rememberNavController()
@@ -48,7 +53,7 @@ fun AppNavHost(startDestination: AppRoute) {
                 onEmailClick = {
                     navController.navigate(AppRoute.EmailScreen)
                 },
-            
+
                 onGoogleClick = {},
                 onAppleClick = {},
                 onAlreadyHaveAccountClick = {}
