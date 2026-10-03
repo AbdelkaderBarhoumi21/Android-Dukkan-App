@@ -34,7 +34,7 @@ fun AuthButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(AppDimens.size2Xl),
+            .height(AppDimens.buttonHeight),
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
