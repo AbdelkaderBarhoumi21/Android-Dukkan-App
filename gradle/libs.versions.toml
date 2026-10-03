@@ -31,6 +31,9 @@ coreSplashScreen = "1.0.1"
 # Coroutines
 coroutines = "1.9.0"
 
+# Iconsax
+iconsax = "1.0.1"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -69,6 +72,9 @@ androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscree
 # Coroutines
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+
+# Iconsax
+iconsax-compose = { module = "io.github.yohannestz:iconsax-compose", version.ref = "iconsax" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
