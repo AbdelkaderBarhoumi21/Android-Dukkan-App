@@ -2,6 +2,7 @@ package com.example.dukkanapp.features.auth.presentation.logic
 
 import androidx.annotation.StringRes
 import com.example.dukkanapp.core.utils.extension.isValidEmail
+import com.example.dukkanapp.core.utils.extension.isValidPassword
 
 data class EmailUiState(
     val email: String = "",
@@ -11,4 +12,5 @@ data class EmailUiState(
     val isLoading: Boolean = false,
 ) {
     val isValidEmail: Boolean get() = emailError == null && email.isValidEmail()
+    val isValidPassword: Boolean get() = passwordError == null && password.isValidPassword()
 }
