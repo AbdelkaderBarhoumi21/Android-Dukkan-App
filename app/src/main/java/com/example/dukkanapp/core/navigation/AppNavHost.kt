@@ -51,12 +51,14 @@ fun AppNavHost(startDestination: AppRoute) {
         composable<AppRoute.LoginScreen> {
             LoginScreen(
                 onEmailClick = {
-                    navController.navigate(AppRoute.EmailScreen)
+                    // Todo go to register screen
                 },
 
                 onGoogleClick = {},
                 onAppleClick = {},
-                onAlreadyHaveAccountClick = {}
+                onAlreadyHaveAccountClick = {
+                    navController.navigate(AppRoute.EmailScreen)
+                }
 
             )
 
@@ -71,6 +73,9 @@ fun AppNavHost(startDestination: AppRoute) {
                 onForgetPasswordClick = {},
                 onNavigationBack = {
                     navController.popBackStack()
+                },
+                onSignupClick = {
+                    // Todo go to register screen
                 }
             )
 

@@ -27,6 +27,7 @@ import com.example.dukkanapp.core.common.components.buttons.AppTextButton
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
+import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppValidationConstants
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
@@ -43,6 +44,7 @@ fun EmailScreenContent(
     onPasswordChanged: (String) -> Unit,
     onRememberMeChanged: (Boolean) -> Unit,
     onNavigationBack: () -> Unit,
+    onSignupClick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -128,8 +130,12 @@ fun EmailScreenContent(
                 onClick = onLoginClick,
                 text = stringResource(R.string.email_login_button),
             )
-
-
+            Spacer(Modifier.height(AppDimens.size2Xs))
+            AppAuthFooterLink(
+                promptText = stringResource(R.string.email_no_account),
+                actionText = stringResource(R.string.email_sign_up),
+                onActionClick = onSignupClick
+            )
         }
     }
 

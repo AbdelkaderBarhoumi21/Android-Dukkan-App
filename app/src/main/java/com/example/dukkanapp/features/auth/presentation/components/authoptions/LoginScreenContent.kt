@@ -11,7 +11,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
-import com.example.dukkanapp.core.common.components.texts.AppAlreadyHaveAccount
+import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
 import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
@@ -42,8 +42,10 @@ fun LoginScreenContent(
             Spacer(Modifier.height(AppDimens.size2Xs))
             LoginOrDivider()
             Spacer(Modifier.height(AppDimens.size3Xs))
-            AppAlreadyHaveAccount(
-                onActionClick = onAlreadyHaveAccountClick,
+            AppAuthFooterLink(
+                promptText = stringResource(R.string.onboarding_already_have_account),
+                actionText = stringResource(R.string.action_log_in),
+                onActionClick = onAlreadyHaveAccountClick
             )
         }
 

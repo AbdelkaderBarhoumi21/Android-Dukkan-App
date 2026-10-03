@@ -11,6 +11,7 @@ import com.example.dukkanapp.features.auth.presentation.logic.EmailViewModel
 fun EmailScreen(
     onForgetPasswordClick: () -> Unit,
     onNavigationBack: () -> Unit,
+    onSignupClick: () -> Unit,
     viewModel: EmailViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -21,6 +22,7 @@ fun EmailScreen(
         onPasswordChanged = { value -> viewModel.onPasswordChanged(value) },
         onForgetPasswordClick = onForgetPasswordClick,
         onRememberMeChanged = { value -> viewModel.onRememberMeChanged(value) },
-        onNavigationBack = onNavigationBack
+        onNavigationBack = onNavigationBack,
+        onSignupClick = onSignupClick
     )
 }

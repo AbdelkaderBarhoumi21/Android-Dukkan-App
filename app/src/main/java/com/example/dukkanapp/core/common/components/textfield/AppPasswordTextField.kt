@@ -1,5 +1,6 @@
 package com.example.dukkanapp.core.common.components.textfield
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,7 +17,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
+import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
@@ -61,7 +62,8 @@ fun AppPasswordTextField(
                         if (isVisible) R.string.email_hide_password
                         else R.string.email_show_password
                     ),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(AppDimens.iconSm)
                 )
             }
         }
