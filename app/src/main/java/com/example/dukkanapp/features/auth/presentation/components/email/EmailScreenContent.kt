@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.CheckBox.AppCheckBox
+import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
 import com.example.dukkanapp.core.common.components.buttons.AppTextButton
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
@@ -67,7 +69,8 @@ fun EmailScreenContent(
                     Icon(
                         imageVector = Iconsax.Linear.Sms,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(AppDimens.iconSm)
                     )
                 },
                 placeHolder = stringResource(R.string.email_email_label),
@@ -94,7 +97,8 @@ fun EmailScreenContent(
                     Icon(
                         imageVector = Iconsax.Linear.PasswordCheck,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(AppDimens.iconSm)
                     )
                 }, keyboardActions = KeyboardActions(
                     onDone = {
@@ -119,6 +123,11 @@ fun EmailScreenContent(
                     text = stringResource(R.string.email_forgot_password),
                 )
             }
+            Spacer(Modifier.height(AppDimens.size3Xs))
+            AppPrimaryButton(
+                onClick = onLoginClick,
+                text = stringResource(R.string.email_login_button),
+            )
 
 
         }

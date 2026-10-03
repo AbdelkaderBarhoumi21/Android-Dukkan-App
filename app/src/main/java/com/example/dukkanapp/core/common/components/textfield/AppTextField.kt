@@ -1,7 +1,7 @@
 package com.example.dukkanapp.core.common.components.textfield
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,8 +21,6 @@ import com.example.dukkanapp.core.utils.constants.AppDimens
 
 object AppTextFieldDefault {
     val shape = RoundedCornerShape(AppDimens.sizeXl)
-    val minHeight = AppDimens.size2Xl
-    val borderWidth = AppDimens.borderWidth
 
     @Composable
     fun colors(isSuccess: Boolean): TextFieldColors {
@@ -100,12 +98,18 @@ fun AppTextFiled(
         onValueChange = onValueChange,
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = AppTextFieldDefault.minHeight),
+            .height(AppDimens.buttonHeight),
 
         enabled = enabled,
         readOnly = readOnly,
         textStyle = MaterialTheme.typography.bodyLarge,
-        placeholder = { Text(text = placeHolder) },
+        placeholder = {
+            Text(
+                text = placeHolder,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         supportingText = errorText?.let {

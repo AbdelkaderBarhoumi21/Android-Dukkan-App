@@ -36,7 +36,7 @@ fun AppPrimaryButton(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.labelLarge
+            style = MaterialTheme.typography.titleMedium
         )
     }
 }
