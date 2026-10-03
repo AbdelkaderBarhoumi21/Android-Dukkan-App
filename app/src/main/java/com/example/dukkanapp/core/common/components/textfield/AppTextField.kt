@@ -21,11 +21,12 @@ import com.example.dukkanapp.core.utils.constants.AppDimens
 object AppTextFieldDefault {
     val shape = RoundedCornerShape(AppDimens.sizeXl)
     val minHeight = AppDimens.size2Xl
+    val borderWidth = AppDimens.borderWidth
 
     @Composable
     fun colors(isSuccess: Boolean): TextFieldColors {
         val scheme = MaterialTheme.colorScheme
-        val container = scheme.surfaceContainer
+        val container = scheme.surfaceVariant
         return OutlinedTextFieldDefaults.colors(
             // Background: always the same
             focusedContainerColor = container,
@@ -33,7 +34,7 @@ object AppTextFieldDefault {
             disabledContainerColor = container,
             errorContainerColor = container,
             // Border: none by default, primary on focus, green on success, red on error
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
             unfocusedBorderColor = if (isSuccess) MaterialTheme.colorScheme.tertiary else Color.Transparent,
             errorBorderColor = scheme.error,
             disabledBorderColor = Color.Transparent,
@@ -60,6 +61,17 @@ object AppTextFieldDefault {
 
         )
     }
+
+    @Composable
+    fun borderColor(isFocused: Boolean, isError: Boolean, isSuccess: Boolean): Color {
+        val scheme = MaterialTheme.colorScheme
+        return when {
+            isError -> scheme.error
+            isSuccess -> scheme.tertiary
+            isFocused -> scheme.primary
+            else -> Color.Transparent
+        }
+    }
 }
 
 
@@ -84,9 +96,10 @@ fun AppTextFiled(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .heightIn(min = AppTextFieldDefault.minHeight),
+
         enabled = enabled,
         readOnly = readOnly,
         textStyle = MaterialTheme.typography.bodyLarge,
