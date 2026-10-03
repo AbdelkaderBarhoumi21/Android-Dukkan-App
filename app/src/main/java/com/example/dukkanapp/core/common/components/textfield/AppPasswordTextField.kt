@@ -1,4 +1,4 @@
-package com.example.dukkanapp.core.common.components.TextField
+package com.example.dukkanapp.core.common.components.textfield
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon

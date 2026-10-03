@@ -1,14 +1,18 @@
 package com.example.dukkanapp.features.auth.presentation.components.email
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
@@ -16,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
+import com.example.dukkanapp.core.common.components.CheckBox.AppCheckBox
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
@@ -32,6 +37,7 @@ fun EmailScreenContent(
     onForgetPasswordClick: () -> Unit,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
+    onRememberMeChanged: (Boolean) -> Unit,
     onNavigationBack: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -90,6 +96,19 @@ fun EmailScreenContent(
                     }
                 )
             )
+            Spacer(Modifier.height(AppDimens.spaceSm))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                AppCheckBox(
+                    checked = state.rememberMe,
+                    onCheckChanged = onRememberMeChanged,
+                    label = stringResource(R.string.email_remember_me),
+                )
+            }
+
 
         }
     }

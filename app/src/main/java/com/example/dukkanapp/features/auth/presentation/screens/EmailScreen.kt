@@ -20,6 +20,7 @@ fun EmailScreen(
         onEmailChanged = { value -> viewModel.onEmailChanged(value) },
         onPasswordChanged = { value -> viewModel.onPasswordChanged(value) },
         onForgetPasswordClick = onForgetPasswordClick,
+        onRememberMeChanged = { value -> viewModel.onRememberMeChanged(value) },
         onNavigationBack = onNavigationBack
     )
 }

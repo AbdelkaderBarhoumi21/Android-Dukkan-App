@@ -68,7 +68,7 @@ object AppTextFieldDefault {
         return when {
             isError -> scheme.error
             isSuccess -> scheme.tertiary
-            isFocused -> scheme.primary
+            isFocused -> scheme.outlineVariant
             else -> Color.Transparent
         }
     }

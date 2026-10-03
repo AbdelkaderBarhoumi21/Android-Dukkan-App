@@ -9,6 +9,7 @@ data class EmailUiState(
     val password: String = "",
     @StringRes val emailError: Int? = null,
     @StringRes val passwordError: Int? = null,
+    val rememberMe: Boolean = false,
     val isLoading: Boolean = false,
 ) {
     val isValidEmail: Boolean get() = emailError == null && email.isValidEmail()

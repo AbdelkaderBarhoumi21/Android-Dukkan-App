@@ -17,8 +17,9 @@ object AppDimens {
     val space5Xl = 96.dp
 
     // Corner radius
-    val radius2Xs = 2.dp
-    val radiusXs = 4.dp
+    val radius3Xs = 2.dp
+    val radius2Xs = 4.dp
+    val radiusXs = 6.dp
     val radiusSm = 8.dp
     val radiusMd = 12.dp
     val radiusLg = 16.dp
@@ -42,6 +43,10 @@ object AppDimens {
 
     // Element sizes: controls, avatars, logos, and media.
     // 48 dp is the minimum touch target.
+
+    val size5Xs = 4.dp
+
+    val size4Xs = 8.dp
     val size3Xs = 12.dp
     val size2Xs = 16.dp
     val sizeXs = 20.dp

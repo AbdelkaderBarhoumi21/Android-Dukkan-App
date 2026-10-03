@@ -30,6 +30,10 @@ class EmailViewModel @Inject constructor() : ViewModel() {
         _state.update { it.copy(password = value, passwordError = null) }
     }
 
+    fun onRememberMeChanged(value: Boolean) {
+        _state.update { it.copy(rememberMe = value) }
+    }
+
     fun onLoginClick() {
         val current = _state.value
 
