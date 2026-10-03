@@ -69,7 +69,7 @@ fun AppCheckBox(
         )
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
     }
