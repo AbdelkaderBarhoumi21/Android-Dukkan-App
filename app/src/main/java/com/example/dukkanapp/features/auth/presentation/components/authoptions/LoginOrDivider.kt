@@ -20,7 +20,7 @@ import com.example.dukkanapp.core.utils.constants.AppDimens
 @Composable
 fun LoginOrDivider(
     modifier: Modifier = Modifier,
-    text: String = stringResource(R.string.or_divider)
+    text: String = stringResource(R.string.login_or_divider)
 ) {
     val lineColor = MaterialTheme.colorScheme.outline
     Row(

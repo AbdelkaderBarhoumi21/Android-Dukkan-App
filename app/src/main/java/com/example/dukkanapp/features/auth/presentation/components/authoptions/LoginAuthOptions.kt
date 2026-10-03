@@ -25,14 +25,14 @@ fun LoginAuthOptions(
         verticalArrangement = Arrangement.spacedBy(AppDimens.spaceMd)
     ) {
         AuthButton(
-            text = stringResource(R.string.sign_in_with_google),
+            text = stringResource(R.string.login_sign_in_with_google),
             icon = painterResource(R.drawable.ic_google),
             containerColor = Color.Transparent,
             borderColor = MaterialTheme.colorScheme.outline,
             onClick = onGoogleClick
         )
         AuthButton(
-            text = stringResource(R.string.continue_with_apple),
+            text = stringResource(R.string.login_continue_with_apple),
             icon = painterResource(R.drawable.ic_apple),
             iconColor = MaterialTheme.colorScheme.onSurface,
             containerColor = Color.Transparent,
@@ -40,7 +40,7 @@ fun LoginAuthOptions(
             onClick = onAppleClick
         )
         AuthButton(
-            text = stringResource(R.string.continue_with_email),
+            text = stringResource(R.string.login_continue_with_email),
             icon = painterResource(R.drawable.ic_email),
             iconColor = MaterialTheme.colorScheme.surface,
             containerColor = MaterialTheme.colorScheme.primary,

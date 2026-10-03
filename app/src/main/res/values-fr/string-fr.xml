@@ -22,33 +22,32 @@
     <string name="login_title">Content de vous revoir</string>
     <string name="login_subtitle">Veuillez vous connecter pour accéder à votre compte et reprendre vos achats</string>
 
-    <string name="login_email_label">Adresse e-mail</string>
-    <string name="login_email_placeholder">nom@exemple.com</string>
-    <string name="login_password_label">Mot de passe</string>
-    <string name="login_show_password">Afficher le mot de passe</string>
-    <string name="login_hide_password">Masquer le mot de passe</string>
+    <string name="email_email_label">Adresse e-mail</string>
+    <string name="email_password_label">Mot de passe</string>
+    <string name="email_show_password">Afficher le mot de passe</string>
+    <string name="email_hide_password">Masquer le mot de passe</string>
 
-    <string name="login_remember_me">Se souvenir de moi</string>
-    <string name="login_forgot_password">Mot de passe oublié ?</string>
-    <string name="login_button">Se connecter</string>
-    <string name="login_loading">Connexion en cours…</string>
+    <string name="email_remember_me">Se souvenir de moi</string>
+    <string name="email_forgot_password">Mot de passe oublié ?</string>
+    <string name="email_login_button">Se connecter</string>
+    <string name="email_login_loading">Connexion en cours…</string>
 
     <string name="login_or_continue_with">Ou continuer avec</string>
-    <string name="sign_in_with_google">Se connecter avec Google</string>
-    <string name="continue_with_apple">Continuer avec Apple</string>
-    <string name="continue_with_email">Continuer avec l\'e-mail</string>
+    <string name="login_sign_in_with_google">Se connecter avec Google</string>
+    <string name="login_continue_with_apple">Continuer avec Apple</string>
+    <string name="login_continue_with_email">Continuer avec l\'e-mail</string>
     <string name="login_as_guest">Continuer en tant qu\'invité</string>
 
-    <string name="login_no_account">Vous n\'avez pas de compte ?</string>
-    <string name="login_sign_up">Créer un compte</string>
+    <string name="email_no_account">Vous n\'avez pas de compte ?</string>
+    <string name="email_sign_up">Créer un compte</string>
 
-    <string name="login_error_email_empty">Veuillez saisir votre adresse e-mail</string>
-    <string name="login_error_email_invalid">Saisissez une adresse e-mail valide</string>
-    <string name="login_error_password_empty">Veuillez saisir votre mot de passe</string>
-    <string name="login_error_password_short">Le mot de passe doit contenir au moins %1$d caractères</string>
-    <string name="login_error_wrong_credentials">E-mail ou mot de passe incorrect</string>
-    <string name="login_error_network">Pas de connexion internet. Veuillez réessayer.</string>
-    <string name="or_divider">OU</string>
+    <string name="email_email_placeholder">Veuillez saisir votre adresse e-mail</string>
+    <string name="email_error_email_invalid">Saisissez une adresse e-mail valide</string>
+    <string name="email_password_placeholder">Veuillez saisir votre mot de passe</string>
+    <string name="email_error_password_short">Le mot de passe doit contenir au moins %1$d caractères</string>
+    <string name="email_error_wrong_credentials">E-mail ou mot de passe incorrect</string>
+    <string name="email_error_network">Pas de connexion internet. Veuillez réessayer.</string>
+    <string name="login_or_divider">OU</string>
     <string name="email_login_title">Prêt à faire du shopping ?</string>
     <string name="email_login_subtitle">Vos coups de cœur, les nouveautés et des offres exclusives vous attendent.</string>
 

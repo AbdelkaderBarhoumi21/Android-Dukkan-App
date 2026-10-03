@@ -22,33 +22,32 @@
     <string name="login_title">Welcome Back</string>
     <string name="login_subtitle">Please sign in to access your account and resume shopping</string>
 
-    <string name="login_email_label">Email address</string>
-    <string name="login_email_placeholder">name@example.com</string>
-    <string name="login_password_label">Password</string>
-    <string name="login_show_password">Show password</string>
-    <string name="login_hide_password">Hide password</string>
+    <string name="email_email_label">Email address</string>
+    <string name="email_password_label">Password</string>
+    <string name="email_show_password">Show password</string>
+    <string name="email_hide_password">Hide password</string>
 
-    <string name="login_remember_me">Remember me</string>
-    <string name="login_forgot_password">Forgot password?</string>
-    <string name="login_button">Log in</string>
-    <string name="login_loading">Logging in…</string>
+    <string name="email_remember_me">Remember me</string>
+    <string name="email_forgot_password">Forgot password?</string>
+    <string name="email_login_button">Log in</string>
+    <string name="email_login_loading">Logging in…</string>
 
     <string name="login_or_continue_with">Or continue with</string>
-    <string name="sign_in_with_google">Sign in with Google</string>
-    <string name="continue_with_apple">Continue with Apple</string>
-    <string name="continue_with_email">Continue with Email</string>
+    <string name="login_sign_in_with_google">Sign in with Google</string>
+    <string name="login_continue_with_apple">Continue with Apple</string>
+    <string name="login_continue_with_email">Continue with Email</string>
     <string name="login_as_guest">Continue as guest</string>
 
-    <string name="login_no_account">Don\'t have an account?</string>
-    <string name="login_sign_up">Sign up</string>
+    <string name="email_no_account">Don\'t have an account?</string>
+    <string name="email_sign_up">Sign up</string>
 
-    <string name="login_error_email_empty">Please enter your email</string>
-    <string name="login_error_email_invalid">Enter a valid email address</string>
-    <string name="login_error_password_empty">Please enter your password</string>
-    <string name="login_error_password_short">Password must be at least %1$d characters</string>
-    <string name="login_error_wrong_credentials">Incorrect email or password</string>
-    <string name="login_error_network">No internet connection. Please try again.</string>
-    <string name="or_divider">OR</string>
+    <string name="email_email_placeholder">Please enter your email</string>
+    <string name="email_error_email_invalid">Enter a valid email address</string>
+    <string name="email_password_placeholder">Please enter your password</string>
+    <string name="email_error_password_short">Password must be at least %1$d characters</string>
+    <string name="email_error_wrong_credentials">Incorrect email or password</string>
+    <string name="email_error_network">No internet connection. Please try again.</string>
+    <string name="login_or_divider">OR</string>
     <string name="email_login_title">Let\'s get shopping</string>
     <string name="email_login_subtitle">Your favorites, new arrivals and exclusive deals are waiting for you.</string>
 

@@ -1,7 +1,9 @@
 package com.example.dukkanapp.features.auth.presentation.components.email
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -35,6 +37,8 @@ fun EmailScreenContent(
                 subTitle = stringResource(R.string.email_login_subtitle),
                 logo = painterResource(R.drawable.ic_app_logo)
             )
+            Spacer(Modifier.height(AppDimens.sizeMd))
+     
         }
     }
 
