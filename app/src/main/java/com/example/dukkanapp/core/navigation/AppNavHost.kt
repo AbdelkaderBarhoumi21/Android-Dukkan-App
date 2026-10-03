@@ -48,9 +48,7 @@ fun AppNavHost(startDestination: AppRoute) {
                 onEmailClick = {
                     navController.navigate(AppRoute.EmailScreen)
                 },
-                onBack = {
-                    navController.popBackStack()
-                },
+            
                 onGoogleClick = {},
                 onAppleClick = {},
                 onAlreadyHaveAccountClick = {}
@@ -68,8 +66,13 @@ fun AppNavHost(startDestination: AppRoute) {
                 onLoginClick = {},
                 onAppleClick = {},
                 onGoogleClick = {},
-                onForgetPasswordClick = {}
+                onForgetPasswordClick = {},
+
+                onNavigationBack = {
+                    navController.popBackStack()
+                }
             )
+
 
         }
     }

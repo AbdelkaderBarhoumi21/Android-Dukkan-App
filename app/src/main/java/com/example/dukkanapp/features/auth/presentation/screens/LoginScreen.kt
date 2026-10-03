@@ -9,12 +9,12 @@ fun LoginScreen(
     onAppleClick: () -> Unit,
     onEmailClick: () -> Unit,
     onAlreadyHaveAccountClick: () -> Unit,
-    onBack: () -> Unit,
-) {
+
+    ) {
     LoginScreenContent(
         onGoogleClick = onGoogleClick,
         onAppleClick = onAppleClick,
         onEmailClick = onEmailClick,
-        onAlreadyHaveAccountClick = onAlreadyHaveAccountClick,
+        onAlreadyHaveAccountClick = onAlreadyHaveAccountClick
     )
 }

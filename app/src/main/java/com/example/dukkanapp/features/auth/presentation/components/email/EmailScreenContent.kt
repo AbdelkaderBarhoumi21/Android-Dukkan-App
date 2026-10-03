@@ -18,9 +18,12 @@ fun EmailScreenContent(
     onGoogleClick: () -> Unit,
     onAppleClick: () -> Unit,
     onForgetPasswordClick: () -> Unit,
+    onNavigationBack: () -> Unit,
 ) {
 
-    AppScaffold { padding ->
+    AppScaffold(
+        onNavigateBack = onNavigationBack
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

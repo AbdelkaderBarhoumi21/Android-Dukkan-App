@@ -9,11 +9,13 @@ fun EmailScreen(
     onGoogleClick: () -> Unit,
     onAppleClick: () -> Unit,
     onForgetPasswordClick: () -> Unit,
+    onNavigationBack: () -> Unit,
 ) {
     EmailScreenContent(
         onLoginClick = onLoginClick,
         onGoogleClick = onGoogleClick,
         onAppleClick = onAppleClick,
-        onForgetPasswordClick = onForgetPasswordClick
+        onForgetPasswordClick = onForgetPasswordClick,
+        onNavigationBack = onNavigationBack
     )
 }
