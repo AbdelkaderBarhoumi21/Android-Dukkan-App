@@ -68,11 +68,7 @@ fun AppNavHost(startDestination: AppRoute) {
 
         composable<AppRoute.EmailScreen> {
             EmailScreen(
-                onLoginClick = {},
-                onAppleClick = {},
-                onGoogleClick = {},
                 onForgetPasswordClick = {},
-
                 onNavigationBack = {
                     navController.popBackStack()
                 }

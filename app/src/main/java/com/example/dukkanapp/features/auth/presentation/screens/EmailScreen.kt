@@ -1,20 +1,24 @@
 package com.example.dukkanapp.features.auth.presentation.screens
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.dukkanapp.features.auth.presentation.components.email.EmailScreenContent
+import com.example.dukkanapp.features.auth.presentation.logic.EmailViewModel
 
 @Composable
 fun EmailScreen(
-    onLoginClick: () -> Unit,
-    onGoogleClick: () -> Unit,
-    onAppleClick: () -> Unit,
     onForgetPasswordClick: () -> Unit,
     onNavigationBack: () -> Unit,
+    viewModel: EmailViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     EmailScreenContent(
-        onLoginClick = onLoginClick,
-        onGoogleClick = onGoogleClick,
-        onAppleClick = onAppleClick,
+        onLoginClick = { viewModel.onLoginClick() },
+        state = state,
+        onEmailChanged = { value -> viewModel.onEmailChanged(value) },
+        onPasswordChanged = { value -> viewModel.onPasswordChanged(value) },
         onForgetPasswordClick = onForgetPasswordClick,
         onNavigationBack = onNavigationBack
     )
