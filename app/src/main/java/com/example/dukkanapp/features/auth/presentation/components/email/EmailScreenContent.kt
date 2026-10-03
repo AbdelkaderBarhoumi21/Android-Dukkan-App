@@ -38,7 +38,8 @@ fun EmailScreenContent(
                 logo = painterResource(R.drawable.ic_app_logo)
             )
             Spacer(Modifier.height(AppDimens.sizeMd))
-     
+
+
         }
     }
 

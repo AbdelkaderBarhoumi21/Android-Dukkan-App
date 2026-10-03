@@ -1,6 +1,7 @@
 package com.example.dukkanapp.core.utils.extension
 
 import android.util.Patterns
+import com.example.dukkanapp.core.utils.constants.AppValidationConstants.MIN_PASSWORD_LENGTH
 
 /**
  * Checks if the string is a valid email address format.
@@ -11,3 +12,4 @@ import android.util.Patterns
  * @return `true` if the string is a valid email format, `false` otherwise.
  */
 fun String.isValidEmail(): Boolean = isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
+fun String.isValidPassword(): Boolean = this.length >= MIN_PASSWORD_LENGTH
