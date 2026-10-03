@@ -16,8 +16,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.common.components.TextField.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
+import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
@@ -90,7 +90,6 @@ fun EmailScreenContent(
                     }
                 )
             )
-
 
         }
     }
