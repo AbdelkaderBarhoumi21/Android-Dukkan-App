@@ -131,8 +131,9 @@ fun EmailScreenContent(
                 onClick = onLoginClick,
                 text = stringResource(R.string.email_login_button),
             )
-            LoginOrDivider()
             Spacer(Modifier.height(AppDimens.size3Xs))
+            LoginOrDivider()
+            Spacer(Modifier.height(AppDimens.size5Xs))
             AppAuthFooterLink(
                 promptText = stringResource(R.string.email_no_account),
                 actionText = stringResource(R.string.email_sign_up),
