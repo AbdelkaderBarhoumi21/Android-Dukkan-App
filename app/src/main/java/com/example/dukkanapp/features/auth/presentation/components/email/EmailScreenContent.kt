@@ -32,6 +32,7 @@ import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppValidationConstants
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.auth.presentation.components.authoptions.LoginBrandHeader
+import com.example.dukkanapp.features.auth.presentation.components.authoptions.LoginOrDivider
 import com.example.dukkanapp.features.auth.presentation.logic.EmailUiState
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
@@ -130,7 +131,8 @@ fun EmailScreenContent(
                 onClick = onLoginClick,
                 text = stringResource(R.string.email_login_button),
             )
-            Spacer(Modifier.height(AppDimens.size2Xs))
+            LoginOrDivider()
+            Spacer(Modifier.height(AppDimens.size3Xs))
             AppAuthFooterLink(
                 promptText = stringResource(R.string.email_no_account),
                 actionText = stringResource(R.string.email_sign_up),
