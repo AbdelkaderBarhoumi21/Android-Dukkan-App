@@ -24,6 +24,8 @@ import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.CheckBox.AppCheckBox
 import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
 import com.example.dukkanapp.core.common.components.buttons.AppTextButton
+import com.example.dukkanapp.core.common.components.dividers.AppDivider
+import com.example.dukkanapp.core.common.components.headers.AppAuthHeader
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
@@ -31,8 +33,6 @@ import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppValidationConstants
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
-import com.example.dukkanapp.features.auth.presentation.components.authoptions.LoginBrandHeader
-import com.example.dukkanapp.features.auth.presentation.components.authoptions.LoginOrDivider
 import com.example.dukkanapp.features.auth.presentation.logic.LoginUiState
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
@@ -59,9 +59,9 @@ fun LoginScreenContent(
                 .padding(padding)
                 .padding(horizontal = AppDimens.size2Xs)
         ) {
-            LoginBrandHeader(
-                title = stringResource(R.string.email_login_title),
-                subTitle = stringResource(R.string.email_login_subtitle),
+            AppAuthHeader(
+                title = stringResource(R.string.login_title),
+                subTitle = stringResource(R.string.login_subtitle),
                 logo = painterResource(R.drawable.ic_app_logo)
             )
             Spacer(Modifier.height(AppDimens.sizeMd))
@@ -76,7 +76,7 @@ fun LoginScreenContent(
                         modifier = Modifier.size(AppDimens.iconSm)
                     )
                 },
-                placeHolder = stringResource(R.string.email_email_label),
+                placeHolder = stringResource(R.string.login_email_placeholder),
                 errorText = state.emailError?.let { stringResource(it) },
                 isSuccess = state.isValidEmail,
                 keyboardType = KeyboardType.Email,
@@ -88,7 +88,7 @@ fun LoginScreenContent(
             AppPasswordTextField(
                 value = state.password,
                 onValueChange = onPasswordChanged,
-                placeHolder = stringResource(R.string.email_password_label),
+                placeHolder = stringResource(R.string.login_password_placeholder),
                 errorText = state.passwordError?.let {
                     stringResource(
                         it,
@@ -119,24 +119,24 @@ fun LoginScreenContent(
                 AppCheckBox(
                     checked = state.rememberMe,
                     onCheckChanged = onRememberMeChanged,
-                    label = stringResource(R.string.email_remember_me),
+                    label = stringResource(R.string.login_remember_me),
                 )
                 AppTextButton(
                     onClick = onForgetPasswordClick,
-                    text = stringResource(R.string.email_forgot_password),
+                    text = stringResource(R.string.login_forgot_password),
                 )
             }
             Spacer(Modifier.height(AppDimens.size3Xs))
             AppPrimaryButton(
                 onClick = onLoginClick,
-                text = stringResource(R.string.email_login_button),
+                text = stringResource(R.string.login_button),
             )
             Spacer(Modifier.height(AppDimens.size3Xs))
-            LoginOrDivider()
+            AppDivider()
             Spacer(Modifier.height(AppDimens.size5Xs))
             AppAuthFooterLink(
-                promptText = stringResource(R.string.email_no_account),
-                actionText = stringResource(R.string.email_sign_up),
+                promptText = stringResource(R.string.login_no_account),
+                actionText = stringResource(R.string.login_sign_up),
                 onActionClick = onSignupClick
             )
         }
