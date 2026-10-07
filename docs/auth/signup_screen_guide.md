@@ -1,16 +1,31 @@
-# SignUp Screen: UI Components, State, and ViewModel
+# SignUp Screen: UI Components, State, Intent, Effect, and ViewModel
 
-Dukkan App (`com.example.dukkanapp`). Pattern: MVI-style state + events + effects, Hilt ViewModel.
+Dukkan App (`com.example.dukkanapp`). Pattern: **MVI** (State + Intent + Effect), Hilt ViewModel.
 
-This document has been updated to perfectly align with the `Login` flow. It uses `@StringRes` for error handling, delegates visibility toggling to `AppPasswordTextField`, and relies on core utility extensions for validation (eliminating the need for custom Enums and standalone validator objects).
+This version replaces the old `onSuccess` callback and the separate `onEmailChanged / onPasswordChanged / ...` functions with:
+
+- **`SignUpIntent`**: everything the user can do (one entry point: `onIntent`).
+- **`SignUpUiState`**: everything the screen shows (single source of truth).
+- **`SignUpEffect`**: one-time events (navigation) sent from the ViewModel to the screen.
+
+```
+User action → SignUpIntent → ViewModel.onIntent() → new SignUpUiState → Screen re-renders
+                                      └─────────→ SignUpEffect (one-time) → Screen navigates
+```
+
+It stays aligned with the `Login` flow: `@StringRes` for errors, visibility toggling handled inside `AppPasswordTextField`, and validation through the core extensions `isValidEmail()` / `isValidPassword()`.
 
 ## Folder structure
+
+Same folders as before. Two new files in `logic/SignUp/`.
 
 ```
 features/auth/presentation/
 ├── logic/
 │   └── SignUp/
-│       ├── SignUpUiState.kt        (state, events, effects)
+│       ├── SignUpUiState.kt
+│       ├── SignUpIntent.kt         (new)
+│       ├── SignUpEffect.kt         (new)
 │       └── SignUpViewModel.kt
 ├── components/
 │   └── SignUp/
@@ -23,7 +38,7 @@ features/auth/presentation/
 
 ## 1. String resources
 
-Keys prefixed with `signup_`. Ensure these exist in `values/strings.xml`, `values-ar/string-ar.xml`, and `values-fr/string-fr.xml`.
+Unchanged. Keys prefixed with `signup_`. Ensure these exist in `values/strings.xml`, `values-ar/string-ar.xml`, and `values-fr/string-fr.xml`.
 
 ```xml
 <!-- Sign up -->
@@ -52,7 +67,7 @@ Keys prefixed with `signup_`. Ensure these exist in `values/strings.xml`, `value
 
 `logic/SignUp/SignUpUiState.kt`
 
-We align with `LoginUiState` by storing `@StringRes` for errors directly, and avoiding explicit `isVisible` fields since `AppPasswordTextField` manages its own internal visibility state!
+Unchanged. It stores `@StringRes` for errors directly, and has no `isVisible` fields because `AppPasswordTextField` manages its own visibility state.
 
 ```kotlin
 package com.example.dukkanapp.features.auth.presentation.logic.SignUp
@@ -72,18 +87,53 @@ data class SignUpUiState(
 ) {
     val isValidEmail: Boolean get() = emailError == null && email.isValidEmail()
     val isValidPassword: Boolean get() = passwordError == null && password.isValidPassword()
-    val isValidConfirmPassword: Boolean get() = confirmPasswordError == null && 
+    val isValidConfirmPassword: Boolean get() = confirmPasswordError == null &&
             confirmPassword.isNotEmpty() && password == confirmPassword
 }
 ```
 
 ---
 
-## 3. ViewModel
+## 3. Intent (new)
+
+`logic/SignUp/SignUpIntent.kt`
+
+Every action the user can perform on this screen.
+
+```kotlin
+package com.example.dukkanapp.features.auth.presentation.logic.SignUp
+
+sealed interface SignUpIntent {
+    data class EmailChanged(val value: String) : SignUpIntent
+    data class PasswordChanged(val value: String) : SignUpIntent
+    data class ConfirmPasswordChanged(val value: String) : SignUpIntent
+    data object SignUpClicked : SignUpIntent
+}
+```
+
+---
+
+## 4. Effect (new)
+
+`logic/SignUp/SignUpEffect.kt`
+
+One-time events. This replaces the old `onSuccess: () -> Unit` callback. Add more later (for example `ShowMessage`) when you connect Firebase Auth.
+
+```kotlin
+package com.example.dukkanapp.features.auth.presentation.logic.SignUp
+
+sealed interface SignUpEffect {
+    data object NavigateToHome : SignUpEffect
+}
+```
+
+---
+
+## 5. ViewModel
 
 `logic/SignUp/SignUpViewModel.kt`
 
-The ViewModel uses standard extension functions (`isValidEmail()`, `isValidPassword()`) to validate, updating the `@StringRes` state variables accordingly. 
+One public function: `onIntent`. The old logic is kept, but moved into private functions. Navigation is sent as an effect through a `Channel`, so it is delivered exactly once even if the screen is recreated.
 
 ```kotlin
 package com.example.dukkanapp.features.auth.presentation.logic.SignUp
@@ -94,10 +144,12 @@ import com.example.dukkanapp.R
 import com.example.dukkanapp.core.utils.extension.isValidEmail
 import com.example.dukkanapp.core.utils.extension.isValidPassword
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -108,14 +160,27 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
     private val _state = MutableStateFlow(SignUpUiState())
     val state: StateFlow<SignUpUiState> = _state.asStateFlow()
 
-    fun onEmailChanged(email: String) {
+    private val _effect = Channel<SignUpEffect>(Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow()
+
+    /** Single entry point: the screen only sends intents. */
+    fun onIntent(intent: SignUpIntent) {
+        when (intent) {
+            is SignUpIntent.EmailChanged -> onEmailChanged(intent.value)
+            is SignUpIntent.PasswordChanged -> onPasswordChanged(intent.value)
+            is SignUpIntent.ConfirmPasswordChanged -> onConfirmPasswordChanged(intent.value)
+            SignUpIntent.SignUpClicked -> onSignUpClicked()
+        }
+    }
+
+    private fun onEmailChanged(email: String) {
         _state.update { it.copy(email = email, emailError = null) }
     }
 
-    fun onPasswordChanged(password: String) {
+    private fun onPasswordChanged(password: String) {
         _state.update {
             it.copy(
-                password = password, 
+                password = password,
                 passwordError = null,
                 confirmPasswordError = if (it.confirmPassword.isNotEmpty() && password != it.confirmPassword) {
                     R.string.signup_error_password_mismatch
@@ -124,7 +189,7 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun onConfirmPasswordChanged(confirmPassword: String) {
+    private fun onConfirmPasswordChanged(confirmPassword: String) {
         _state.update {
             it.copy(
                 confirmPassword = confirmPassword,
@@ -135,7 +200,7 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun onSignUpClicked(onSuccess: () -> Unit) {
+    private fun onSignUpClicked() {
         val currentState = _state.value
         if (currentState.isLoading) return
 
@@ -172,7 +237,7 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
             // TODO: Implement actual signup logic using Firebase Auth later
             delay(1000)
             _state.update { it.copy(isLoading = false) }
-            onSuccess()
+            _effect.send(SignUpEffect.NavigateToHome) // replaces onSuccess()
         }
     }
 }
@@ -180,18 +245,23 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
 
 ---
 
-## 4. Screen (stateful)
+## 6. Screen (stateful)
 
 `screens/SignUpScreen.kt`
+
+The screen does two things: shows the `state`, and collects `effect` to navigate. It no longer passes `onSuccess` to the ViewModel.
 
 ```kotlin
 package com.example.dukkanapp.features.auth.presentation.screens
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.dukkanapp.features.auth.presentation.components.SignUp.SignUpScreenContent
+import com.example.dukkanapp.features.auth.presentation.logic.SignUp.SignUpEffect
 import com.example.dukkanapp.features.auth.presentation.logic.SignUp.SignUpViewModel
 
 @Composable
@@ -201,27 +271,31 @@ fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val currentOnNavigateToHome by rememberUpdatedState(onNavigateToHome)
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                SignUpEffect.NavigateToHome -> currentOnNavigateToHome()
+            }
+        }
+    }
 
     SignUpScreenContent(
         state = state,
-        onEmailChanged = viewModel::onEmailChanged,
-        onPasswordChanged = viewModel::onPasswordChanged,
-        onConfirmPasswordChanged = viewModel::onConfirmPasswordChanged,
-        onNavigationBack = onNavigationBack,
-        onSignUpClick = {
-            viewModel.onSignUpClicked(onSuccess = onNavigateToHome)
-        }
+        onIntent = viewModel::onIntent,
+        onNavigationBack = onNavigationBack
     )
 }
 ```
 
 ---
 
-## 5. Screen content (stateless) with reusable text fields
+## 7. Screen content (stateless) with reusable text fields
 
 `components/SignUp/SignUpScreenContent.kt`
 
-This leverages the existing `AppTextFiled` and `AppPasswordTextField`. 
+Four callbacks (`onEmailChanged`, `onPasswordChanged`, `onConfirmPasswordChanged`, `onSignUpClick`) are replaced by one: `onIntent`. Back navigation stays a plain callback because it is pure navigation with no logic.
 
 ```kotlin
 package com.example.dukkanapp.features.auth.presentation.components.SignUp
@@ -245,17 +319,15 @@ import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppValidationConstants
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
+import com.example.dukkanapp.features.auth.presentation.logic.SignUp.SignUpIntent
 import com.example.dukkanapp.features.auth.presentation.logic.SignUp.SignUpUiState
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
 fun SignUpScreenContent(
     state: SignUpUiState,
-    onEmailChanged: (String) -> Unit,
-    onPasswordChanged: (String) -> Unit,
-    onConfirmPasswordChanged: (String) -> Unit,
+    onIntent: (SignUpIntent) -> Unit,
     onNavigationBack: () -> Unit,
-    onSignUpClick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -277,7 +349,7 @@ fun SignUpScreenContent(
 
             AppTextFiled(
                 value = state.email,
-                onValueChange = onEmailChanged,
+                onValueChange = { onIntent(SignUpIntent.EmailChanged(it)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Iconsax.Linear.Sms,
@@ -298,7 +370,7 @@ fun SignUpScreenContent(
 
             AppPasswordTextField(
                 value = state.password,
-                onValueChange = onPasswordChanged,
+                onValueChange = { onIntent(SignUpIntent.PasswordChanged(it)) },
                 placeHolder = stringResource(R.string.signup_password_placeholder),
                 errorText = state.passwordError?.let {
                     stringResource(it, AppValidationConstants.MIN_PASSWORD_LENGTH)
@@ -320,7 +392,7 @@ fun SignUpScreenContent(
 
             AppPasswordTextField(
                 value = state.confirmPassword,
-                onValueChange = onConfirmPasswordChanged,
+                onValueChange = { onIntent(SignUpIntent.ConfirmPasswordChanged(it)) },
                 placeHolder = stringResource(R.string.signup_confirm_password_placeholder),
                 errorText = state.confirmPasswordError?.let { stringResource(it) },
                 isSuccess = state.isValidConfirmPassword,
@@ -335,14 +407,14 @@ fun SignUpScreenContent(
                 keyboardActions = KeyboardActions(
                     onDone = {
                         focusManager.clearFocus()
-                        onSignUpClick()
+                        onIntent(SignUpIntent.SignUpClicked)
                     }
                 )
             )
             Spacer(Modifier.height(AppDimens.spaceSm))
 
             AppPrimaryButton(
-                onClick = onSignUpClick,
+                onClick = { onIntent(SignUpIntent.SignUpClicked) },
                 text = stringResource(R.string.signup_button),
                 isLoading = state.isLoading
             )
@@ -353,9 +425,19 @@ fun SignUpScreenContent(
 
 ---
 
-## Key Alignments and Optimizations Made:
-1. **Simplified Fields**: Removed `name` and `terms` fields to stick purely to `email`, `password`, and `confirmPassword` matching the initial `Login` approach.
-2. **`@StringRes` Approach**: Eliminated custom `Enum` error types and `SignUpValidator.kt` entirely. Directly uses `@StringRes val emailError: Int?` which drastically reduces boilerplate and matches `LoginUiState`.
-3. **Internal Component State**: Removed visibility toggling events and booleans (`isPasswordVisible` and `isConfirmPasswordVisible`) from the `ViewModel` because `AppPasswordTextField` internally handles visibility (`var isVisible by rememberSaveable { mutableStateOf(false) }`).
-4. **Validation Extensions**: Reused `String.isValidEmail()` and `String.isValidPassword()` from `core/utils/extension/` to keep validation logic dry and standard across all auth screens.
-5. **Folder Uniformity**: Standardized paths mapping strictly into `features/auth/presentation/logic/SignUp` and `features/auth/presentation/components/SignUp`.
+## What changed (summary)
+
+| Before | After (MVI) |
+|---|---|
+| `onEmailChanged`, `onPasswordChanged`, `onConfirmPasswordChanged`, `onSignUpClicked` public in ViewModel | One public `onIntent(SignUpIntent)` |
+| `onSignUpClicked(onSuccess: () -> Unit)` callback | `SignUpEffect.NavigateToHome` sent through a `Channel` |
+| `SignUpScreenContent` took 4 callbacks | Takes one `onIntent` (+ `onNavigationBack`) |
+| `SignUpScreen` passed `onSuccess` into the ViewModel | `SignUpScreen` collects `viewModel.effect` in a `LaunchedEffect` |
+| Files: `SignUpUiState.kt`, `SignUpViewModel.kt` | Added `SignUpIntent.kt`, `SignUpEffect.kt` |
+
+Unchanged: string resources, `SignUpUiState`, validation logic, `@StringRes` errors, reusable text fields, folder names.
+
+**Notes**
+
+- `data object` needs Kotlin 1.9 or newer. On older versions, use `object` instead.
+- When you add Firebase Auth, add effects like `ShowMessage(@StringRes val message: Int)` for errors such as `signup_error_email_taken` and `signup_error_network`.
