@@ -7,9 +7,12 @@ import com.example.dukkanapp.core.utils.extension.isValidEmail
 import com.example.dukkanapp.core.utils.extension.isValidPassword
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -17,9 +20,21 @@ import kotlinx.coroutines.launch
 class SignUpViewModel @Inject constructor() : ViewModel() {
     private val _state = MutableStateFlow<SignUpUiState>(SignUpUiState())
     val state: StateFlow<SignUpUiState> = _state.asStateFlow()
+    private val _effect = Channel<SignUpEffect>(Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow()
     fun onEmailChanged(email: String) {
         // clear the error as soon as the user edits the field
         _state.update { current -> current.copy(email = email, emailError = null) }
+    }
+
+    /** Single entry point: the screen only sends intents. */
+    fun onIntent(intent: SignUpIntent) {
+        when (intent) {
+            is SignUpIntent.EmailChanged -> onEmailChanged(intent.email)
+            is SignUpIntent.PasswordChanged -> onPasswordChanged(intent.password)
+            is SignUpIntent.ConfirmPasswordChanged -> onConfirmPasswordChanged(intent.confirmPassword)
+            is SignUpIntent.SignUpClicked -> onSignUpClicked()
+        }
     }
 
     fun onPasswordChanged(password: String) {
@@ -50,7 +65,7 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun onSignUpClicked(onSuccess: () -> Unit) {
+    fun onSignUpClicked() {
         val current = _state.value
         if (current.isLoading) return
 
@@ -83,10 +98,10 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
             _state.update {
                 it.copy(isLoading = true)
             }
-
             // TODO: Implement actual signup logic using Firebase Auth later
+            delay(2000)
             _state.update { it.copy(isLoading = false) }
-            onSuccess()
+            _effect.send(SignUpEffect.NavigateToHome)
         }
 
     }
