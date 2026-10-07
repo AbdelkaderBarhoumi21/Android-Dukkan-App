@@ -1,4 +1,4 @@
-package com.example.dukkanapp.features.auth.presentation.logic.SignUp
+package com.example.dukkanapp.features.auth.presentation.logic.signup
 
 import androidx.annotation.StringRes
 import com.example.dukkanapp.core.utils.extension.isValidEmail
