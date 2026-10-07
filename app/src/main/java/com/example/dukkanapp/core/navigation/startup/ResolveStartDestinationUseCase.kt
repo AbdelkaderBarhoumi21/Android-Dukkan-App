@@ -22,7 +22,7 @@ class ResolveStartDestinationUseCase @Inject constructor(
         when {
             !hasLanguageDeferred.await() -> AppRoute.LanguageSelectionScreen
             !hasOnboardingDeferred.await() -> AppRoute.OnboardingScreen
-            !isLoggedInDeferred.await() -> AppRoute.LoginScreen
+            !isLoggedInDeferred.await() -> AppRoute.AuthOptionsScreen
             else -> AppRoute.HomeScreen
         }
     }

@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dukkanapp.features.auth.presentation.screens.AuthOptionsScreen
 import com.example.dukkanapp.features.auth.presentation.screens.LoginScreen
+import com.example.dukkanapp.features.auth.presentation.screens.SignUpScreen
 import com.example.dukkanapp.features.language.presentation.screens.LanguageSelectionScreen
 import com.example.dukkanapp.features.onboarding.presentation.screens.OnboardingScreen
 
@@ -22,7 +23,7 @@ fun AppNavHost(startDestination: AppRoute) {
         navController = navController,
         startDestination = startDestination
     ) {
-        // 1. Language Selection Screen
+        //  Language Selection Screen
         composable<AppRoute.LanguageSelectionScreen> {
             LanguageSelectionScreen(
                 onBack = {},
@@ -37,7 +38,7 @@ fun AppNavHost(startDestination: AppRoute) {
             )
         }
 
-        // 2. Onboarding Screen
+        //  Onboarding Screen
         composable<AppRoute.OnboardingScreen> {
             OnboardingScreen(
                 onFinished = {
@@ -47,8 +48,8 @@ fun AppNavHost(startDestination: AppRoute) {
                 }
             )
         }
-
-        composable<AppRoute.LoginScreen> {
+        // Auth options screen
+        composable<AppRoute.AuthOptionsScreen> {
             AuthOptionsScreen(
                 onEmailClick = {
                     // Todo go to register screen
@@ -57,18 +58,18 @@ fun AppNavHost(startDestination: AppRoute) {
                 onGoogleClick = {},
                 onAppleClick = {},
                 onAlreadyHaveAccountClick = {
-                    navController.navigate(AppRoute.EmailScreen)
+                    navController.navigate(AppRoute.LoginScreen)
                 }
 
             )
 
         }
-
+        // Home screen
         composable<AppRoute.HomeScreen> {
 
         }
-
-        composable<AppRoute.EmailScreen> {
+        // Login Screen
+        composable<AppRoute.LoginScreen> {
             LoginScreen(
                 onForgetPasswordClick = {},
                 onNavigationBack = {
@@ -78,8 +79,13 @@ fun AppNavHost(startDestination: AppRoute) {
                     // Todo go to register screen
                 }
             )
+        }
 
-
+        // SignUp screen
+        composable<AppRoute.SignUpScreen> {
+            SignUpScreen(
+                onNavigationBack = { navController.popBackStack() }
+            )
         }
     }
 }

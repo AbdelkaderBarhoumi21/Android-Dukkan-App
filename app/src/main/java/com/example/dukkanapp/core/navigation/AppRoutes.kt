@@ -10,11 +10,15 @@ sealed interface AppRoute {
     data object OnboardingScreen : AppRoute
 
     @Serializable
-    data object LoginScreen : AppRoute
+    data object AuthOptionsScreen : AppRoute
 
     @Serializable
     data object HomeScreen : AppRoute
 
     @Serializable
-    data object EmailScreen
+
+    data object LoginScreen
+
+    @Serializable
+    data object SignUpScreen
 }
