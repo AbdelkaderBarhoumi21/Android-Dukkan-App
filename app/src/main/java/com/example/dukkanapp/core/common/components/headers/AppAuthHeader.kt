@@ -1,4 +1,4 @@
-package com.example.dukkanapp.features.auth.presentation.components.authoptions
+package com.example.dukkanapp.core.common.components.headers
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
-fun LoginBrandHeader(
+fun AppAuthHeader(
     logo: Painter,
     title: String,
     subTitle: String,

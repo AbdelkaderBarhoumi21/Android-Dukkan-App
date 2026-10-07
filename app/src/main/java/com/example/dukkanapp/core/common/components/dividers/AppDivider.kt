@@ -1,4 +1,4 @@
-package com.example.dukkanapp.features.auth.presentation.components.authoptions
+package com.example.dukkanapp.core.common.components.dividers
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,7 +18,7 @@ import com.example.dukkanapp.R
 import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
-fun LoginOrDivider(
+fun AppDivider(
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.login_or_divider)
 ) {
