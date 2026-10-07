@@ -51,28 +51,19 @@
     <!-- Sign up -->
     <string name="signup_title">Create your account</string>
     <string name="signup_subtitle">Join Dukkan to discover great deals and enjoy a faster checkout.</string>
-    <string name="signup_name_placeholder">Full name</string>
     <string name="signup_email_placeholder">Email address</string>
     <string name="signup_password_placeholder">Password</string>
     <string name="signup_confirm_password_placeholder">Confirm password</string>
-    <string name="signup_show_password">Show password</string>
-    <string name="signup_hide_password">Hide password</string>
-    <string name="signup_terms">I agree to the Terms of Service and Privacy Policy</string>
     <string name="signup_button">Create account</string>
     <string name="signup_loading">Creating account…</string>
-    <string name="signup_or_divider">OR</string>
-    <string name="signup_have_account">Already have an account?</string>
-    <string name="signup_log_in">Log in</string>
-    <string name="signup_error_name_empty">Please enter your full name</string>
+
+    <!-- Errors -->
     <string name="signup_error_email_empty">Please enter your email</string>
     <string name="signup_error_email_invalid">Enter a valid email address</string>
     <string name="signup_error_password_empty">Please enter a password</string>
     <string name="signup_error_password_short">Password must be at least %1$d characters</string>
     <string name="signup_error_password_mismatch">Passwords do not match</string>
-    <string name="signup_error_terms">Please accept the terms to continue</string>
+    <string name="signup_error_confirm_password_empty">Please confirm your password</string>
     <string name="signup_error_email_taken">This email is already registered</string>
     <string name="signup_error_network">No internet connection. Please try again.</string>
-    <string name="signup_error_confirm_password_empty">Please confirm your password</string>
-    <string name="signup_error_password_weak">Password must contain letters and numbers</string>
-
 </resources>
