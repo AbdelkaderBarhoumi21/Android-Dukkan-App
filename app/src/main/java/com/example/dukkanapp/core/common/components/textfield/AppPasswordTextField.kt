@@ -59,8 +59,8 @@ fun AppPasswordTextField(
                 Icon(
                     imageVector = if (isVisible) Iconsax.Linear.Eye else Iconsax.Linear.EyeSlash,
                     contentDescription = stringResource(
-                        if (isVisible) R.string.email_hide_password
-                        else R.string.email_show_password
+                        if (isVisible) R.string.login_hide_password
+                        else R.string.login_show_password
                     ),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(AppDimens.iconSm)

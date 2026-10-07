@@ -52,7 +52,7 @@ fun AppNavHost(startDestination: AppRoute) {
         composable<AppRoute.AuthOptionsScreen> {
             AuthOptionsScreen(
                 onEmailClick = {
-                    // Todo go to register screen
+                    navController.navigate(AppRoute.SignUpScreen)
                 },
 
                 onGoogleClick = {},
