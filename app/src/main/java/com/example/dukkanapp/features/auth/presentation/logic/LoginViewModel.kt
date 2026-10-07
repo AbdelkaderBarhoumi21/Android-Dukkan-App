@@ -12,9 +12,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
-class EmailViewModel @Inject constructor() : ViewModel() {
-    private val _state = MutableStateFlow<EmailUiState>(EmailUiState())
-    val state: StateFlow<EmailUiState> = _state.asStateFlow()
+class LoginViewModel @Inject constructor() : ViewModel() {
+    private val _state = MutableStateFlow<LoginUiState>(LoginUiState())
+    val state: StateFlow<LoginUiState> = _state.asStateFlow()
 
     fun onEmailChanged(value: String) {
         // clear the error as soon as the user edits the field

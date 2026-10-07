@@ -33,12 +33,12 @@ import com.example.dukkanapp.core.utils.constants.AppValidationConstants
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.auth.presentation.components.authoptions.LoginBrandHeader
 import com.example.dukkanapp.features.auth.presentation.components.authoptions.LoginOrDivider
-import com.example.dukkanapp.features.auth.presentation.logic.EmailUiState
+import com.example.dukkanapp.features.auth.presentation.logic.LoginUiState
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
 fun EmailScreenContent(
-    state: EmailUiState,
+    state: LoginUiState,
     onLoginClick: () -> Unit,
     onForgetPasswordClick: () -> Unit,
     onEmailChanged: (String) -> Unit,

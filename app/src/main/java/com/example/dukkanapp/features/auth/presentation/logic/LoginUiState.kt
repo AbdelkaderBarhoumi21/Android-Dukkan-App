@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import com.example.dukkanapp.core.utils.extension.isValidEmail
 import com.example.dukkanapp.core.utils.extension.isValidPassword
 
-data class EmailUiState(
+data class LoginUiState(
     val email: String = "",
     val password: String = "",
     @StringRes val emailError: Int? = null,
