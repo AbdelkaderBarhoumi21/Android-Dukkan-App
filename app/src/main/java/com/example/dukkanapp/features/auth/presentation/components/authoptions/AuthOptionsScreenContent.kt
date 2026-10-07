@@ -10,12 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.dukkanapp.R
+import com.example.dukkanapp.core.common.components.dividers.AppDivider
+import com.example.dukkanapp.core.common.components.headers.AppAuthHeader
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
 import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
-fun LoginScreenContent(
+fun AuthOptionsScreenContent(
     onGoogleClick: () -> Unit,
     onAppleClick: () -> Unit,
     onEmailClick: () -> Unit,
@@ -28,19 +30,19 @@ fun LoginScreenContent(
                 .padding(padding)
                 .padding(horizontal = AppDimens.size2Xs)
         ) {
-            LoginBrandHeader(
+            AppAuthHeader(
                 logo = painterResource(R.drawable.ic_app_logo),
-                title = stringResource(R.string.login_title),
-                subTitle = stringResource(R.string.login_subtitle)
+                title = stringResource(R.string.auth_options_title),
+                subTitle = stringResource(R.string.auth_options_subtitle)
             )
             Spacer(Modifier.height(AppDimens.size2Xl))
-            LoginAuthOptions(
+            AuthOptionsSection(
                 onGoogleClick = onGoogleClick,
                 onAppleClick = onAppleClick,
                 onEmailClick = onEmailClick,
             )
             Spacer(Modifier.height(AppDimens.size2Xs))
-            LoginOrDivider()
+            AppDivider()
             Spacer(Modifier.height(AppDimens.size3Xs))
             AppAuthFooterLink(
                 promptText = stringResource(R.string.onboarding_already_have_account),
