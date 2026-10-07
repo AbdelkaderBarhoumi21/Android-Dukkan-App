@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.dukkanapp.features.auth.presentation.components.email.EmailScreenContent
+import com.example.dukkanapp.features.auth.presentation.components.login.LoginScreenContent
 import com.example.dukkanapp.features.auth.presentation.logic.LoginViewModel
 
 @Composable
@@ -15,7 +15,7 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    EmailScreenContent(
+    LoginScreenContent(
         onLoginClick = { viewModel.onLoginClick() },
         state = state,
         onEmailChanged = { value -> viewModel.onEmailChanged(value) },

@@ -1,4 +1,4 @@
-package com.example.dukkanapp.features.auth.presentation.components.email
+package com.example.dukkanapp.features.auth.presentation.components.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,7 +37,7 @@ import com.example.dukkanapp.features.auth.presentation.logic.LoginUiState
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
-fun EmailScreenContent(
+fun LoginScreenContent(
     state: LoginUiState,
     onLoginClick: () -> Unit,
     onForgetPasswordClick: () -> Unit,
