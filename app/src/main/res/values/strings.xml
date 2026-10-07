@@ -72,5 +72,7 @@
     <string name="signup_error_terms">Please accept the terms to continue</string>
     <string name="signup_error_email_taken">This email is already registered</string>
     <string name="signup_error_network">No internet connection. Please try again.</string>
+    <string name="signup_error_confirm_password_empty">Please confirm your password</string>
+    <string name="signup_error_password_weak">Password must contain letters and numbers</string>
 
 </resources>

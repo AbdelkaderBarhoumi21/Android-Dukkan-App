@@ -73,5 +73,7 @@
     <string name="signup_error_terms">Veuillez accepter les conditions pour continuer</string>
     <string name="signup_error_email_taken">Cette adresse e-mail est déjà utilisée</string>
     <string name="signup_error_network">Pas de connexion Internet. Veuillez réessayer.</string>
+    <string name="signup_error_confirm_password_empty">Veuillez confirmer votre mot de passe</string>
+    <string name="signup_error_password_weak">Le mot de passe doit contenir des lettres et des chiffres</string>
 
 </resources>

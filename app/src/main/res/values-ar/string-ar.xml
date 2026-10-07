@@ -73,4 +73,6 @@
     <string name="signup_error_terms">يرجى الموافقة على الشروط للمتابعة</string>
     <string name="signup_error_email_taken">هذا البريد الإلكتروني مسجّل مسبقاً</string>
     <string name="signup_error_network">لا يوجد اتصال بالإنترنت. حاول مرة أخرى.</string>
+    <string name="signup_error_confirm_password_empty">يرجى تأكيد كلمة المرور</string>
+    <string name="signup_error_password_weak">يجب أن تحتوي كلمة المرور على أحرف وأرقام</string>
 </resources>
