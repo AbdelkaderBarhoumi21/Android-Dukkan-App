@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.dividers.AppDivider
@@ -31,7 +30,6 @@ fun AuthOptionsScreenContent(
                 .padding(horizontal = AppDimens.size2Xs)
         ) {
             AppAuthHeader(
-                logo = painterResource(R.drawable.ic_app_logo),
                 title = stringResource(R.string.auth_options_title),
                 subTitle = stringResource(R.string.auth_options_subtitle)
             )

@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.dukkanapp.features.auth.presentation.components.login.LoginScreenContent
-import com.example.dukkanapp.features.auth.presentation.logic.LoginViewModel
+import com.example.dukkanapp.features.auth.presentation.logic.Login.LoginViewModel
 
 @Composable
 fun LoginScreen(

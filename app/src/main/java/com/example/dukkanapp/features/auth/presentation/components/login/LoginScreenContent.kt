@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
@@ -33,7 +32,7 @@ import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppValidationConstants
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
-import com.example.dukkanapp.features.auth.presentation.logic.LoginUiState
+import com.example.dukkanapp.features.auth.presentation.logic.Login.LoginUiState
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
@@ -62,7 +61,6 @@ fun LoginScreenContent(
             AppAuthHeader(
                 title = stringResource(R.string.login_title),
                 subTitle = stringResource(R.string.login_subtitle),
-                logo = painterResource(R.drawable.ic_app_logo)
             )
             Spacer(Modifier.height(AppDimens.sizeMd))
             AppTextFiled(

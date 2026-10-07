@@ -13,12 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import com.example.dukkanapp.R
 import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
 fun AppAuthHeader(
-    logo: Painter,
+    logo: Painter = painterResource(R.drawable.ic_app_logo),
     title: String,
     subTitle: String,
     modifier: Modifier = Modifier,
