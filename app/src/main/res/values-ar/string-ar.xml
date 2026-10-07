@@ -19,37 +19,58 @@
     <string name="action_log_in">تسجيل الدخول</string>
     <string name="cd_pager_indicator">الصفحة %1$d من %2$d</string>
 
-    <string name="login_title">مرحباً بك مجدداً</string>
-    <string name="login_subtitle">يرجى تسجيل الدخول للوصول إلى حسابك ومتابعة التسوق</string>
+    <!-- Auth options -->
+    <string name="auth_options_title">أهلاً بعودتك</string>
+    <string name="auth_options_subtitle">سجّل الدخول للوصول إلى حسابك ومواصلة التسوق</string>
+    <string name="auth_options_or_continue_with">أو تابع باستخدام</string>
+    <string name="auth_options_google">تسجيل الدخول عبر Google</string>
+    <string name="auth_options_apple">المتابعة عبر Apple</string>
+    <string name="auth_options_email">المتابعة عبر البريد الإلكتروني</string>
+    <string name="auth_options_guest">المتابعة كضيف</string>
 
-    <string name="email_email_label">البريد الإلكتروني</string>
-    <string name="email_email_placeholder">البريد الإلكتروني</string>
-    <string name="email_password_label">كلمة المرور</string>
-    <string name="email_password_placeholder">كلمة المرور</string>
-    <string name="email_show_password">إظهار كلمة المرور</string>
-    <string name="email_hide_password">إخفاء كلمة المرور</string>
-
-    <string name="email_remember_me">تذكرني</string>
-    <string name="email_forgot_password">نسيت كلمة المرور؟</string>
-    <string name="email_login_button">تسجيل الدخول</string>
-    <string name="email_login_loading">جارٍ تسجيل الدخول…</string>
-
-    <string name="login_or_continue_with">أو تابع باستخدام</string>
-    <string name="login_sign_in_with_google">تسجيل الدخول باستخدام Google</string>
-    <string name="login_continue_with_apple">المتابعة باستخدام Apple</string>
-    <string name="login_continue_with_email">المتابعة باستخدام البريد الإلكتروني</string>
-    <string name="login_as_guest">المتابعة كزائر</string>
-
-    <string name="email_no_account">ليس لديك حساب؟</string>
-    <string name="email_sign_up">إنشاء حساب</string>
-
-    <string name="email_error_email_empty">يرجى إدخال البريد الإلكتروني</string>
-    <string name="email_error_email_invalid">أدخل بريداً إلكترونياً صالحاً</string>
-    <string name="email_error_password_empty">يرجى إدخال كلمة المرور</string>
-    <string name="email_error_password_short">يجب ألا تقل كلمة المرور عن %1$d أحرف</string>
-    <string name="email_error_wrong_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة</string>
-    <string name="email_error_network">لا يوجد اتصال بالإنترنت. يرجى المحاولة مرة أخرى.</string>
+    <!-- Login -->
+    <string name="login_title">لنبدأ التسوق</string>
+    <string name="login_subtitle">مفضلاتك ووصولاتك الجديدة وعروضك الحصرية بانتظارك.</string>
+    <string name="login_email_placeholder">البريد الإلكتروني</string>
+    <string name="login_password_placeholder">كلمة المرور</string>
+    <string name="login_show_password">إظهار كلمة المرور</string>
+    <string name="login_hide_password">إخفاء كلمة المرور</string>
+    <string name="login_remember_me">تذكّرني</string>
+    <string name="login_forgot_password">نسيت كلمة المرور؟</string>
+    <string name="login_button">تسجيل الدخول</string>
+    <string name="login_loading">جارٍ تسجيل الدخول…</string>
     <string name="login_or_divider">أو</string>
-    <string name="email_login_title">هيا نبدأ التسوق</string>
-    <string name="email_login_subtitle">مفضلاتك وأحدث المنتجات وعروض حصرية بانتظارك.</string>
+    <string name="login_no_account">ليس لديك حساب؟</string>
+    <string name="login_sign_up">أنشئ حساباً</string>
+    <string name="login_error_email_empty">يرجى إدخال بريدك الإلكتروني</string>
+    <string name="login_error_email_invalid">أدخل بريداً إلكترونياً صالحاً</string>
+    <string name="login_error_password_empty">يرجى إدخال كلمة المرور</string>
+    <string name="login_error_password_short">يجب أن تتكوّن كلمة المرور من %1$d أحرف على الأقل</string>
+    <string name="login_error_wrong_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة</string>
+    <string name="login_error_network">لا يوجد اتصال بالإنترنت. حاول مرة أخرى.</string>
+
+    <!-- Sign up -->
+    <string name="signup_title">أنشئ حسابك</string>
+    <string name="signup_subtitle">انضم إلى دكان لتكتشف أفضل العروض وتستمتع بتجربة دفع أسرع.</string>
+    <string name="signup_name_placeholder">الاسم الكامل</string>
+    <string name="signup_email_placeholder">البريد الإلكتروني</string>
+    <string name="signup_password_placeholder">كلمة المرور</string>
+    <string name="signup_confirm_password_placeholder">تأكيد كلمة المرور</string>
+    <string name="signup_show_password">إظهار كلمة المرور</string>
+    <string name="signup_hide_password">إخفاء كلمة المرور</string>
+    <string name="signup_terms">أوافق على شروط الخدمة وسياسة الخصوصية</string>
+    <string name="signup_button">إنشاء حساب</string>
+    <string name="signup_loading">جارٍ إنشاء الحساب…</string>
+    <string name="signup_or_divider">أو</string>
+    <string name="signup_have_account">لديك حساب بالفعل؟</string>
+    <string name="signup_log_in">تسجيل الدخول</string>
+    <string name="signup_error_name_empty">يرجى إدخال اسمك الكامل</string>
+    <string name="signup_error_email_empty">يرجى إدخال بريدك الإلكتروني</string>
+    <string name="signup_error_email_invalid">أدخل بريداً إلكترونياً صالحاً</string>
+    <string name="signup_error_password_empty">يرجى إدخال كلمة مرور</string>
+    <string name="signup_error_password_short">يجب أن تتكوّن كلمة المرور من %1$d أحرف على الأقل</string>
+    <string name="signup_error_password_mismatch">كلمتا المرور غير متطابقتين</string>
+    <string name="signup_error_terms">يرجى الموافقة على الشروط للمتابعة</string>
+    <string name="signup_error_email_taken">هذا البريد الإلكتروني مسجّل مسبقاً</string>
+    <string name="signup_error_network">لا يوجد اتصال بالإنترنت. حاول مرة أخرى.</string>
 </resources>

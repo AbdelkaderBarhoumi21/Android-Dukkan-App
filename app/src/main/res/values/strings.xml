@@ -18,39 +18,59 @@
     <string name="onboarding_already_have_account">Already have an account?</string>
     <string name="action_log_in">Log In</string>
     <string name="cd_pager_indicator">Page %1$d of %2$d</string>
+    <!-- Auth options -->
+    <string name="auth_options_title">Welcome Back</string>
+    <string name="auth_options_subtitle">Please sign in to access your account and resume shopping</string>
+    <string name="auth_options_or_continue_with">Or continue with</string>
+    <string name="auth_options_google">Sign in with Google</string>
+    <string name="auth_options_apple">Continue with Apple</string>
+    <string name="auth_options_email">Continue with Email</string>
+    <string name="auth_options_guest">Continue as guest</string>
 
-    <string name="login_title">Welcome Back</string>
-    <string name="login_subtitle">Please sign in to access your account and resume shopping</string>
-
-    <string name="email_email_label">Email address</string>
-    <string name="email_email_placeholder">Email address</string>
-    <string name="email_password_label">Password</string>
-    <string name="email_password_placeholder">Password</string>
-    <string name="email_show_password">Show password</string>
-    <string name="email_hide_password">Hide password</string>
-
-    <string name="email_remember_me">Remember me</string>
-    <string name="email_forgot_password">Forgot password?</string>
-    <string name="email_login_button">Log in</string>
-    <string name="email_login_loading">Logging in…</string>
-
-    <string name="login_or_continue_with">Or continue with</string>
-    <string name="login_sign_in_with_google">Sign in with Google</string>
-    <string name="login_continue_with_apple">Continue with Apple</string>
-    <string name="login_continue_with_email">Continue with Email</string>
-    <string name="login_as_guest">Continue as guest</string>
-
-    <string name="email_no_account">Don\'t have an account?</string>
-    <string name="email_sign_up">Sign up</string>
-
-    <string name="email_error_email_empty">Please enter your email</string>
-    <string name="email_error_email_invalid">Enter a valid email address</string>
-    <string name="email_error_password_empty">Please enter your password</string>
-    <string name="email_error_password_short">Password must be at least %1$d characters</string>
-    <string name="email_error_wrong_credentials">Incorrect email or password</string>
-    <string name="email_error_network">No internet connection. Please try again.</string>
+    <!-- Login -->
+    <string name="login_title">Let\'s get shopping</string>
+    <string name="login_subtitle">Your favorites, new arrivals and exclusive deals are waiting for you.</string>
+    <string name="login_email_placeholder">Email address</string>
+    <string name="login_password_placeholder">Password</string>
+    <string name="login_show_password">Show password</string>
+    <string name="login_hide_password">Hide password</string>
+    <string name="login_remember_me">Remember me</string>
+    <string name="login_forgot_password">Forgot password?</string>
+    <string name="login_button">Log in</string>
+    <string name="login_loading">Logging in…</string>
     <string name="login_or_divider">OR</string>
-    <string name="email_login_title">Let\'s get shopping</string>
-    <string name="email_login_subtitle">Your favorites, new arrivals and exclusive deals are waiting for you.</string>
+    <string name="login_no_account">Don\'t have an account?</string>
+    <string name="login_sign_up">Sign up</string>
+    <string name="login_error_email_empty">Please enter your email</string>
+    <string name="login_error_email_invalid">Enter a valid email address</string>
+    <string name="login_error_password_empty">Please enter your password</string>
+    <string name="login_error_password_short">Password must be at least %1$d characters</string>
+    <string name="login_error_wrong_credentials">Incorrect email or password</string>
+    <string name="login_error_network">No internet connection. Please try again.</string>
+
+    <!-- Sign up -->
+    <string name="signup_title">Create your account</string>
+    <string name="signup_subtitle">Join Dukkan to discover great deals and enjoy a faster checkout.</string>
+    <string name="signup_name_placeholder">Full name</string>
+    <string name="signup_email_placeholder">Email address</string>
+    <string name="signup_password_placeholder">Password</string>
+    <string name="signup_confirm_password_placeholder">Confirm password</string>
+    <string name="signup_show_password">Show password</string>
+    <string name="signup_hide_password">Hide password</string>
+    <string name="signup_terms">I agree to the Terms of Service and Privacy Policy</string>
+    <string name="signup_button">Create account</string>
+    <string name="signup_loading">Creating account…</string>
+    <string name="signup_or_divider">OR</string>
+    <string name="signup_have_account">Already have an account?</string>
+    <string name="signup_log_in">Log in</string>
+    <string name="signup_error_name_empty">Please enter your full name</string>
+    <string name="signup_error_email_empty">Please enter your email</string>
+    <string name="signup_error_email_invalid">Enter a valid email address</string>
+    <string name="signup_error_password_empty">Please enter a password</string>
+    <string name="signup_error_password_short">Password must be at least %1$d characters</string>
+    <string name="signup_error_password_mismatch">Passwords do not match</string>
+    <string name="signup_error_terms">Please accept the terms to continue</string>
+    <string name="signup_error_email_taken">This email is already registered</string>
+    <string name="signup_error_network">No internet connection. Please try again.</string>
 
 </resources>
