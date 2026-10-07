@@ -8,7 +8,7 @@ import com.example.dukkanapp.features.auth.presentation.components.email.EmailSc
 import com.example.dukkanapp.features.auth.presentation.logic.EmailViewModel
 
 @Composable
-fun EmailScreen(
+fun LoginScreen(
     onForgetPasswordClick: () -> Unit,
     onNavigationBack: () -> Unit,
     onSignupClick: () -> Unit,

@@ -5,7 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dukkanapp.features.auth.presentation.screens.AuthOptionsScreen
-import com.example.dukkanapp.features.auth.presentation.screens.EmailScreen
+import com.example.dukkanapp.features.auth.presentation.screens.LoginScreen
 import com.example.dukkanapp.features.language.presentation.screens.LanguageSelectionScreen
 import com.example.dukkanapp.features.onboarding.presentation.screens.OnboardingScreen
 
@@ -69,7 +69,7 @@ fun AppNavHost(startDestination: AppRoute) {
         }
 
         composable<AppRoute.EmailScreen> {
-            EmailScreen(
+            LoginScreen(
                 onForgetPasswordClick = {},
                 onNavigationBack = {
                     navController.popBackStack()
