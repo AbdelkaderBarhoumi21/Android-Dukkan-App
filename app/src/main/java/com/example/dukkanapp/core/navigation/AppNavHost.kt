@@ -76,7 +76,11 @@ fun AppNavHost(startDestination: AppRoute) {
                     navController.popBackStack()
                 },
                 onSignupClick = {
-                    navController.navigate(AppRoute.SignUpScreen)
+                    navController.navigate(AppRoute.SignUpScreen) {
+                        popUpTo(AppRoute.AuthOptionsScreen) {
+                            inclusive = false
+                        }
+                    }
                 }
             )
         }
@@ -87,12 +91,16 @@ fun AppNavHost(startDestination: AppRoute) {
                 onNavigationBack = { navController.popBackStack() },
                 onNavigateToHome = {
                     navController.navigate(AppRoute.HomeScreen) {
-                        popUpTo(navController.graph.id) { inclusive = true }
+                        // Todo
                     }
                 },
                 onForgetPasswordClick = {},
                 onLogin = {
-                    navController.navigate(AppRoute.LoginScreen)
+                    navController.navigate(AppRoute.LoginScreen) {
+                        popUpTo(AppRoute.AuthOptionsScreen) {
+                            inclusive = false
+                        }
+                    }
                 },
             )
         }
