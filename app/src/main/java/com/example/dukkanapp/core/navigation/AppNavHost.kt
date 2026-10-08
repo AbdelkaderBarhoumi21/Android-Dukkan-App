@@ -76,7 +76,7 @@ fun AppNavHost(startDestination: AppRoute) {
                     navController.popBackStack()
                 },
                 onSignupClick = {
-                    // Todo go to register screen
+                    navController.navigate(AppRoute.SignUpScreen)
                 }
             )
         }
@@ -84,7 +84,16 @@ fun AppNavHost(startDestination: AppRoute) {
         // SignUp screen
         composable<AppRoute.SignUpScreen> {
             SignUpScreen(
-                onNavigationBack = { navController.popBackStack() }
+                onNavigationBack = { navController.popBackStack() },
+                onNavigateToHome = {
+                    navController.navigate(AppRoute.HomeScreen) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
+                },
+                onForgetPasswordClick = {},
+                onLogin = {
+                    navController.navigate(AppRoute.LoginScreen)
+                },
             )
         }
     }
