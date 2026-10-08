@@ -1,6 +1,11 @@
 package com.example.dukkanapp.features.auth.presentation.components.SignUp
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +30,6 @@ import com.example.dukkanapp.core.utils.constants.AppValidationConstants
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpIntent
 import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpUiState
-
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
@@ -128,6 +132,7 @@ fun SignUpScreenContent(
             AppPrimaryButton(
                 onClick = { onIntent(SignUpIntent.SignUpClicked) },
                 text = stringResource(R.string.signup_button),
+                isLoading = state.isLoading
             )
             Spacer(Modifier.height(AppDimens.size3Xs))
             AppDivider()
@@ -135,7 +140,7 @@ fun SignUpScreenContent(
             AppAuthFooterLink(
                 promptText = stringResource(R.string.signup_have_account),
                 actionText = stringResource(R.string.signup_log_in),
-                onActionClick = onLogin
+                onActionClick = onLogin,
             )
         }
     }
