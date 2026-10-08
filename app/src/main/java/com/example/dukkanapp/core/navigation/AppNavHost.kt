@@ -42,7 +42,7 @@ fun AppNavHost(startDestination: AppRoute) {
         composable<AppRoute.OnboardingScreen> {
             OnboardingScreen(
                 onFinished = {
-                    navController.navigate(AppRoute.LoginScreen) {
+                    navController.navigate(AppRoute.AuthOptionsScreen) {
                         popUpTo(AppRoute.OnboardingScreen) { inclusive = true }
                     }
                 }
@@ -77,9 +77,11 @@ fun AppNavHost(startDestination: AppRoute) {
                 },
                 onSignupClick = {
                     navController.navigate(AppRoute.SignUpScreen) {
-                        popUpTo(AppRoute.AuthOptionsScreen) {
-                            inclusive = false
+                        popUpTo(AppRoute.LoginScreen) {
+                            inclusive = true
                         }
+                        launchSingleTop =
+                            true // prevent pushing a second copy of that screen if that screen already in the top
                     }
                 }
             )
@@ -95,11 +97,12 @@ fun AppNavHost(startDestination: AppRoute) {
                     }
                 },
                 onForgetPasswordClick = {},
-                onLogin = {
+                onLoginClick = {
                     navController.navigate(AppRoute.LoginScreen) {
-                        popUpTo(AppRoute.AuthOptionsScreen) {
-                            inclusive = false
+                        popUpTo(AppRoute.SignUpScreen) {
+                            inclusive = true
                         }
+                        launchSingleTop = true
                     }
                 },
             )

@@ -15,7 +15,7 @@ fun SignUpScreen(
     onNavigationBack: () -> Unit,
     onNavigateToHome: () -> Unit,
     onForgetPasswordClick: () -> Unit,
-    onLogin: () -> Unit,
+    onLoginClick: () -> Unit,
     viewModel: SignUpViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -33,6 +33,6 @@ fun SignUpScreen(
         onIntent = { intent -> viewModel.onIntent(intent) },
         onNavigationBack = onNavigationBack,
         onForgetPasswordClick = onForgetPasswordClick,
-        onLogin = onLogin,
+        onLoginClick = onLoginClick,
     )
 }

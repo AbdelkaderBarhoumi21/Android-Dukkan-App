@@ -38,7 +38,7 @@ fun SignUpScreenContent(
     onIntent: (SignUpIntent) -> Unit,
     onNavigationBack: () -> Unit,
     onForgetPasswordClick: () -> Unit,
-    onLogin: () -> Unit,
+    onLoginClick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -140,7 +140,7 @@ fun SignUpScreenContent(
             AppAuthFooterLink(
                 promptText = stringResource(R.string.signup_have_account),
                 actionText = stringResource(R.string.signup_log_in),
-                onActionClick = onLogin,
+                onActionClick = onLoginClick,
             )
         }
     }
