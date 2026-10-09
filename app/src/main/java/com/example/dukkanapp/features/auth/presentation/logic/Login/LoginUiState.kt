@@ -1,6 +1,7 @@
-package com.example.dukkanapp.features.auth.presentation.logic.Login
+package com.example.dukkanapp.features.auth.presentation.logic.login
 
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
 import com.example.dukkanapp.core.utils.extension.isValidEmail
 import com.example.dukkanapp.core.utils.extension.isValidPassword
 
@@ -15,3 +16,4 @@ data class LoginUiState(
     val isValidEmail: Boolean get() = emailError == null && email.isValidEmail()
     val isValidPassword: Boolean get() = passwordError == null && password.isValidPassword()
 }
+

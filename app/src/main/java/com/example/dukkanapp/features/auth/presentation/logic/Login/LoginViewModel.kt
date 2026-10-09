@@ -1,4 +1,4 @@
-package com.example.dukkanapp.features.auth.presentation.logic.Login
+package com.example.dukkanapp.features.auth.presentation.logic.login
 
 import androidx.lifecycle.ViewModel
 import com.example.dukkanapp.R

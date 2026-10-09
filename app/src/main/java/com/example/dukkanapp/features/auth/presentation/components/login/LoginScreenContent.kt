@@ -32,7 +32,7 @@ import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppValidationConstants
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
-import com.example.dukkanapp.features.auth.presentation.logic.Login.LoginUiState
+import com.example.dukkanapp.features.auth.presentation.logic.login.LoginUiState
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
