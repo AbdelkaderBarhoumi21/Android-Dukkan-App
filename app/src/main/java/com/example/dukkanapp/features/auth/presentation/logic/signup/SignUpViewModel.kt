@@ -6,7 +6,7 @@ import com.example.dukkanapp.R
 import com.example.dukkanapp.core.utils.extension.isValidEmail
 import com.example.dukkanapp.core.utils.extension.isValidPassword
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

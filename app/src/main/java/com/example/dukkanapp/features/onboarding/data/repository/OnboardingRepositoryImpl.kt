@@ -3,7 +3,7 @@ package com.example.dukkanapp.features.onboarding.data.repository
 import com.example.dukkanapp.features.onboarding.data.datasource.OnboardingPreferenceLocalDataSource
 import com.example.dukkanapp.features.onboarding.domain.model.OnboardingPageModel
 import com.example.dukkanapp.features.onboarding.domain.repository.OnboardingRepository
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 
 class OnboardingRepositoryImpl @Inject constructor(

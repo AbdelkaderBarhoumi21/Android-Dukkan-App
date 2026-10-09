@@ -1,7 +1,7 @@
 package com.example.dukkanapp.features.language.domain.usecase
 
 import com.example.dukkanapp.features.language.domain.repository.LanguageRepository
-import jakarta.inject.Inject
+import javax.inject.Inject
 
 
 class ObserveSelectedLanguageUseCase @Inject constructor(

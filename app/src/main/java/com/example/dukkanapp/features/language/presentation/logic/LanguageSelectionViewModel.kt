@@ -7,7 +7,7 @@ import com.example.dukkanapp.features.language.domain.usecase.ObserveSelectedLan
 import com.example.dukkanapp.features.language.domain.usecase.SelectLanguageUseCase
 import com.example.dukkanapp.features.language.presentation.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
