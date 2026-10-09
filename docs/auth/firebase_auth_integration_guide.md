@@ -1,59 +1,92 @@
 # Firebase Authentication Integration Guide
 
-Complete guide for integrating Firebase Authentication with email verification and Firestore user collection in the Dukkan App. Follows the existing **MVI architecture** (State + Intent + Effect).
+Email/password authentication with email verification and a Firestore user profile for the Dukkan B2C e-commerce app. It follows the app's **MVI** pattern (State + Intent + Effect).
 
-> **Prerequisites:** Read [Error Handling Architecture](../core/error_handling_architecture.md) first. This guide uses `AppResult`, `AppException`, and the Firebase exception mappers defined there.
+> **Prerequisite:** implement [Error Handling Architecture](../core/error_handling_architecture.md) first. This guide uses `AppResult`, `AppError`, `ErrorMapper.safeCall`, `UiText` and `ValidationError` from there.
 
 ```
-User SignUp → Firebase Auth → Send Verification Email → Create User in Firestore
-                    ↓
-           Navigate to Email Verification Screen
-                    ↓
-           User verifies email → Navigate to Home
+SignUp ──► Firebase Auth (create) ──► Firestore users/{uid} (create if absent) ──► send verification email
+                                                     │
+                                       EmailVerification screen
+                                (re-checks on every resume + manual button)
+                                                     │
+                                               verified ──► Home
+
+SignIn ──► Firebase Auth ──► ensure profile exists ──► verified ? Home : EmailVerification
 ```
 
 ---
 
 ## Table of Contents
 
-1. [Dependencies Setup](#1-dependencies-setup)
-2. [Firebase Console Setup](#2-firebase-console-setup)
+0. [Review: What Changed and Why](#0-review-what-changed-and-why)
+1. [Dependencies](#1-dependencies)
+2. [Firebase Console and Security Rules](#2-firebase-console-and-security-rules)
 3. [Domain Layer](#3-domain-layer)
 4. [Data Layer](#4-data-layer)
 5. [Dependency Injection](#5-dependency-injection)
-6. [Presentation Layer - Updated MVI](#6-presentation-layer---updated-mvi)
-7. [Email Verification Screen](#7-email-verification-screen)
-8. [Navigation Setup](#8-navigation-setup)
-9. [String Resources](#9-string-resources)
-10. [Error Handling](#10-error-handling)
-
-> **Note:** This guide uses the centralized error handling from `core/error/`. See [Error Handling Architecture](../core/error_handling_architecture.md) for details on `AppResult`, `AppException`, and `ErrorCodeMapper`.
+6. [Sign Up (MVI)](#6-sign-up-mvi)
+7. [Login (MVI)](#7-login-mvi)
+8. [Email Verification (MVI)](#8-email-verification-mvi)
+9. [Navigation and App Start](#9-navigation-and-app-start)
+10. [String Resources](#10-string-resources)
+11. [Folder Structure](#11-folder-structure)
+12. [Implementation Checklist](#12-implementation-checklist)
+13. [Manual Testing](#13-manual-testing)
 
 ---
 
-## 1. Dependencies Setup
+## 0. Review: What Changed and Why
 
-### Step 1.1: Add Firebase BOM and dependencies to `gradle/libs.versions.toml`
+| # | Previous version | Problem | Now |
+|---|---|---|---|
+| 1 | `firebase-auth-ktx`, `firebase-firestore-ktx` | KTX modules were **removed** from the Firebase BoM in v34. The Kotlin APIs now live in the main modules. | `firebase-auth`, `firebase-firestore` |
+| 2 | `.await()` used without its dependency | `kotlinx.coroutines.tasks.await` comes from `kotlinx-coroutines-play-services`, which wasn't declared. | Added |
+| 3 | Rule `allow create: if request.auth != null` | **Security hole:** any signed-in user could create or overwrite *anyone's* `users/{id}` document. | `request.auth.uid == userId`, plus a field whitelist on update |
+| 4 | One `AuthRepository` doing auth **and** Firestore profile CRUD | Violates Single Responsibility and Interface Segregation. Profile grows in e-commerce (addresses, phone, FCM token). | `AuthRepository` (session) + `UserRepository` (profile) |
+| 5 | One `User` model with `createdAt = System.currentTimeMillis()` defaults | Domain invented timestamps. Auth identity and profile data were mixed. | `AuthUser` (identity) + `UserProfile` (Firestore). No fake defaults. |
+| 6 | `UserDto` with `@ServerTimestamp createdAt` written via `set(merge)` on update | **Bug:** `createdAt` is `null` in `fromDomain()`, so every update **overwrote `createdAt`** with the current time. | Create once in a transaction. Updates write only the changed fields plus `FieldValue.serverTimestamp()`. |
+| 7 | `isEmailVerified` stored in Firestore | Duplicates the source of truth (Auth). Kotlin `is`-prefixed properties also serialize as `emailVerified`, so they never read back. | Not stored. Read from `FirebaseUser`. |
+| 8 | Sign-up: if the Firestore write failed, the use case returned **Error** although the Auth account existed | Retrying then gave "email already in use", and the user was stuck without a profile. | Auth success = sign-up success. The profile is created *if absent* at sign-up **and** at every sign-in, so it self-heals. |
+| 9 | Data sources and repositories each had `try/catch` in every method | Boilerplate. Also swallowed `CancellationException`. | Repositories use `errorMapper.safeCall { }`. Data sources are thin. |
+| 10 | `isEmailVerified()` separate from `reloadUser()`; `isLoggedIn()` suspend | Two calls for one fact. Needless `suspend`. | `reloadUser(): AppResult<AuthUser>` carries `isEmailVerified`. `currentUser` is a property. |
+| 11 | Verification polling `while (true) { delay(5000) }` in `init` | Runs while the app is in background, drains battery, risks Firebase quota, can navigate twice. | Check on every **screen resume** (user returns from mail app) + manual button, guarded by a single `Job`. |
+| 12 | Resend button had no cooldown | Firebase rate-limits verification mail, so users hit `TooManyRequests`. | 60 s cooldown in state |
+| 13 | `isLoading = true` set *inside* `launch` | Double-tap race: two sign-ups could start. | Loading set synchronously before `launch`. |
+| 14 | Every server error went to a top banner | "Email already registered" belongs on the email field. | Field-specific errors are routed to their field. |
+| 15 | `@StringRes Int` errors | `%1$d` in password-length strings rendered literally | `UiText` with args |
+| 16 | `Intent(ACTION_MAIN).addCategory(CATEGORY_APP_EMAIL)` + hardcoded `"Open Email"` | Wrong pattern for app categories. Crashes with no mail app. Unlocalized string. | `Intent.makeMainSelectorActivity` + `ActivityNotFoundException` handled |
+| 17 | Duplicate strings (`signup_error_password_weak`, `signup_error_unknown`...) next to `error_*` | Two sources of truth | Removed. Core `error_*` / `validation_*` only. |
+
+**Bugs already in the current code** (`SignUpViewModel` / `SignUpUiState`). The code in section 6 fixes all of them:
+- `if (emailError != null && passwordError != null && confirmPasswordError != null) return`: `&&` should be `||`. Sign-up proceeds while fields are invalid.
+- `current.confirmPassword.isNotEmpty() -> signup_error_confirm_password_empty`: inverted. It shows "please confirm" when the user *did* confirm.
+- `current.password.isEmpty() -> R.string.signup_error_confirm_password_empty`: wrong string.
+- `SignUpUiState.isValidEmail = emailError != null && ...`: inverted (`== null`).
+- `stringResource(R.string.signup_error_password_short)` without the `%1$d` argument.
+
+---
+
+## 1. Dependencies
+
+### Step 1.1: `gradle/libs.versions.toml`
 
 ```toml
 [versions]
-# ... existing versions ...
-firebaseBom = "33.7.0"
+firebaseBom = "34.0.0"        # use the latest 34.x+ (KTX modules removed since 34.0.0)
+googleServices = "4.4.2"
 
 [libraries]
-# ... existing libraries ...
-
-# Firebase
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
-firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 
 [plugins]
-# ... existing plugins ...
-google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 ```
 
-### Step 1.2: Update root `build.gradle.kts`
+### Step 1.2: root `build.gradle.kts`
 
 ```kotlin
 plugins {
@@ -62,101 +95,101 @@ plugins {
 }
 ```
 
-### Step 1.3: Update `app/build.gradle.kts`
+### Step 1.3: `app/build.gradle.kts`
 
 ```kotlin
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.google.services)  // Add this
+    // ... existing plugins ...
+    alias(libs.plugins.google.services)
 }
 
 dependencies {
-    // ... existing dependencies ...
-
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.kotlinx.coroutines.play.services) // Task.await()
 }
 ```
 
-### Step 1.4: Add `google-services.json`
+### Step 1.4: `google-services.json`
 
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Create a new project or select existing one
-3. Add Android app with package name: `com.example.dukkanapp`
-4. Download `google-services.json`
-5. Place it in `app/` directory
+1. [Firebase Console](https://console.firebase.google.com/) → add an Android app with package `com.example.dukkanapp`
+2. Download `google-services.json` into `app/`
+3. Add it to `.gitignore` if the repository is public
 
 ---
 
-## 2. Firebase Console Setup
+## 2. Firebase Console and Security Rules
 
-### Step 2.1: Enable Email/Password Authentication
-
-1. Go to Firebase Console → Authentication → Sign-in method
-2. Enable **Email/Password** provider
-3. Enable **Email link (passwordless sign-in)** if needed
-
-### Step 2.2: Create Firestore Database
-
-1. Go to Firebase Console → Firestore Database
-2. Click **Create database**
-3. Choose **Start in test mode** (for development)
-4. Select your region
-
-### Step 2.3: Firestore Security Rules (Production)
+1. **Authentication → Sign-in method:** enable **Email/Password**.
+2. **Authentication → Settings:** keep **Email enumeration protection** enabled (default). Wrong password and unknown user both return `ERROR_INVALID_CREDENTIAL`, mapped to `AppError.Auth.InvalidCredentials`.
+3. **Firestore Database:** create the database in your users' region. Start in **production mode** with these rules (never ship test mode):
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users collection
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
     match /users/{userId} {
-      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null;
+      allow read: if isOwner(userId);
+
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'photoUrl', 'createdAt', 'updatedAt'])
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if isOwner(userId)
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['displayName', 'photoUrl', 'updatedAt']);
+
+      allow delete: if false; // account deletion goes through a Cloud Function
     }
   }
 }
 ```
 
+> **Production tip:** for a B2C app, the most robust way to create the profile is a Cloud Function triggered on Auth user creation. The client-side "create if absent" below is the no-backend alternative and self-heals on next sign-in.
+
 ---
 
 ## 3. Domain Layer
 
-### Step 3.1: Create User Model
+### Step 3.1: Models
 
-**File:** `features/auth/domain/model/User.kt`
+**File:** `features/auth/domain/model/AuthUser.kt`
 
 ```kotlin
 package com.example.dukkanapp.features.auth.domain.model
 
-data class User(
-    val uid: String = "",
-    val email: String = "",
-    val displayName: String = "",
-    val photoUrl: String? = null,
-    val isEmailVerified: Boolean = false,
-    val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long = System.currentTimeMillis()
+/** The authenticated identity. Source of truth: Firebase Auth. */
+data class AuthUser(
+    val uid: String,
+    val email: String,
+    val isEmailVerified: Boolean,
 )
 ```
 
-### Step 3.2: Use Core Error Handling
+**File:** `features/user/domain/model/UserProfile.kt`
 
-> **Important:** We use the centralized `AppResult` and `AppException` from `core/error/` instead of creating auth-specific error classes. See [Error Handling Architecture](../core/error_handling_architecture.md).
+```kotlin
+package com.example.dukkanapp.features.user.domain.model
 
-The following are already defined in core:
-- `core/error/AppResult.kt` - Generic result wrapper
-- `core/error/AppException.kt` - All exception types including auth exceptions
-- `core/error/firebase/FirebaseAuthExceptionMapper.kt` - Maps Firebase Auth errors
-- `core/error/firebase/FirebaseFirestoreExceptionMapper.kt` - Maps Firestore errors
+/** The customer's profile. Source of truth: Firestore `users/{uid}`. */
+data class UserProfile(
+    val uid: String,
+    val email: String,
+    val displayName: String,
+    val photoUrl: String?,
+    val createdAtMillis: Long?,
+)
+```
 
-### Step 3.3: Update AuthRepository Interface
+### Step 3.2: Repositories
 
 **File:** `features/auth/domain/repository/AuthRepository.kt`
 
@@ -164,44 +197,41 @@ The following are already defined in core:
 package com.example.dukkanapp.features.auth.domain.repository
 
 import com.example.dukkanapp.core.error.AppResult
-import com.example.dukkanapp.features.auth.domain.model.User
+import com.example.dukkanapp.core.error.EmptyResult
+import com.example.dukkanapp.features.auth.domain.model.AuthUser
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
-    
-    val currentUser: Flow<User?>
-    
-    suspend fun isLoggedIn(): Boolean
-    
-    suspend fun signUpWithEmail(
-        email: String,
-        password: String
-    ): AppResult<User>
-    
-    suspend fun signInWithEmail(
-        email: String,
-        password: String
-    ): AppResult<User>
-    
-    suspend fun sendEmailVerification(): AppResult<Unit>
-    
-    suspend fun reloadUser(): AppResult<User>
-    
-    suspend fun isEmailVerified(): Boolean
-    
-    suspend fun createUserInFirestore(user: User): AppResult<Unit>
-    
-    suspend fun getUserFromFirestore(uid: String): AppResult<User?>
-    
-    suspend fun updateUserInFirestore(user: User): AppResult<Unit>
-    
-    suspend fun signOut()
-    
-    suspend fun sendPasswordResetEmail(email: String): AppResult<Unit>
+    val currentUser: AuthUser?
+    val authState: Flow<AuthUser?>
+
+    suspend fun signUp(email: String, password: String): AppResult<AuthUser>
+    suspend fun signIn(email: String, password: String): AppResult<AuthUser>
+    suspend fun sendEmailVerification(): EmptyResult
+    suspend fun reloadUser(): AppResult<AuthUser>
+    suspend fun sendPasswordResetEmail(email: String): EmptyResult
+    fun signOut()
 }
 ```
 
-### Step 3.4: Create Use Cases
+**File:** `features/user/domain/repository/UserRepository.kt`
+
+```kotlin
+package com.example.dukkanapp.features.user.domain.repository
+
+import com.example.dukkanapp.core.error.AppResult
+import com.example.dukkanapp.core.error.EmptyResult
+import com.example.dukkanapp.features.auth.domain.model.AuthUser
+import com.example.dukkanapp.features.user.domain.model.UserProfile
+
+interface UserRepository {
+    suspend fun createProfileIfAbsent(user: AuthUser): EmptyResult
+    suspend fun getProfile(uid: String): AppResult<UserProfile>
+    suspend fun updateProfile(uid: String, displayName: String, photoUrl: String?): EmptyResult
+}
+```
+
+### Step 3.3: Use Cases
 
 **File:** `features/auth/domain/usecase/SignUpUseCase.kt`
 
@@ -209,60 +239,50 @@ interface AuthRepository {
 package com.example.dukkanapp.features.auth.domain.usecase
 
 import com.example.dukkanapp.core.error.AppResult
-import com.example.dukkanapp.features.auth.domain.model.User
+import com.example.dukkanapp.core.error.onSuccess
+import com.example.dukkanapp.features.auth.domain.model.AuthUser
 import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
+import com.example.dukkanapp.features.user.domain.repository.UserRepository
 import javax.inject.Inject
 
 class SignUpUseCase @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository,
 ) {
-    suspend operator fun invoke(
-        email: String,
-        password: String
-    ): AppResult<User> {
-        // Step 1: Create user in Firebase Auth
-        val authResult = authRepository.signUpWithEmail(email, password)
-        
-        if (authResult is AppResult.Error) {
-            return authResult
-        }
-        
-        val user = (authResult as AppResult.Success).data
-        
-        // Step 2: Create user document in Firestore
-        val firestoreResult = authRepository.createUserInFirestore(user)
-        
-        if (firestoreResult is AppResult.Error) {
-            return firestoreResult
-        }
-        
-        // Step 3: Send email verification
-        val verificationResult = authRepository.sendEmailVerification()
-        
-        if (verificationResult is AppResult.Error) {
-            // Log but don't fail - user is created, verification can be resent
-        }
-        
-        return AppResult.Success(user)
-    }
+    /**
+     * Once the Auth account exists, sign-up has succeeded. The follow-up steps are best effort:
+     * the profile is re-ensured on every sign-in, and the verification email can be resent
+     * from the verification screen. Failing here would leave the user unable to retry
+     * ("email already in use").
+     */
+    suspend operator fun invoke(email: String, password: String): AppResult<AuthUser> =
+        authRepository.signUp(email, password)
+            .onSuccess { user ->
+                userRepository.createProfileIfAbsent(user)
+                authRepository.sendEmailVerification()
+            }
 }
 ```
 
-**File:** `features/auth/domain/usecase/SendEmailVerificationUseCase.kt`
+**File:** `features/auth/domain/usecase/SignInUseCase.kt`
 
 ```kotlin
 package com.example.dukkanapp.features.auth.domain.usecase
 
 import com.example.dukkanapp.core.error.AppResult
+import com.example.dukkanapp.core.error.onSuccess
+import com.example.dukkanapp.features.auth.domain.model.AuthUser
 import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
+import com.example.dukkanapp.features.user.domain.repository.UserRepository
 import javax.inject.Inject
 
-class SendEmailVerificationUseCase @Inject constructor(
-    private val authRepository: AuthRepository
+class SignInUseCase @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository,
 ) {
-    suspend operator fun invoke(): AppResult<Unit> {
-        return authRepository.sendEmailVerification()
-    }
+    suspend operator fun invoke(email: String, password: String): AppResult<AuthUser> =
+        authRepository.signIn(email, password)
+            .onSuccess { user -> userRepository.createProfileIfAbsent(user) } // self-heals a failed sign-up write
 }
 ```
 
@@ -272,22 +292,87 @@ class SendEmailVerificationUseCase @Inject constructor(
 package com.example.dukkanapp.features.auth.domain.usecase
 
 import com.example.dukkanapp.core.error.AppResult
+import com.example.dukkanapp.core.error.map
 import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class CheckEmailVerificationUseCase @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) {
-    suspend operator fun invoke(): AppResult<Boolean> {
-        // Reload user to get latest verification status
-        val reloadResult = authRepository.reloadUser()
-        
-        if (reloadResult is AppResult.Error) {
-            return reloadResult
-        }
-        
-        val isVerified = authRepository.isEmailVerified()
-        return AppResult.Success(isVerified)
+    /** Reloads the user from the server; the cached flag never changes on its own. */
+    suspend operator fun invoke(): AppResult<Boolean> =
+        authRepository.reloadUser().map { it.isEmailVerified }
+}
+```
+
+**File:** `features/auth/domain/usecase/SendEmailVerificationUseCase.kt`
+
+```kotlin
+package com.example.dukkanapp.features.auth.domain.usecase
+
+import com.example.dukkanapp.core.error.EmptyResult
+import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
+import javax.inject.Inject
+
+class SendEmailVerificationUseCase @Inject constructor(
+    private val authRepository: AuthRepository,
+) {
+    suspend operator fun invoke(): EmptyResult = authRepository.sendEmailVerification()
+}
+```
+
+**File:** `features/auth/domain/usecase/GetCurrentUserUseCase.kt`
+
+```kotlin
+package com.example.dukkanapp.features.auth.domain.usecase
+
+import com.example.dukkanapp.features.auth.domain.model.AuthUser
+import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
+import javax.inject.Inject
+
+class GetCurrentUserUseCase @Inject constructor(
+    private val authRepository: AuthRepository,
+) {
+    operator fun invoke(): AuthUser? = authRepository.currentUser
+}
+```
+
+### Step 3.4: AuthFormValidator
+
+Shared by Login and Sign Up, so the rules are written once.
+
+**File:** `features/auth/domain/validation/AuthFormValidator.kt`
+
+```kotlin
+package com.example.dukkanapp.features.auth.domain.validation
+
+import com.example.dukkanapp.core.domain.validation.ValidationError
+import com.example.dukkanapp.core.utils.extension.isValidEmail
+import com.example.dukkanapp.core.utils.extension.isValidPassword
+
+object AuthFormValidator {
+
+    fun validateEmail(email: String): ValidationError? = when {
+        email.isBlank() -> ValidationError.EMAIL_EMPTY
+        !email.trim().isValidEmail() -> ValidationError.EMAIL_INVALID
+        else -> null
+    }
+
+    /** Sign-up: enforce the password policy. */
+    fun validateNewPassword(password: String): ValidationError? = when {
+        password.isEmpty() -> ValidationError.PASSWORD_EMPTY
+        !password.isValidPassword() -> ValidationError.PASSWORD_TOO_SHORT
+        else -> null
+    }
+
+    /** Login: only require a value. Older accounts may predate the current policy. */
+    fun validateExistingPassword(password: String): ValidationError? =
+        if (password.isEmpty()) ValidationError.PASSWORD_EMPTY else null
+
+    fun validateConfirmPassword(password: String, confirmPassword: String): ValidationError? = when {
+        confirmPassword.isEmpty() -> ValidationError.CONFIRM_PASSWORD_EMPTY
+        password != confirmPassword -> ValidationError.PASSWORDS_MISMATCH
+        else -> null
     }
 }
 ```
@@ -296,414 +381,275 @@ class CheckEmailVerificationUseCase @Inject constructor(
 
 ## 4. Data Layer
 
-> **Architecture:** Data sources throw `AppException`, repositories catch and wrap in `AppResult`. See [Error Handling Architecture](../core/error_handling_architecture.md).
+Data sources are thin wrappers that only call Firebase and let exceptions propagate. Repositories are the single error boundary (`errorMapper.safeCall`).
 
-### Step 4.1: Create Firestore User DTO
+### Step 4.1: FirebaseUser Mapper
 
-**File:** `features/auth/data/model/UserDto.kt`
+**File:** `features/auth/data/mapper/AuthUserMapper.kt`
 
 ```kotlin
-package com.example.dukkanapp.features.auth.data.model
+package com.example.dukkanapp.features.auth.data.mapper
 
-import com.example.dukkanapp.features.auth.domain.model.User
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentId
-import com.google.firebase.firestore.ServerTimestamp
+import com.example.dukkanapp.features.auth.domain.model.AuthUser
+import com.google.firebase.auth.FirebaseUser
 
-data class UserDto(
-    @DocumentId
-    val uid: String = "",
-    val email: String = "",
-    val displayName: String = "",
-    val photoUrl: String? = null,
-    val isEmailVerified: Boolean = false,
-    @ServerTimestamp
-    val createdAt: Timestamp? = null,
-    @ServerTimestamp
-    val updatedAt: Timestamp? = null
-) {
-    fun toDomain(): User = User(
-        uid = uid,
-        email = email,
-        displayName = displayName,
-        photoUrl = photoUrl,
-        isEmailVerified = isEmailVerified,
-        createdAt = createdAt?.toDate()?.time ?: System.currentTimeMillis(),
-        updatedAt = updatedAt?.toDate()?.time ?: System.currentTimeMillis()
-    )
-    
-    companion object {
-        fun fromDomain(user: User): UserDto = UserDto(
-            uid = user.uid,
-            email = user.email,
-            displayName = user.displayName,
-            photoUrl = user.photoUrl,
-            isEmailVerified = user.isEmailVerified
-        )
-    }
-}
+fun FirebaseUser.toAuthUser(): AuthUser = AuthUser(
+    uid = uid,
+    email = email.orEmpty(),
+    isEmailVerified = isEmailVerified,
+)
 ```
 
-### Step 4.2: Create Remote Data Sources
-
-> See [Error Handling Architecture](../core/error_handling_architecture.md) for full data source implementations with `AuthRemoteDataSource` and `UserRemoteDataSource`.
+### Step 4.2: AuthRemoteDataSource
 
 **File:** `features/auth/data/datasource/AuthRemoteDataSource.kt`
 
 ```kotlin
 package com.example.dukkanapp.features.auth.data.datasource
 
-import com.google.firebase.auth.FirebaseUser
-
-/**
- * Remote data source for authentication operations.
- * All methods throw AppException on failure.
- */
-interface AuthRemoteDataSource {
-    suspend fun signUpWithEmail(email: String, password: String): FirebaseUser
-    suspend fun signInWithEmail(email: String, password: String): FirebaseUser
-    suspend fun sendEmailVerification()
-    suspend fun reloadUser(): FirebaseUser
-    fun getCurrentUser(): FirebaseUser?
-    fun isEmailVerified(): Boolean
-    fun signOut()
-    suspend fun sendPasswordResetEmail(email: String)
-}
-```
-
-**File:** `features/auth/data/datasource/AuthRemoteDataSourceImpl.kt`
-
-```kotlin
-package com.example.dukkanapp.features.auth.data.datasource
-
-import com.example.dukkanapp.core.error.AppException
-import com.example.dukkanapp.core.error.firebase.FirebaseAuthExceptionMapper
+import com.example.dukkanapp.core.data.error.AppErrorException
+import com.example.dukkanapp.core.error.AppError
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class AuthRemoteDataSourceImpl @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
-) : AuthRemoteDataSource {
-    
-    override suspend fun signUpWithEmail(email: String, password: String): FirebaseUser {
-        return try {
-            val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-            result.user ?: throw AppException.UnknownException("User creation failed")
-        } catch (e: AppException) {
-            throw e
-        } catch (e: Exception) {
-            throw FirebaseAuthExceptionMapper.map(e)
-        }
+/** Thin wrapper over FirebaseAuth. Throws raw Firebase exceptions; the repository maps them. */
+class AuthRemoteDataSource @Inject constructor(
+    private val auth: FirebaseAuth,
+) {
+    val currentUser: FirebaseUser? get() = auth.currentUser
+
+    val authState: Flow<FirebaseUser?> = callbackFlow {
+        val listener = FirebaseAuth.AuthStateListener { trySend(it.currentUser) }
+        auth.addAuthStateListener(listener)
+        awaitClose { auth.removeAuthStateListener(listener) }
     }
-    
-    override suspend fun signInWithEmail(email: String, password: String): FirebaseUser {
-        return try {
-            val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            result.user ?: throw AppException.UnknownException("Sign in failed")
-        } catch (e: AppException) {
-            throw e
-        } catch (e: Exception) {
-            throw FirebaseAuthExceptionMapper.map(e)
-        }
+
+    suspend fun signUp(email: String, password: String): FirebaseUser =
+        checkNotNull(auth.createUserWithEmailAndPassword(email, password).await().user)
+
+    suspend fun signIn(email: String, password: String): FirebaseUser =
+        checkNotNull(auth.signInWithEmailAndPassword(email, password).await().user)
+
+    suspend fun sendEmailVerification() {
+        requireUser().sendEmailVerification().await()
     }
-    
-    override suspend fun sendEmailVerification() {
-        try {
-            val user = firebaseAuth.currentUser 
-                ?: throw AppException.UserNotFoundException("No current user")
-            user.sendEmailVerification().await()
-        } catch (e: AppException) {
-            throw e
-        } catch (e: Exception) {
-            throw FirebaseAuthExceptionMapper.map(e)
-        }
+
+    suspend fun reloadUser(): FirebaseUser {
+        requireUser().reload().await()
+        return requireUser()
     }
-    
-    override suspend fun reloadUser(): FirebaseUser {
-        return try {
-            val user = firebaseAuth.currentUser 
-                ?: throw AppException.UserNotFoundException("No current user")
-            user.reload().await()
-            firebaseAuth.currentUser 
-                ?: throw AppException.UserNotFoundException("User not found after reload")
-        } catch (e: AppException) {
-            throw e
-        } catch (e: Exception) {
-            throw FirebaseAuthExceptionMapper.map(e)
-        }
+
+    suspend fun sendPasswordResetEmail(email: String) {
+        auth.sendPasswordResetEmail(email).await()
     }
-    
-    override fun getCurrentUser(): FirebaseUser? = firebaseAuth.currentUser
-    
-    override fun isEmailVerified(): Boolean = firebaseAuth.currentUser?.isEmailVerified ?: false
-    
-    override fun signOut() = firebaseAuth.signOut()
-    
-    override suspend fun sendPasswordResetEmail(email: String) {
-        try {
-            firebaseAuth.sendPasswordResetEmail(email).await()
-        } catch (e: AppException) {
-            throw e
-        } catch (e: Exception) {
-            throw FirebaseAuthExceptionMapper.map(e)
-        }
-    }
+
+    fun signOut() = auth.signOut()
+
+    private fun requireUser(): FirebaseUser =
+        auth.currentUser ?: throw AppErrorException(AppError.Auth.SessionExpired)
 }
 ```
 
-**File:** `features/auth/data/datasource/UserRemoteDataSource.kt`
-
-```kotlin
-package com.example.dukkanapp.features.auth.data.datasource
-
-import com.example.dukkanapp.features.auth.data.model.UserDto
-
-/**
- * Remote data source for user Firestore operations.
- * All methods throw AppException on failure.
- */
-interface UserRemoteDataSource {
-    suspend fun createUser(userDto: UserDto)
-    suspend fun getUser(uid: String): UserDto?
-    suspend fun updateUser(userDto: UserDto)
-    suspend fun deleteUser(uid: String)
-    suspend fun updateUserFields(uid: String, fields: Map<String, Any?>)
-}
-```
-
-**File:** `features/auth/data/datasource/UserRemoteDataSourceImpl.kt`
-
-```kotlin
-package com.example.dukkanapp.features.auth.data.datasource
-
-import com.example.dukkanapp.core.error.AppException
-import com.example.dukkanapp.core.error.firebase.FirebaseFirestoreExceptionMapper
-import com.example.dukkanapp.features.auth.data.model.UserDto
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
-import kotlinx.coroutines.tasks.await
-import javax.inject.Inject
-
-class UserRemoteDataSourceImpl @Inject constructor(
-    private val firestore: FirebaseFirestore
-) : UserRemoteDataSource {
-    
-    companion object {
-        private const val USERS_COLLECTION = "users"
-    }
-    
-    override suspend fun createUser(userDto: UserDto) {
-        try {
-            firestore.collection(USERS_COLLECTION)
-                .document(userDto.uid)
-                .set(userDto)
-                .await()
-        } catch (e: AppException) {
-            throw e
-        } catch (e: Exception) {
-            throw FirebaseFirestoreExceptionMapper.map(e)
-        }
-    }
-    
-    override suspend fun getUser(uid: String): UserDto? {
-        return try {
-            val document = firestore.collection(USERS_COLLECTION)
-                .document(uid)
-                .get()
-                .await()
-            document.toObject(UserDto::class.java)
-        } catch (e: AppException) {
-            throw e
-        } catch (e: Exception) {
-            throw FirebaseFirestoreExceptionMapper.map(e)
-        }
-    }
-    
-    override suspend fun updateUser(userDto: UserDto) {
-        try {
-            firestore.collection(USERS_COLLECTION)
-                .document(userDto.uid)
-                .set(userDto, SetOptions.merge())
-                .await()
-        } catch (e: AppException) {
-            throw e
-        } catch (e: Exception) {
-            throw FirebaseFirestoreExceptionMapper.map(e)
-        }
-    }
-    
-    override suspend fun deleteUser(uid: String) {
-        try {
-            firestore.collection(USERS_COLLECTION)
-                .document(uid)
-                .delete()
-                .await()
-        } catch (e: AppException) {
-            throw e
-        } catch (e: Exception) {
-            throw FirebaseFirestoreExceptionMapper.map(e)
-        }
-    }
-    
-    override suspend fun updateUserFields(uid: String, fields: Map<String, Any?>) {
-        try {
-            firestore.collection(USERS_COLLECTION)
-                .document(uid)
-                .update(fields)
-                .await()
-        } catch (e: AppException) {
-            throw e
-        } catch (e: Exception) {
-            throw FirebaseFirestoreExceptionMapper.map(e)
-        }
-    }
-}
-```
-
-### Step 4.3: Update AuthRepositoryImpl
+### Step 4.3: AuthRepositoryImpl
 
 **File:** `features/auth/data/repository/AuthRepositoryImpl.kt`
 
 ```kotlin
 package com.example.dukkanapp.features.auth.data.repository
 
-import com.example.dukkanapp.core.error.AppException
+import com.example.dukkanapp.core.data.error.ErrorMapper
+import com.example.dukkanapp.core.data.error.safeCall
 import com.example.dukkanapp.core.error.AppResult
+import com.example.dukkanapp.core.error.EmptyResult
 import com.example.dukkanapp.features.auth.data.datasource.AuthRemoteDataSource
-import com.example.dukkanapp.features.auth.data.datasource.UserRemoteDataSource
-import com.example.dukkanapp.features.auth.data.model.UserDto
-import com.example.dukkanapp.features.auth.domain.model.User
+import com.example.dukkanapp.features.auth.data.mapper.toAuthUser
+import com.example.dukkanapp.features.auth.domain.model.AuthUser
 import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val firebaseAuth: FirebaseAuth,
-    private val authRemoteDataSource: AuthRemoteDataSource,
-    private val userRemoteDataSource: UserRemoteDataSource
+    private val remote: AuthRemoteDataSource,
+    private val errorMapper: ErrorMapper,
 ) : AuthRepository {
 
-    override val currentUser: Flow<User?> = callbackFlow {
-        val listener = FirebaseAuth.AuthStateListener { auth ->
-            trySend(auth.currentUser?.toDomain())
-        }
-        firebaseAuth.addAuthStateListener(listener)
-        awaitClose { firebaseAuth.removeAuthStateListener(listener) }
+    override val currentUser: AuthUser?
+        get() = remote.currentUser?.toAuthUser()
+
+    override val authState: Flow<AuthUser?> =
+        remote.authState.map { it?.toAuthUser() }
+
+    override suspend fun signUp(email: String, password: String): AppResult<AuthUser> =
+        errorMapper.safeCall { remote.signUp(email, password).toAuthUser() }
+
+    override suspend fun signIn(email: String, password: String): AppResult<AuthUser> =
+        errorMapper.safeCall { remote.signIn(email, password).toAuthUser() }
+
+    override suspend fun sendEmailVerification(): EmptyResult =
+        errorMapper.safeCall { remote.sendEmailVerification() }
+
+    override suspend fun reloadUser(): AppResult<AuthUser> =
+        errorMapper.safeCall { remote.reloadUser().toAuthUser() }
+
+    override suspend fun sendPasswordResetEmail(email: String): EmptyResult =
+        errorMapper.safeCall { remote.sendPasswordResetEmail(email) }
+
+    override fun signOut() = remote.signOut()
+}
+```
+
+Compare with the previous version: 8 `try/catch` blocks are gone, and the error behavior is identical everywhere.
+
+### Step 4.4: Firestore Profile DTO
+
+**File:** `features/user/data/model/UserProfileDto.kt`
+
+```kotlin
+package com.example.dukkanapp.features.user.data.model
+
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.ServerTimestamp
+
+/**
+ * Firestore shape of `users/{uid}`.
+ * - [uid] comes from the document id ([DocumentId] fields are not written).
+ * - [createdAt]/[updatedAt] are filled by the server when written as null.
+ * - Email verification is NOT stored: Firebase Auth is its source of truth.
+ */
+data class UserProfileDto(
+    @DocumentId val uid: String = "",
+    val email: String = "",
+    val displayName: String = "",
+    val photoUrl: String? = null,
+    @ServerTimestamp val createdAt: Timestamp? = null,
+    @ServerTimestamp val updatedAt: Timestamp? = null,
+) {
+    companion object {
+        const val COLLECTION = "users"
+        const val FIELD_DISPLAY_NAME = "displayName"
+        const val FIELD_PHOTO_URL = "photoUrl"
+        const val FIELD_UPDATED_AT = "updatedAt"
+    }
+}
+```
+
+**File:** `features/user/data/mapper/UserProfileMapper.kt`
+
+```kotlin
+package com.example.dukkanapp.features.user.data.mapper
+
+import com.example.dukkanapp.features.auth.domain.model.AuthUser
+import com.example.dukkanapp.features.user.data.model.UserProfileDto
+import com.example.dukkanapp.features.user.domain.model.UserProfile
+
+fun UserProfileDto.toDomain(): UserProfile = UserProfile(
+    uid = uid,
+    email = email,
+    displayName = displayName,
+    photoUrl = photoUrl,
+    createdAtMillis = createdAt?.toDate()?.time,
+)
+
+fun AuthUser.toNewProfileDto(): UserProfileDto = UserProfileDto(email = email)
+```
+
+### Step 4.5: UserRemoteDataSource
+
+**File:** `features/user/data/datasource/UserRemoteDataSource.kt`
+
+```kotlin
+package com.example.dukkanapp.features.user.data.datasource
+
+import com.example.dukkanapp.core.data.error.AppErrorException
+import com.example.dukkanapp.core.error.AppError
+import com.example.dukkanapp.features.user.data.model.UserProfileDto
+import com.example.dukkanapp.features.user.data.model.UserProfileDto.Companion.COLLECTION
+import com.example.dukkanapp.features.user.data.model.UserProfileDto.Companion.FIELD_DISPLAY_NAME
+import com.example.dukkanapp.features.user.data.model.UserProfileDto.Companion.FIELD_PHOTO_URL
+import com.example.dukkanapp.features.user.data.model.UserProfileDto.Companion.FIELD_UPDATED_AT
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+
+class UserRemoteDataSource @Inject constructor(
+    private val firestore: FirebaseFirestore,
+) {
+    private fun userDoc(uid: String) = firestore.collection(COLLECTION).document(uid)
+
+    /** Idempotent: never overwrites an existing profile (and its createdAt). */
+    suspend fun createProfileIfAbsent(uid: String, profile: UserProfileDto) {
+        val ref = userDoc(uid)
+        firestore.runTransaction { tx ->
+            if (!tx.get(ref).exists()) tx.set(ref, profile)
+            null
+        }.await()
     }
 
-    override suspend fun isLoggedIn(): Boolean {
-        return authRemoteDataSource.getCurrentUser() != null
-    }
+    suspend fun getProfile(uid: String): UserProfileDto =
+        userDoc(uid).get().await().toObject(UserProfileDto::class.java)
+            ?: throw AppErrorException(AppError.Data.NotFound)
 
-    override suspend fun signUpWithEmail(
-        email: String,
-        password: String
-    ): AppResult<User> {
-        return try {
-            val firebaseUser = authRemoteDataSource.signUpWithEmail(email, password)
-            AppResult.Success(firebaseUser.toDomain())
-        } catch (e: AppException) {
-            AppResult.Error(e)
-        }
+    /** Writes only the editable fields, so createdAt is never touched. */
+    suspend fun updateProfile(uid: String, displayName: String, photoUrl: String?) {
+        userDoc(uid).update(
+            mapOf(
+                FIELD_DISPLAY_NAME to displayName,
+                FIELD_PHOTO_URL to photoUrl,
+                FIELD_UPDATED_AT to FieldValue.serverTimestamp(),
+            )
+        ).await()
     }
+}
+```
 
-    override suspend fun signInWithEmail(
-        email: String,
-        password: String
-    ): AppResult<User> {
-        return try {
-            val firebaseUser = authRemoteDataSource.signInWithEmail(email, password)
-            AppResult.Success(firebaseUser.toDomain())
-        } catch (e: AppException) {
-            AppResult.Error(e)
-        }
-    }
+> **Offline behavior:** Firestore queues writes offline, and `update(...).await()` only resumes after the **server** acknowledges. For profile edits you can skip awaiting the server and trust the local cache. Transactions (`createProfileIfAbsent`) fail fast offline with `UNAVAILABLE`, which maps to `AppError.Network.ServiceUnavailable`.
 
-    override suspend fun sendEmailVerification(): AppResult<Unit> {
-        return try {
-            authRemoteDataSource.sendEmailVerification()
-            AppResult.Success(Unit)
-        } catch (e: AppException) {
-            AppResult.Error(e)
-        }
-    }
+### Step 4.6: UserRepositoryImpl
 
-    override suspend fun reloadUser(): AppResult<User> {
-        return try {
-            val firebaseUser = authRemoteDataSource.reloadUser()
-            AppResult.Success(firebaseUser.toDomain())
-        } catch (e: AppException) {
-            AppResult.Error(e)
-        }
-    }
+**File:** `features/user/data/repository/UserRepositoryImpl.kt`
 
-    override suspend fun isEmailVerified(): Boolean {
-        return authRemoteDataSource.isEmailVerified()
-    }
+```kotlin
+package com.example.dukkanapp.features.user.data.repository
 
-    override suspend fun createUserInFirestore(user: User): AppResult<Unit> {
-        return try {
-            val userDto = UserDto.fromDomain(user)
-            userRemoteDataSource.createUser(userDto)
-            AppResult.Success(Unit)
-        } catch (e: AppException) {
-            AppResult.Error(e)
-        }
-    }
+import com.example.dukkanapp.core.data.error.ErrorMapper
+import com.example.dukkanapp.core.data.error.safeCall
+import com.example.dukkanapp.core.error.AppResult
+import com.example.dukkanapp.core.error.EmptyResult
+import com.example.dukkanapp.features.auth.domain.model.AuthUser
+import com.example.dukkanapp.features.user.data.datasource.UserRemoteDataSource
+import com.example.dukkanapp.features.user.data.mapper.toDomain
+import com.example.dukkanapp.features.user.data.mapper.toNewProfileDto
+import com.example.dukkanapp.features.user.domain.model.UserProfile
+import com.example.dukkanapp.features.user.domain.repository.UserRepository
+import javax.inject.Inject
 
-    override suspend fun getUserFromFirestore(uid: String): AppResult<User?> {
-        return try {
-            val userDto = userRemoteDataSource.getUser(uid)
-            AppResult.Success(userDto?.toDomain())
-        } catch (e: AppException) {
-            AppResult.Error(e)
-        }
-    }
+class UserRepositoryImpl @Inject constructor(
+    private val remote: UserRemoteDataSource,
+    private val errorMapper: ErrorMapper,
+) : UserRepository {
 
-    override suspend fun updateUserInFirestore(user: User): AppResult<Unit> {
-        return try {
-            val userDto = UserDto.fromDomain(user)
-            userRemoteDataSource.updateUser(userDto)
-            AppResult.Success(Unit)
-        } catch (e: AppException) {
-            AppResult.Error(e)
-        }
-    }
+    override suspend fun createProfileIfAbsent(user: AuthUser): EmptyResult =
+        errorMapper.safeCall { remote.createProfileIfAbsent(user.uid, user.toNewProfileDto()) }
 
-    override suspend fun signOut() {
-        authRemoteDataSource.signOut()
-    }
+    override suspend fun getProfile(uid: String): AppResult<UserProfile> =
+        errorMapper.safeCall { remote.getProfile(uid).toDomain() }
 
-    override suspend fun sendPasswordResetEmail(email: String): AppResult<Unit> {
-        return try {
-            authRemoteDataSource.sendPasswordResetEmail(email)
-            AppResult.Success(Unit)
-        } catch (e: AppException) {
-            AppResult.Error(e)
-        }
-    }
-    
-    private fun FirebaseUser.toDomain(): User = User(
-        uid = uid,
-        email = email ?: "",
-        displayName = displayName ?: "",
-        photoUrl = photoUrl?.toString(),
-        isEmailVerified = isEmailVerified
-    )
+    override suspend fun updateProfile(uid: String, displayName: String, photoUrl: String?): EmptyResult =
+        errorMapper.safeCall { remote.updateProfile(uid, displayName, photoUrl) }
 }
 ```
 
 ---
 
 ## 5. Dependency Injection
-
-### Step 5.1: Create Firebase Module
 
 **File:** `core/di/FirebaseModule.kt`
 
@@ -724,75 +670,54 @@ object FirebaseModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseAuth(): FirebaseAuth {
-        return FirebaseAuth.getInstance()
-    }
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 
     @Provides
     @Singleton
-    fun provideFirebaseFirestore(): FirebaseFirestore {
-        return FirebaseFirestore.getInstance()
-    }
+    fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 }
 ```
 
-### Step 5.2: Update AuthModule
-
-**File:** `core/di/AuthModule.kt`
+**File:** `core/di/AuthModule.kt` (updated)
 
 ```kotlin
-package com.example.dukkanapp.core.di
-
-import com.example.dukkanapp.features.auth.data.datasource.AuthRemoteDataSource
-import com.example.dukkanapp.features.auth.data.datasource.AuthRemoteDataSourceImpl
-import com.example.dukkanapp.features.auth.data.datasource.UserRemoteDataSource
-import com.example.dukkanapp.features.auth.data.datasource.UserRemoteDataSourceImpl
-import com.example.dukkanapp.features.auth.data.repository.AuthRepositoryImpl
-import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
-
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class AuthModule {
 
-    @Binds
     @Singleton
-    abstract fun bindAuthRepository(
-        authRepositoryImpl: AuthRepositoryImpl
-    ): AuthRepository
-    
     @Binds
-    @Singleton
-    abstract fun bindAuthRemoteDataSource(
-        authRemoteDataSourceImpl: AuthRemoteDataSourceImpl
-    ): AuthRemoteDataSource
-    
-    @Binds
-    @Singleton
-    abstract fun bindUserRemoteDataSource(
-        userRemoteDataSourceImpl: UserRemoteDataSourceImpl
-    ): UserRemoteDataSource
+    abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
 }
 ```
 
-> **Note:** Use cases don't need explicit `@Provides` when using `@Inject constructor` - Hilt will inject them automatically.
+**File:** `core/di/UserModule.kt`
+
+```kotlin
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class UserModule {
+
+    @Singleton
+    @Binds
+    abstract fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
+}
+```
+
+`ErrorModule` (binding `ErrorMapper`) comes from the [Error Handling guide](../core/error_handling_architecture.md#11-dependency-injection). Data sources and use cases need no bindings: they are concrete `@Inject constructor` classes.
 
 ---
 
-## 6. Presentation Layer - Updated MVI
+## 6. Sign Up (MVI)
 
-### Step 6.1: Update SignUpUiState
+### Step 6.1: SignUpUiState
 
 **File:** `features/auth/presentation/logic/signup/SignUpUiState.kt`
 
 ```kotlin
 package com.example.dukkanapp.features.auth.presentation.logic.signup
 
-import androidx.annotation.StringRes
+import com.example.dukkanapp.core.common.text.UiText
 import com.example.dukkanapp.core.utils.extension.isValidEmail
 import com.example.dukkanapp.core.utils.extension.isValidPassword
 
@@ -800,68 +725,52 @@ data class SignUpUiState(
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "",
-    @StringRes val emailError: Int? = null,
-    @StringRes val passwordError: Int? = null,
-    @StringRes val confirmPasswordError: Int? = null,
-    @StringRes val generalError: Int? = null,
+    val emailError: UiText? = null,
+    val passwordError: UiText? = null,
+    val confirmPasswordError: UiText? = null,
+    val generalError: UiText? = null,
     val isLoading: Boolean = false,
-    val signUpSuccess: Boolean = false
 ) {
     val isValidEmail: Boolean get() = emailError == null && email.isValidEmail()
     val isValidPassword: Boolean get() = passwordError == null && password.isValidPassword()
-    val isValidConfirmPassword: Boolean get() = confirmPasswordError == null &&
-            confirmPassword.isNotEmpty() && password == confirmPassword
+    val isValidConfirmPassword: Boolean
+        get() = confirmPasswordError == null && confirmPassword.isNotEmpty() && password == confirmPassword
 }
 ```
 
-### Step 6.2: Update SignUpIntent
-
-**File:** `features/auth/presentation/logic/signup/SignUpIntent.kt`
+### Step 6.2: SignUpIntent and SignUpEffect
 
 ```kotlin
-package com.example.dukkanapp.features.auth.presentation.logic.signup
-
 sealed interface SignUpIntent {
     data class EmailChanged(val email: String) : SignUpIntent
     data class PasswordChanged(val password: String) : SignUpIntent
     data class ConfirmPasswordChanged(val confirmPassword: String) : SignUpIntent
     data object SignUpClicked : SignUpIntent
-    data object DismissError : SignUpIntent
+    data object ErrorDismissed : SignUpIntent
 }
-```
-
-### Step 6.3: Update SignUpEffect
-
-**File:** `features/auth/presentation/logic/signup/SignUpEffect.kt`
-
-```kotlin
-package com.example.dukkanapp.features.auth.presentation.logic.signup
-
-import androidx.annotation.StringRes
 
 sealed interface SignUpEffect {
     data object NavigateToEmailVerification : SignUpEffect
-    data class ShowSnackbar(@StringRes val message: Int) : SignUpEffect
 }
 ```
 
-### Step 6.4: Update SignUpViewModel
+### Step 6.3: SignUpViewModel
 
 **File:** `features/auth/presentation/logic/signup/SignUpViewModel.kt`
-
-> Uses `ErrorCodeMapper.toStringRes()` from core to convert `AppException` to `@StringRes`. See [Error Handling Architecture](../core/error_handling_architecture.md).
 
 ```kotlin
 package com.example.dukkanapp.features.auth.presentation.logic.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dukkanapp.R
-import com.example.dukkanapp.core.error.AppResult
-import com.example.dukkanapp.core.error.ErrorCodeMapper.toStringRes
-import com.example.dukkanapp.core.utils.extension.isValidEmail
-import com.example.dukkanapp.core.utils.extension.isValidPassword
+import com.example.dukkanapp.core.common.error.toUiText
+import com.example.dukkanapp.core.common.text.UiText
+import com.example.dukkanapp.core.domain.validation.ValidationError
+import com.example.dukkanapp.core.error.AppError
+import com.example.dukkanapp.core.error.onFailure
+import com.example.dukkanapp.core.error.onSuccess
 import com.example.dukkanapp.features.auth.domain.usecase.SignUpUseCase
+import com.example.dukkanapp.features.auth.domain.validation.AuthFormValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -874,7 +783,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val signUpUseCase: SignUpUseCase
+    private val signUp: SignUpUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SignUpUiState())
@@ -883,13 +792,14 @@ class SignUpViewModel @Inject constructor(
     private val _effect = Channel<SignUpEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
+    /** Single entry point: the screen only sends intents. */
     fun onIntent(intent: SignUpIntent) {
         when (intent) {
             is SignUpIntent.EmailChanged -> onEmailChanged(intent.email)
             is SignUpIntent.PasswordChanged -> onPasswordChanged(intent.password)
             is SignUpIntent.ConfirmPasswordChanged -> onConfirmPasswordChanged(intent.confirmPassword)
             SignUpIntent.SignUpClicked -> onSignUpClicked()
-            SignUpIntent.DismissError -> onDismissError()
+            SignUpIntent.ErrorDismissed -> _state.update { it.copy(generalError = null) }
         }
     }
 
@@ -902,10 +812,8 @@ class SignUpViewModel @Inject constructor(
             it.copy(
                 password = password,
                 passwordError = null,
+                confirmPasswordError = liveMismatchError(password, it.confirmPassword),
                 generalError = null,
-                confirmPasswordError = if (it.confirmPassword.isNotEmpty() && password != it.confirmPassword) {
-                    R.string.signup_error_password_mismatch
-                } else null
             )
         }
     }
@@ -914,88 +822,69 @@ class SignUpViewModel @Inject constructor(
         _state.update {
             it.copy(
                 confirmPassword = confirmPassword,
+                confirmPasswordError = liveMismatchError(it.password, confirmPassword),
                 generalError = null,
-                confirmPasswordError = if (confirmPassword.isNotEmpty() && it.password != confirmPassword) {
-                    R.string.signup_error_password_mismatch
-                } else null
             )
         }
-    }
-
-    private fun onDismissError() {
-        _state.update { it.copy(generalError = null) }
     }
 
     private fun onSignUpClicked() {
-        val currentState = _state.value
-        if (currentState.isLoading) return
+        val current = _state.value
+        if (current.isLoading) return
 
-        // Validate inputs
-        val emailError = when {
-            currentState.email.isBlank() -> R.string.signup_error_email_empty
-            !currentState.email.isValidEmail() -> R.string.signup_error_email_invalid
-            else -> null
+        val email = current.email.trim()
+        val emailError = AuthFormValidator.validateEmail(email)
+        val passwordError = AuthFormValidator.validateNewPassword(current.password)
+        val confirmError = AuthFormValidator.validateConfirmPassword(current.password, current.confirmPassword)
+
+        if (emailError != null || passwordError != null || confirmError != null) {
+            _state.update {
+                it.copy(
+                    emailError = emailError?.toUiText(),
+                    passwordError = passwordError?.toUiText(),
+                    confirmPasswordError = confirmError?.toUiText(),
+                )
+            }
+            return
         }
 
-        val passwordError = when {
-            currentState.password.isEmpty() -> R.string.signup_error_password_empty
-            !currentState.password.isValidPassword() -> R.string.signup_error_password_short
-            else -> null
-        }
-
-        val confirmPasswordError = when {
-            currentState.confirmPassword.isEmpty() -> R.string.signup_error_confirm_password_empty
-            currentState.password != currentState.confirmPassword -> R.string.signup_error_password_mismatch
-            else -> null
-        }
-
-        _state.update {
-            it.copy(
-                emailError = emailError,
-                passwordError = passwordError,
-                confirmPasswordError = confirmPasswordError
-            )
-        }
-
-        if (emailError != null || passwordError != null || confirmPasswordError != null) return
-
-        // Proceed with sign up
+        // Set synchronously, before launch, so a double tap can't start two sign-ups.
+        _state.update { it.copy(isLoading = true, generalError = null) }
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, generalError = null) }
+            signUp(email, current.password)
+                .onSuccess { _effect.send(SignUpEffect.NavigateToEmailVerification) }
+                .onFailure(::showError)
+            _state.update { it.copy(isLoading = false) }
+        }
+    }
 
-            when (val result = signUpUseCase(currentState.email, currentState.password)) {
-                is AppResult.Success -> {
-                    _state.update { it.copy(isLoading = false, signUpSuccess = true) }
-                    _effect.send(SignUpEffect.NavigateToEmailVerification)
-                }
-                is AppResult.Error -> {
-                    // Use ErrorCodeMapper extension function
-                    val errorRes = result.exception.toStringRes()
-                    _state.update { it.copy(isLoading = false, generalError = errorRes) }
-                }
+    /** Errors that concern a single field are shown on that field; everything else in the banner. */
+    private fun showError(error: AppError) {
+        val message = error.toUiText()
+        _state.update {
+            when (error) {
+                AppError.Auth.InvalidEmail,
+                AppError.Auth.EmailAlreadyInUse -> it.copy(emailError = message)
+                AppError.Auth.WeakPassword -> it.copy(passwordError = message)
+                else -> it.copy(generalError = message)
             }
         }
     }
+
+    private fun liveMismatchError(password: String, confirmPassword: String): UiText? =
+        if (confirmPassword.isNotEmpty() && password != confirmPassword) {
+            ValidationError.PASSWORDS_MISMATCH.toUiText()
+        } else {
+            null
+        }
 }
 ```
 
-### Step 6.5: Update SignUpScreen
+### Step 6.4: SignUpScreen
 
 **File:** `features/auth/presentation/screens/SignUpScreen.kt`
 
 ```kotlin
-package com.example.dukkanapp.features.auth.presentation.screens
-
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.dukkanapp.features.auth.presentation.components.SignUp.SignUpScreenContent
-import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpEffect
-import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpViewModel
-
 @Composable
 fun SignUpScreen(
     onNavigationBack: () -> Unit,
@@ -1011,16 +900,13 @@ fun SignUpScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 SignUpEffect.NavigateToEmailVerification -> currentOnNavigateToEmailVerification()
-                is SignUpEffect.ShowSnackbar -> {
-                    // Handle snackbar if needed
-                }
             }
         }
     }
 
     SignUpScreenContent(
         state = state,
-        onIntent = { intent -> viewModel.onIntent(intent) },
+        onIntent = viewModel::onIntent,
         onNavigationBack = onNavigationBack,
         onForgetPasswordClick = onForgetPasswordClick,
         onLoginClick = onLoginClick,
@@ -1028,92 +914,122 @@ fun SignUpScreen(
 }
 ```
 
-### Step 6.6: Update SignUpScreenContent (Add Error Banner)
+### Step 6.5: SignUpScreenContent changes
 
-**File:** `features/auth/presentation/components/signup/SignUpScreenContent.kt`
-
-Add general error display at the top:
+Field errors switch from `stringResource(id)` to `UiText.asString()`, which also fixes the `%1$d` argument:
 
 ```kotlin
-// Add this import
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
-import androidx.compose.ui.graphics.Color
+errorText = state.emailError?.asString(),
+// ...
+errorText = state.passwordError?.asString(),
+// ...
+errorText = state.confirmPasswordError?.asString(),
+```
 
-// Inside the Column, after AppAuthHeader:
+General error banner (after `AppAuthHeader`):
 
-// General error banner
-state.generalError?.let { errorRes ->
+```kotlin
+state.generalError?.let { error ->
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
-        )
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
     ) {
         Text(
-            text = stringResource(errorRes),
+            text = error.asString(),
             color = MaterialTheme.colorScheme.onErrorContainer,
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(AppDimens.sizeXs),
-            style = MaterialTheme.typography.bodyMedium
         )
     }
     Spacer(Modifier.height(AppDimens.sizeXs))
 }
 ```
 
+> Extract this banner to `core/common/components/banner/AppErrorBanner.kt` once Login uses it too.
+
 ---
 
-## 7. Email Verification Screen
+## 7. Login (MVI)
 
-### Step 7.1: Create EmailVerificationUiState
+Login follows the same pattern. Here are only the parts that differ:
+
+```kotlin
+sealed interface LoginEffect {
+    data object NavigateToHome : LoginEffect
+    data object NavigateToEmailVerification : LoginEffect
+}
+
+private fun onLoginClicked() {
+    val current = _state.value
+    if (current.isLoading) return
+
+    val email = current.email.trim()
+    val emailError = AuthFormValidator.validateEmail(email)
+    val passwordError = AuthFormValidator.validateExistingPassword(current.password)
+    if (emailError != null || passwordError != null) {
+        _state.update { it.copy(emailError = emailError?.toUiText(), passwordError = passwordError?.toUiText()) }
+        return
+    }
+
+    _state.update { it.copy(isLoading = true, generalError = null) }
+    viewModelScope.launch {
+        signIn(email, current.password)
+            .onSuccess { user ->
+                _effect.send(
+                    if (user.isEmailVerified) LoginEffect.NavigateToHome
+                    else LoginEffect.NavigateToEmailVerification
+                )
+            }
+            .onFailure { error -> _state.update { it.copy(generalError = error.toUiText()) } }
+        _state.update { it.copy(isLoading = false) }
+    }
+}
+```
+
+---
+
+## 8. Email Verification (MVI)
+
+### Step 8.1: State, Intent, Effect
 
 **File:** `features/auth/presentation/logic/emailverification/EmailVerificationUiState.kt`
 
 ```kotlin
-package com.example.dukkanapp.features.auth.presentation.logic.emailverification
-
-import androidx.annotation.StringRes
-
 data class EmailVerificationUiState(
     val email: String = "",
-    val isLoading: Boolean = false,
+    val isChecking: Boolean = false,
     val isResending: Boolean = false,
-    val isCheckingVerification: Boolean = false,
-    @StringRes val message: Int? = null,
-    val isVerified: Boolean = false
-)
+    val resendCooldownSeconds: Int = 0,
+    val message: UiText? = null,
+) {
+    val canResend: Boolean get() = !isResending && resendCooldownSeconds == 0
+}
 ```
-
-### Step 7.2: Create EmailVerificationIntent
 
 **File:** `features/auth/presentation/logic/emailverification/EmailVerificationIntent.kt`
 
 ```kotlin
-package com.example.dukkanapp.features.auth.presentation.logic.emailverification
-
 sealed interface EmailVerificationIntent {
-    data object ResendEmailClicked : EmailVerificationIntent
-    data object CheckVerificationClicked : EmailVerificationIntent
-    data object DismissMessage : EmailVerificationIntent
-    data object OpenEmailApp : EmailVerificationIntent
+    /** Sent on every ON_RESUME, e.g. when the user comes back from their mail app. */
+    data object ScreenResumed : EmailVerificationIntent
+    data object CheckClicked : EmailVerificationIntent
+    data object ResendClicked : EmailVerificationIntent
+    data object OpenEmailAppClicked : EmailVerificationIntent
+    data object EmailAppUnavailable : EmailVerificationIntent
+    data object MessageDismissed : EmailVerificationIntent
 }
 ```
-
-### Step 7.3: Create EmailVerificationEffect
 
 **File:** `features/auth/presentation/logic/emailverification/EmailVerificationEffect.kt`
 
 ```kotlin
-package com.example.dukkanapp.features.auth.presentation.logic.emailverification
-
 sealed interface EmailVerificationEffect {
     data object NavigateToHome : EmailVerificationEffect
     data object OpenEmailApp : EmailVerificationEffect
 }
 ```
 
-### Step 7.4: Create EmailVerificationViewModel
+### Step 8.2: EmailVerificationViewModel
 
 **File:** `features/auth/presentation/logic/emailverification/EmailVerificationViewModel.kt`
 
@@ -1123,11 +1039,15 @@ package com.example.dukkanapp.features.auth.presentation.logic.emailverification
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.error.AppResult
-import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
+import com.example.dukkanapp.core.common.error.toUiText
+import com.example.dukkanapp.core.common.text.UiText
+import com.example.dukkanapp.core.error.onFailure
+import com.example.dukkanapp.core.error.onSuccess
 import com.example.dukkanapp.features.auth.domain.usecase.CheckEmailVerificationUseCase
+import com.example.dukkanapp.features.auth.domain.usecase.GetCurrentUserUseCase
 import com.example.dukkanapp.features.auth.domain.usecase.SendEmailVerificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -1140,292 +1060,136 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val sendEmailVerificationUseCase: SendEmailVerificationUseCase,
-    private val checkEmailVerificationUseCase: CheckEmailVerificationUseCase
+    getCurrentUser: GetCurrentUserUseCase,
+    private val checkEmailVerification: CheckEmailVerificationUseCase,
+    private val sendEmailVerification: SendEmailVerificationUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(EmailVerificationUiState())
+    private val _state = MutableStateFlow(
+        EmailVerificationUiState(email = getCurrentUser()?.email.orEmpty())
+    )
     val state: StateFlow<EmailVerificationUiState> = _state.asStateFlow()
 
     private val _effect = Channel<EmailVerificationEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
-    init {
-        loadUserEmail()
-        startPeriodicVerificationCheck()
-    }
-
-    private fun loadUserEmail() {
-        viewModelScope.launch {
-            authRepository.currentUser.collect { user ->
-                user?.let {
-                    _state.update { state -> state.copy(email = it.email) }
-                }
-            }
-        }
-    }
-
-    private fun startPeriodicVerificationCheck() {
-        viewModelScope.launch {
-            while (true) {
-                delay(5000) // Check every 5 seconds
-                checkVerificationStatus(silent = true)
-            }
-        }
-    }
+    private var checkJob: Job? = null
 
     fun onIntent(intent: EmailVerificationIntent) {
         when (intent) {
-            EmailVerificationIntent.ResendEmailClicked -> resendVerificationEmail()
-            EmailVerificationIntent.CheckVerificationClicked -> checkVerificationStatus(silent = false)
-            EmailVerificationIntent.DismissMessage -> dismissMessage()
-            EmailVerificationIntent.OpenEmailApp -> openEmailApp()
+            EmailVerificationIntent.ScreenResumed -> checkVerification(silent = true)
+            EmailVerificationIntent.CheckClicked -> checkVerification(silent = false)
+            EmailVerificationIntent.ResendClicked -> resend()
+            EmailVerificationIntent.OpenEmailAppClicked -> viewModelScope.launch {
+                _effect.send(EmailVerificationEffect.OpenEmailApp)
+            }
+            EmailVerificationIntent.EmailAppUnavailable -> showMessage(UiText.Res(R.string.email_verification_no_email_app))
+            EmailVerificationIntent.MessageDismissed -> _state.update { it.copy(message = null) }
         }
     }
 
-    private fun resendVerificationEmail() {
-        viewModelScope.launch {
-            _state.update { it.copy(isResending = true, message = null) }
+    /** One check at a time: ignores taps while a check is already running. */
+    private fun checkVerification(silent: Boolean) {
+        if (checkJob?.isActive == true) return
+        if (!silent) _state.update { it.copy(isChecking = true, message = null) }
 
-            when (val result = sendEmailVerificationUseCase()) {
-                is AppResult.Success -> {
-                    _state.update {
-                        it.copy(
-                            isResending = false,
-                            message = R.string.email_verification_resent_success
-                        )
+        checkJob = viewModelScope.launch {
+            checkEmailVerification()
+                .onSuccess { verified ->
+                    when {
+                        verified -> _effect.send(EmailVerificationEffect.NavigateToHome)
+                        !silent -> showMessage(UiText.Res(R.string.email_verification_not_verified_yet))
                     }
                 }
-                is AppResult.Error -> {
-                    _state.update {
-                        it.copy(
-                            isResending = false,
-                            message = R.string.email_verification_resent_error
-                        )
-                    }
+                .onFailure { error -> if (!silent) showMessage(error.toUiText()) }
+            _state.update { it.copy(isChecking = false) }
+        }
+    }
+
+    private fun resend() {
+        if (!_state.value.canResend) return
+        _state.update { it.copy(isResending = true, message = null) }
+
+        viewModelScope.launch {
+            sendEmailVerification()
+                .onSuccess {
+                    showMessage(UiText.Res(R.string.email_verification_resent_success))
+                    startResendCooldown()
                 }
+                .onFailure { error -> showMessage(error.toUiText()) }
+            _state.update { it.copy(isResending = false) }
+        }
+    }
+
+    private fun startResendCooldown() {
+        viewModelScope.launch {
+            for (seconds in RESEND_COOLDOWN_SECONDS downTo 0) {
+                _state.update { it.copy(resendCooldownSeconds = seconds) }
+                if (seconds > 0) delay(1_000)
             }
         }
     }
 
-    private fun checkVerificationStatus(silent: Boolean) {
-        viewModelScope.launch {
-            if (!silent) {
-                _state.update { it.copy(isCheckingVerification = true, message = null) }
-            }
-
-            when (val result = checkEmailVerificationUseCase()) {
-                is AppResult.Success -> {
-                    if (result.data) {
-                        _state.update { it.copy(isVerified = true, isCheckingVerification = false) }
-                        _effect.send(EmailVerificationEffect.NavigateToHome)
-                    } else if (!silent) {
-                        _state.update {
-                            it.copy(
-                                isCheckingVerification = false,
-                                message = R.string.email_verification_not_verified_yet
-                            )
-                        }
-                    }
-                }
-                is AppResult.Error -> {
-                    if (!silent) {
-                        _state.update {
-                            it.copy(
-                                isCheckingVerification = false,
-                                message = R.string.email_verification_check_error
-                            )
-                        }
-                    }
-                }
-            }
-        }
+    private fun showMessage(message: UiText) {
+        _state.update { it.copy(message = message) }
     }
 
-    private fun dismissMessage() {
-        _state.update { it.copy(message = null) }
-    }
-
-    private fun openEmailApp() {
-        viewModelScope.launch {
-            _effect.send(EmailVerificationEffect.OpenEmailApp)
-        }
+    private companion object {
+        const val RESEND_COOLDOWN_SECONDS = 60
     }
 }
 ```
 
-### Step 7.5: Create EmailVerificationScreenContent
-
-**File:** `features/auth/presentation/components/emailverification/EmailVerificationScreenContent.kt`
-
-```kotlin
-package com.example.dukkanapp.features.auth.presentation.components.emailverification
-
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.R
-import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
-import com.example.dukkanapp.core.common.components.buttons.AppTextButton
-import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
-import com.example.dukkanapp.core.utils.constants.AppDimens
-import com.example.dukkanapp.features.auth.presentation.logic.emailverification.EmailVerificationIntent
-import com.example.dukkanapp.features.auth.presentation.logic.emailverification.EmailVerificationUiState
-import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
-
-@Composable
-fun EmailVerificationScreenContent(
-    state: EmailVerificationUiState,
-    onIntent: (EmailVerificationIntent) -> Unit,
-    onNavigationBack: () -> Unit
-) {
-    AppScaffold(
-        onNavigateBack = onNavigationBack
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = AppDimens.size2Xs),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            // Email icon
-            Icon(
-                imageVector = Iconsax.Linear.Sms,
-                contentDescription = null,
-                modifier = Modifier.size(80.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-
-            Spacer(Modifier.height(AppDimens.sizeMd))
-
-            // Title
-            Text(
-                text = stringResource(R.string.email_verification_title),
-                style = MaterialTheme.typography.headlineMedium,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(Modifier.height(AppDimens.sizeXs))
-
-            // Subtitle with email
-            Text(
-                text = stringResource(R.string.email_verification_subtitle, state.email),
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(Modifier.height(AppDimens.sizeMd))
-
-            // Message card (success or error)
-            state.message?.let { messageRes ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Text(
-                        text = stringResource(messageRes),
-                        modifier = Modifier.padding(AppDimens.sizeXs),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                }
-                Spacer(Modifier.height(AppDimens.sizeXs))
-            }
-
-            // Open Email App button
-            AppPrimaryButton(
-                onClick = { onIntent(EmailVerificationIntent.OpenEmailApp) },
-                text = stringResource(R.string.email_verification_open_email_app),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(AppDimens.sizeXs))
-
-            // Check verification button
-            AppPrimaryButton(
-                onClick = { onIntent(EmailVerificationIntent.CheckVerificationClicked) },
-                text = stringResource(R.string.email_verification_check_status),
-                isLoading = state.isCheckingVerification,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(AppDimens.sizeXs))
-
-            // Resend email button
-            AppTextButton(
-                onClick = { onIntent(EmailVerificationIntent.ResendEmailClicked) },
-                text = if (state.isResending) {
-                    stringResource(R.string.email_verification_resending)
-                } else {
-                    stringResource(R.string.email_verification_resend)
-                }
-            )
-        }
-    }
-}
-```
-
-### Step 7.6: Create EmailVerificationScreen
+### Step 8.3: EmailVerificationScreen
 
 **File:** `features/auth/presentation/screens/EmailVerificationScreen.kt`
 
 ```kotlin
 package com.example.dukkanapp.features.auth.presentation.screens
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.dukkanapp.features.auth.presentation.components.emailverification.EmailVerificationScreenContent
 import com.example.dukkanapp.features.auth.presentation.logic.emailverification.EmailVerificationEffect
+import com.example.dukkanapp.features.auth.presentation.logic.emailverification.EmailVerificationIntent
 import com.example.dukkanapp.features.auth.presentation.logic.emailverification.EmailVerificationViewModel
 
 @Composable
 fun EmailVerificationScreen(
     onNavigationBack: () -> Unit,
     onNavigateToHome: () -> Unit,
-    viewModel: EmailVerificationViewModel = hiltViewModel()
+    viewModel: EmailVerificationViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val currentOnNavigateToHome by rememberUpdatedState(onNavigateToHome)
     val context = LocalContext.current
+
+    // Re-check whenever the user returns to the app (e.g. after tapping the link in their mail app).
+    LifecycleResumeEffect(Unit) {
+        viewModel.onIntent(EmailVerificationIntent.ScreenResumed)
+        onPauseOrDispose { }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 EmailVerificationEffect.NavigateToHome -> currentOnNavigateToHome()
                 EmailVerificationEffect.OpenEmailApp -> {
-                    val intent = Intent(Intent.ACTION_MAIN).apply {
-                        addCategory(Intent.CATEGORY_APP_EMAIL)
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    val intent = Intent.makeMainSelectorActivity(Intent.ACTION_MAIN, Intent.CATEGORY_APP_EMAIL)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    try {
+                        context.startActivity(intent)
+                    } catch (_: ActivityNotFoundException) {
+                        viewModel.onIntent(EmailVerificationIntent.EmailAppUnavailable)
                     }
-                    context.startActivity(Intent.createChooser(intent, "Open Email"))
                 }
             }
         }
@@ -1434,62 +1198,185 @@ fun EmailVerificationScreen(
     EmailVerificationScreenContent(
         state = state,
         onIntent = viewModel::onIntent,
-        onNavigationBack = onNavigationBack
+        onNavigationBack = onNavigationBack,
     )
 }
 ```
 
----
+### Step 8.4: EmailVerificationScreenContent
 
-## 8. Navigation Setup
-
-### Step 8.1: Add Navigation Route
-
-**File:** Update your navigation routes file
+**File:** `features/auth/presentation/components/emailverification/EmailVerificationScreenContent.kt`
 
 ```kotlin
-// Add to your Routes sealed class or object
-@Serializable
-data object EmailVerification : Route
+@Composable
+fun EmailVerificationScreenContent(
+    state: EmailVerificationUiState,
+    onIntent: (EmailVerificationIntent) -> Unit,
+    onNavigationBack: () -> Unit,
+) {
+    AppScaffold(onNavigateBack = onNavigationBack) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = AppDimens.size2Xs),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(
+                imageVector = Iconsax.Linear.Sms,
+                contentDescription = null,
+                modifier = Modifier.size(80.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(Modifier.height(AppDimens.sizeMd))
+
+            Text(
+                text = stringResource(R.string.email_verification_title),
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(AppDimens.sizeXs))
+
+            Text(
+                text = stringResource(R.string.email_verification_subtitle, state.email),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(AppDimens.sizeMd))
+
+            state.message?.let { message ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                ) {
+                    Text(
+                        text = message.asString(),
+                        modifier = Modifier.padding(AppDimens.sizeXs),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                Spacer(Modifier.height(AppDimens.sizeXs))
+            }
+
+            AppPrimaryButton(
+                onClick = { onIntent(EmailVerificationIntent.OpenEmailAppClicked) },
+                text = stringResource(R.string.email_verification_open_email_app),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(AppDimens.sizeXs))
+
+            AppPrimaryButton(
+                onClick = { onIntent(EmailVerificationIntent.CheckClicked) },
+                text = stringResource(R.string.email_verification_check_status),
+                isLoading = state.isChecking,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(AppDimens.sizeXs))
+
+            AppTextButton(
+                onClick = { onIntent(EmailVerificationIntent.ResendClicked) },
+                enabled = state.canResend,
+                text = when {
+                    state.isResending -> stringResource(R.string.email_verification_resending)
+                    state.resendCooldownSeconds > 0 ->
+                        stringResource(R.string.email_verification_resend_in, state.resendCooldownSeconds)
+                    else -> stringResource(R.string.email_verification_resend)
+                },
+            )
+        }
+    }
+}
 ```
 
-### Step 8.2: Add to NavHost
+> If `AppTextButton` has no `enabled` parameter yet, add one (default `true`).
+
+---
+
+## 9. Navigation and App Start
+
+### Step 9.1: Route
+
+**File:** `core/navigation/AppRoutes.kt`
 
 ```kotlin
-// In your NavHost composable
-composable<Routes.EmailVerification> {
+@Serializable
+data object EmailVerificationScreen : AppRoute
+```
+
+> While you're there: `LoginScreen` and `SignUpScreen` don't implement `AppRoute` yet. Add `: AppRoute` to both.
+
+### Step 9.2: NavHost
+
+```kotlin
+composable<AppRoute.SignUpScreen> {
+    SignUpScreen(
+        onNavigationBack = { navController.popBackStack() },
+        onNavigateToEmailVerification = {
+            navController.navigate(AppRoute.EmailVerificationScreen) {
+                // The account now exists: going "back" to the sign-up form makes no sense.
+                popUpTo(AppRoute.AuthOptionsScreen) { inclusive = true }
+            }
+        },
+        onForgetPasswordClick = {},
+        onLoginClick = {
+            navController.navigate(AppRoute.LoginScreen) {
+                popUpTo(AppRoute.SignUpScreen) { inclusive = true }
+                launchSingleTop = true
+            }
+        },
+    )
+}
+
+composable<AppRoute.EmailVerificationScreen> {
     EmailVerificationScreen(
         onNavigationBack = { navController.popBackStack() },
         onNavigateToHome = {
-            navController.navigate(Routes.Home) {
-                popUpTo(Routes.AuthOptions) { inclusive = true }
+            navController.navigate(AppRoute.HomeScreen) {
+                popUpTo(AppRoute.EmailVerificationScreen) { inclusive = true }
             }
-        }
+        },
     )
 }
+```
 
-// Update SignUpScreen navigation
-composable<Routes.SignUp> {
-    SignUpScreen(
-        onNavigationBack = { navController.popBackStack() },
-        onNavigateToEmailVerification = { 
-            navController.navigate(Routes.EmailVerification) 
-        },
-        onForgetPasswordClick = { navController.navigate(Routes.ForgotPassword) },
-        onLoginClick = { 
-            navController.navigate(Routes.Login) {
-                popUpTo(Routes.SignUp) { inclusive = true }
-            }
+### Step 9.3: Start Destination
+
+Users who signed up but never verified must land on the verification screen, not Home.
+
+**File:** `core/navigation/startup/ResolveStartDestinationUseCase.kt`
+
+```kotlin
+class ResolveStartDestinationUseCase @Inject constructor(
+    private val languageRepository: LanguageRepository,
+    private val onboardingRepository: OnboardingRepository,
+    private val authRepository: AuthRepository,
+) {
+    suspend operator fun invoke(): AppRoute = coroutineScope {
+        val hasLanguageDeferred = async { languageRepository.hasSelectedLanguage() }
+        val hasOnboardingDeferred = async { onboardingRepository.hasSeenOnboarding() }
+        val user = authRepository.currentUser // cached locally by Firebase, no network
+
+        when {
+            !hasLanguageDeferred.await() -> AppRoute.LanguageSelectionScreen
+            !hasOnboardingDeferred.await() -> AppRoute.OnboardingScreen
+            user == null -> AppRoute.AuthOptionsScreen
+            !user.isEmailVerified -> AppRoute.EmailVerificationScreen
+            else -> AppRoute.HomeScreen
         }
-    )
+    }
 }
 ```
 
 ---
 
-## 9. String Resources
+## 10. String Resources
 
-### Step 9.1: Add to `values/strings.xml`
+Error and validation strings come from the [Error Handling guide](../core/error_handling_architecture.md#12-string-resources). Only screen-specific copy lives here.
+
+### `values/strings.xml`
 
 ```xml
 <!-- Email Verification -->
@@ -1498,236 +1385,160 @@ composable<Routes.SignUp> {
 <string name="email_verification_open_email_app">Open Email App</string>
 <string name="email_verification_check_status">I\'ve Verified My Email</string>
 <string name="email_verification_resend">Resend Verification Email</string>
-<string name="email_verification_resending">Sending...</string>
-<string name="email_verification_resent_success">Verification email sent successfully!</string>
-<string name="email_verification_resent_error">Failed to send verification email. Try again.</string>
+<string name="email_verification_resend_in">Resend in %1$ds</string>
+<string name="email_verification_resending">Sending…</string>
+<string name="email_verification_resent_success">Verification email sent!</string>
 <string name="email_verification_not_verified_yet">Email not verified yet. Please check your inbox.</string>
-<string name="email_verification_check_error">Could not check verification status. Try again.</string>
-
-<!-- Additional SignUp Errors -->
-<string name="signup_error_password_weak">Password is too weak</string>
-<string name="signup_error_user_not_found">User not found</string>
-<string name="signup_error_wrong_password">Wrong password</string>
-<string name="signup_error_email_not_verified">Email not verified</string>
-<string name="signup_error_unknown">An unexpected error occurred</string>
+<string name="email_verification_no_email_app">No email app found on this device.</string>
 ```
 
-### Step 9.2: Add to `values-ar/strings.xml`
+### `values-ar/strings.xml`
 
 ```xml
-<!-- Email Verification -->
+<!-- تأكيد البريد الإلكتروني -->
 <string name="email_verification_title">تأكيد البريد الإلكتروني</string>
 <string name="email_verification_subtitle">أرسلنا رابط التأكيد إلى %1$s</string>
 <string name="email_verification_open_email_app">فتح تطبيق البريد</string>
 <string name="email_verification_check_status">لقد أكدت بريدي الإلكتروني</string>
 <string name="email_verification_resend">إعادة إرسال رسالة التأكيد</string>
-<string name="email_verification_resending">جارٍ الإرسال...</string>
-<string name="email_verification_resent_success">تم إرسال رسالة التأكيد بنجاح!</string>
-<string name="email_verification_resent_error">فشل إرسال رسالة التأكيد. حاول مرة أخرى.</string>
+<string name="email_verification_resend_in">إعادة الإرسال خلال %1$d ث</string>
+<string name="email_verification_resending">جارٍ الإرسال…</string>
+<string name="email_verification_resent_success">تم إرسال رسالة التأكيد!</string>
 <string name="email_verification_not_verified_yet">لم يتم تأكيد البريد الإلكتروني بعد. يرجى التحقق من صندوق الوارد.</string>
-<string name="email_verification_check_error">لم نتمكن من التحقق من حالة التأكيد. حاول مرة أخرى.</string>
-
-<!-- Additional SignUp Errors -->
-<string name="signup_error_password_weak">كلمة المرور ضعيفة جدًا</string>
-<string name="signup_error_user_not_found">المستخدم غير موجود</string>
-<string name="signup_error_wrong_password">كلمة المرور خاطئة</string>
-<string name="signup_error_email_not_verified">البريد الإلكتروني غير مؤكد</string>
-<string name="signup_error_unknown">حدث خطأ غير متوقع</string>
+<string name="email_verification_no_email_app">لا يوجد تطبيق بريد على هذا الجهاز.</string>
 ```
 
-### Step 9.3: Add to `values-fr/strings.xml`
+### `values-fr/strings.xml`
 
 ```xml
-<!-- Email Verification -->
-<string name="email_verification_title">Vérifiez votre email</string>
+<!-- Vérification de l'e-mail -->
+<string name="email_verification_title">Vérifiez votre e-mail</string>
 <string name="email_verification_subtitle">Nous avons envoyé un lien de vérification à %1$s</string>
-<string name="email_verification_open_email_app">Ouvrir l\'application Email</string>
-<string name="email_verification_check_status">J\'ai vérifié mon email</string>
-<string name="email_verification_resend">Renvoyer l\'email de vérification</string>
-<string name="email_verification_resending">Envoi en cours...</string>
-<string name="email_verification_resent_success">Email de vérification envoyé avec succès !</string>
-<string name="email_verification_resent_error">Échec de l\'envoi. Réessayez.</string>
-<string name="email_verification_not_verified_yet">Email non vérifié. Vérifiez votre boîte de réception.</string>
-<string name="email_verification_check_error">Impossible de vérifier le statut. Réessayez.</string>
-
-<!-- Additional SignUp Errors -->
-<string name="signup_error_password_weak">Le mot de passe est trop faible</string>
-<string name="signup_error_user_not_found">Utilisateur non trouvé</string>
-<string name="signup_error_wrong_password">Mot de passe incorrect</string>
-<string name="signup_error_email_not_verified">Email non vérifié</string>
-<string name="signup_error_unknown">Une erreur inattendue s\'est produite</string>
+<string name="email_verification_open_email_app">Ouvrir l\'application e-mail</string>
+<string name="email_verification_check_status">J\'ai vérifié mon e-mail</string>
+<string name="email_verification_resend">Renvoyer l\'e-mail de vérification</string>
+<string name="email_verification_resend_in">Renvoyer dans %1$d s</string>
+<string name="email_verification_resending">Envoi en cours…</string>
+<string name="email_verification_resent_success">E-mail de vérification envoyé !</string>
+<string name="email_verification_not_verified_yet">E-mail non vérifié. Consultez votre boîte de réception.</string>
+<string name="email_verification_no_email_app">Aucune application e-mail trouvée sur cet appareil.</string>
 ```
+
+### Firebase Auth → UI mapping (reference)
+
+| Firebase | AppError | String |
+|---|---|---|
+| `ERROR_INVALID_EMAIL` | `Auth.InvalidEmail` (email field) | `error_invalid_email` |
+| `ERROR_WEAK_PASSWORD` | `Auth.WeakPassword` (password field) | `error_weak_password` |
+| `ERROR_EMAIL_ALREADY_IN_USE` | `Auth.EmailAlreadyInUse` (email field) | `error_email_already_in_use` |
+| `ERROR_INVALID_CREDENTIAL`, `ERROR_WRONG_PASSWORD`, `ERROR_USER_NOT_FOUND` | `Auth.InvalidCredentials` | `error_invalid_credentials` |
+| `ERROR_USER_DISABLED` | `Auth.UserDisabled` | `error_user_disabled` |
+| `FirebaseTooManyRequestsException` | `Auth.TooManyRequests` | `error_too_many_requests` |
+| `FirebaseNetworkException` | `Network.NoConnection` | `error_no_connection` |
+| Firestore `UNAVAILABLE` | `Network.ServiceUnavailable` | `error_service_unavailable` |
+| Firestore `PERMISSION_DENIED` | `Data.PermissionDenied` | `error_permission_denied` |
 
 ---
 
-## 10. Error Handling
-
-> **Important:** See [Error Handling Architecture](../core/error_handling_architecture.md) for the complete error handling system.
-
-### Error Flow
-
-```
-Firebase SDK Error → FirebaseAuthExceptionMapper / FirebaseFirestoreExceptionMapper
-                            ↓
-                     AppException (in DataSource - thrown)
-                            ↓
-                     AppResult.Error (in Repository - caught)
-                            ↓
-                     ErrorCodeMapper.toStringRes() (in ViewModel)
-                            ↓
-                     @StringRes displayed in UI
-```
-
-### Common Firebase Auth Error Codes
-
-| Error Code | AppException | @StringRes |
-|------------|--------------|------------|
-| `ERROR_INVALID_EMAIL` | `InvalidEmailException` | `error_invalid_email` |
-| `ERROR_WEAK_PASSWORD` | `WeakPasswordException` | `error_weak_password` |
-| `ERROR_EMAIL_ALREADY_IN_USE` | `EmailAlreadyInUseException` | `error_email_already_in_use` |
-| `ERROR_USER_NOT_FOUND` | `UserNotFoundException` | `error_user_not_found` |
-| `ERROR_WRONG_PASSWORD` | `WrongPasswordException` | `error_wrong_password` |
-| `ERROR_NETWORK_REQUEST_FAILED` | `NetworkException` | `error_network` |
-| `ERROR_TOO_MANY_REQUESTS` | `TooManyRequestsException` | `error_too_many_requests` |
-
----
-
-## Folder Structure Summary
+## 11. Folder Structure
 
 ```
 core/
-├── error/                                (from Error Handling Architecture)
-│   ├── AppException.kt
-│   ├── AppResult.kt
-│   ├── ErrorCode.kt
-│   ├── ErrorCodeMapper.kt
-│   └── firebase/
-│       ├── FirebaseAuthExceptionMapper.kt
-│       └── FirebaseFirestoreExceptionMapper.kt
+├── error/                       AppError.kt, AppResult.kt              (Error guide)
+├── data/error/                  AppErrorException.kt, ErrorMapper.kt, FirebaseErrorMapper.kt
+├── common/text/                 UiText.kt
+├── common/error/                AppErrorUiText.kt, ValidationErrorUiText.kt
+├── domain/validation/           ValidationError.kt
 ├── di/
-│   ├── AuthModule.kt                     (UPDATED)
-│   └── FirebaseModule.kt                 (NEW)
-└── utils/
-    └── extension/
-        └── AppResultExtension.kt         (NEW)
+│   ├── ErrorModule.kt           (NEW)
+│   ├── FirebaseModule.kt        (NEW)
+│   ├── AuthModule.kt            (UPDATED)
+│   └── UserModule.kt            (NEW)
+└── navigation/
+    ├── AppRoutes.kt             (UPDATED: EmailVerificationScreen)
+    ├── AppNavHost.kt            (UPDATED)
+    └── startup/ResolveStartDestinationUseCase.kt (UPDATED)
 
 features/auth/
 ├── data/
-│   ├── datasource/
-│   │   ├── AuthRemoteDataSource.kt       (NEW)
-│   │   ├── AuthRemoteDataSourceImpl.kt   (NEW)
-│   │   ├── UserRemoteDataSource.kt       (NEW)
-│   │   └── UserRemoteDataSourceImpl.kt   (NEW)
-│   ├── model/
-│   │   └── UserDto.kt                    (NEW)
-│   └── repository/
-│       └── AuthRepositoryImpl.kt         (UPDATED)
+│   ├── datasource/AuthRemoteDataSource.kt
+│   ├── mapper/AuthUserMapper.kt
+│   └── repository/AuthRepositoryImpl.kt
 ├── domain/
-│   ├── model/
-│   │   └── User.kt                       (NEW)
-│   ├── repository/
-│   │   └── AuthRepository.kt             (UPDATED)
+│   ├── model/AuthUser.kt
+│   ├── repository/AuthRepository.kt
+│   ├── validation/AuthFormValidator.kt
 │   └── usecase/
-│       ├── SignUpUseCase.kt              (NEW)
-│       ├── SendEmailVerificationUseCase.kt (NEW)
-│       └── CheckEmailVerificationUseCase.kt (NEW)
+│       ├── SignUpUseCase.kt
+│       ├── SignInUseCase.kt
+│       ├── SendEmailVerificationUseCase.kt
+│       ├── CheckEmailVerificationUseCase.kt
+│       └── GetCurrentUserUseCase.kt
 └── presentation/
-    ├── components/
-    │   ├── signup/
-    │   │   └── SignUpScreenContent.kt    (UPDATED)
-    │   └── emailverification/
-    │       └── EmailVerificationScreenContent.kt (NEW)
-    ├── logic/
-    │   ├── signup/
-    │   │   ├── SignUpUiState.kt          (UPDATED)
-    │   │   ├── SignUpIntent.kt           (UPDATED)
-    │   │   ├── SignUpEffect.kt           (UPDATED)
-    │   │   └── SignUpViewModel.kt        (UPDATED)
-    │   └── emailverification/
-    │       ├── EmailVerificationUiState.kt (NEW)
-    │       ├── EmailVerificationIntent.kt  (NEW)
-    │       ├── EmailVerificationEffect.kt  (NEW)
-    │       └── EmailVerificationViewModel.kt (NEW)
-    └── screens/
-        ├── SignUpScreen.kt               (UPDATED)
-        └── EmailVerificationScreen.kt    (NEW)
+    ├── components/emailverification/EmailVerificationScreenContent.kt
+    ├── logic/signup/               SignUpUiState, SignUpIntent, SignUpEffect, SignUpViewModel
+    ├── logic/Login/                (UPDATED to use SignInUseCase)
+    ├── logic/emailverification/    UiState, Intent, Effect, ViewModel
+    └── screens/                    SignUpScreen.kt, EmailVerificationScreen.kt
+
+features/user/
+├── data/
+│   ├── datasource/UserRemoteDataSource.kt
+│   ├── mapper/UserProfileMapper.kt
+│   ├── model/UserProfileDto.kt
+│   └── repository/UserRepositoryImpl.kt
+└── domain/
+    ├── model/UserProfile.kt
+    └── repository/UserRepository.kt
 ```
 
 ---
 
-## Implementation Checklist
+## 12. Implementation Checklist
 
-### Core Error Handling (do first)
-- [ ] Create `core/error/ErrorCode.kt`
-- [ ] Create `core/error/AppException.kt`
-- [ ] Create `core/error/AppResult.kt`
-- [ ] Create `core/error/ErrorCodeMapper.kt`
-- [ ] Create `core/error/firebase/FirebaseAuthExceptionMapper.kt`
-- [ ] Create `core/error/firebase/FirebaseFirestoreExceptionMapper.kt`
-- [ ] Create `core/utils/extension/AppResultExtension.kt`
-- [ ] Add error string resources (EN, AR, FR)
+**Core error handling (do first):** see the [Error Handling checklist](../core/error_handling_architecture.md#14-implementation-checklist).
 
-### Firebase Setup
-- [ ] Add Firebase dependencies to `libs.versions.toml`
-- [ ] Add Google Services plugin to `build.gradle.kts`
-- [ ] Download and add `google-services.json`
-- [ ] Enable Email/Password auth in Firebase Console
-- [ ] Create Firestore database
+**Firebase setup**
+- [ ] BoM 34+, `firebase-auth`, `firebase-firestore`, `kotlinx-coroutines-play-services`
+- [ ] Google Services plugin + `google-services.json`
+- [ ] Email/Password enabled, enumeration protection on
+- [ ] Firestore created in production mode with the rules above
 
-### Domain Layer
-- [ ] Create `User.kt` domain model
-- [ ] Update `AuthRepository.kt` interface
-- [ ] Create `SignUpUseCase.kt`
-- [ ] Create `SendEmailVerificationUseCase.kt`
-- [ ] Create `CheckEmailVerificationUseCase.kt`
+**Domain**
+- [ ] `AuthUser`, `UserProfile`
+- [ ] `AuthRepository`, `UserRepository`
+- [ ] Use cases: SignUp, SignIn, SendEmailVerification, CheckEmailVerification, GetCurrentUser
+- [ ] `AuthFormValidator`
 
-### Data Layer
-- [ ] Create `UserDto.kt` data model
-- [ ] Create `AuthRemoteDataSource.kt` interface
-- [ ] Create `AuthRemoteDataSourceImpl.kt`
-- [ ] Create `UserRemoteDataSource.kt` interface
-- [ ] Create `UserRemoteDataSourceImpl.kt`
-- [ ] Update `AuthRepositoryImpl.kt`
+**Data**
+- [ ] `AuthRemoteDataSource`, `AuthUserMapper`, `AuthRepositoryImpl`
+- [ ] `UserProfileDto`, `UserProfileMapper`, `UserRemoteDataSource`, `UserRepositoryImpl`
 
-### DI
-- [ ] Create `FirebaseModule.kt`
-- [ ] Update `AuthModule.kt` (add data source bindings)
+**DI**
+- [ ] `ErrorModule`, `FirebaseModule`, `UserModule`; update `AuthModule`
 
-### Presentation Layer
-- [ ] Update SignUp MVI components (State, Intent, Effect, ViewModel)
-- [ ] Create EmailVerification MVI components
-- [ ] Add navigation routes
+**Presentation**
+- [ ] SignUp: state with `UiText`, ViewModel, screen, content
+- [ ] Login: `SignInUseCase` + verified/unverified routing
+- [ ] EmailVerification: state, intent, effect, ViewModel, screen, content
+- [ ] Routes, NavHost, start destination
 
-### Resources
-- [ ] Add auth string resources (EN, AR, FR)
-- [ ] Add email verification string resources (EN, AR, FR)
-
-### Testing
-- [ ] Test signup flow
-- [ ] Test email verification
-- [ ] Test Firestore user creation
-- [ ] Test error handling (invalid email, weak password, etc.)
+**Resources**
+- [ ] Email verification strings (EN, AR, FR)
+- [ ] Remove `signup_error_*` / `login_error_*` duplicates after migration
 
 ---
 
-## Testing
+## 13. Manual Testing
 
-### Manual Testing Steps
-
-1. **Sign Up Flow**
-   - Enter valid email and password
-   - Click "Create Account"
-   - Verify redirect to Email Verification screen
-   - Check Firestore for new user document
-
-2. **Email Verification**
-   - Check inbox for verification email
-   - Click link in email
-   - Return to app and click "I've Verified"
-   - Verify redirect to Home screen
-
-3. **Error Handling**
-   - Try signing up with existing email
-   - Try signing up with weak password
-   - Try signing up with invalid email format
-   - Test without internet connection
+1. **Sign up (happy path):** valid email + password → Email Verification screen; `users/{uid}` exists with `createdAt`; verification email arrives.
+2. **Verify:** tap the link in the email, return to the app → navigates to Home **automatically** (resume check).
+3. **Resend:** tap Resend → success message, button disabled with a 60 s countdown.
+4. **Unverified restart:** sign up, kill the app, relaunch → starts on Email Verification.
+5. **Errors:**
+   - Existing email → message under the **email field**
+   - Short password → "at least 8 characters" (number rendered, not `%1$d`)
+   - Wrong password at login → "Incorrect email or password"
+   - Airplane mode → "No internet connection…"
+6. **Self-healing profile:** delete `users/{uid}` in the console, sign in → document recreated, original account intact.
+7. **Security rules:** in the Rules Playground, try writing `users/otherUid` as another user → denied.
