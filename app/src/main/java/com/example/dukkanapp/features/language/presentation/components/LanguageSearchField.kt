@@ -1,10 +1,12 @@
 package com.example.dukkanapp.features.language.presentation.components
 
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -19,6 +21,7 @@ fun LanguageSearchField(
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val focusManager = LocalFocusManager.current
     AppTextFiled(
         value = query,
         onValueChange = onQueryChange,
@@ -33,6 +36,11 @@ fun LanguageSearchField(
             )
         },
         keyboardType = KeyboardType.Text,
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                focusManager.clearFocus()
+            }
+        ),
         imeAction = ImeAction.Search,
         singleLine = true
     )

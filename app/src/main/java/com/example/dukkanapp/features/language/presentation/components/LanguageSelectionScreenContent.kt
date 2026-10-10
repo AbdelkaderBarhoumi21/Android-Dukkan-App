@@ -17,6 +17,7 @@ import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.config.theme.AppTheme
 import com.example.dukkanapp.core.utils.constants.AppDimens
+import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.language.presentation.logic.LanguageSelectionEvent
 import com.example.dukkanapp.features.language.presentation.logic.LanguageSelectionUiState
 
@@ -43,7 +44,9 @@ fun LanguageSelectionScreenContent(
         LazyColumn(
             contentPadding = padding,
 
-            modifier = Modifier.padding(horizontal = AppDimens.screenHorizontalPadding),
+            modifier = Modifier
+                .clearFocusOnTap()
+                .padding(horizontal = AppDimens.screenHorizontalPadding),
         ) {
             item {
                 Text(
