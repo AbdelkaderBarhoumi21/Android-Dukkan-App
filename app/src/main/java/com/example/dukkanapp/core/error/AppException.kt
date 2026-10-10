@@ -1,6 +1,6 @@
 package com.example.dukkanapp.core.error
 
-sealed class AppException(cause: Throwable?) {
+sealed class AppException(cause: Throwable?) : Exception(cause) {
     // ── Network (any backend) ─────────────────────────────────────────────
     sealed class Network(cause: Throwable?) : AppException(cause) {
         class NoConnection(cause: Throwable? = null) : Network(cause)
