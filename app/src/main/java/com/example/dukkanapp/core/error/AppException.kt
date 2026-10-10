@@ -111,7 +111,7 @@ sealed class AppException(cause: Throwable?) {
 
 
     /** A business rule failed in the data layer (e.g. a Cloud Function said "out of stock"). */
-    class Feature(val feature: AppFailure.Feature, cause: Throwable?) : AppException(cause)
+//    class Feature(val feature: AppFailure.Feature, cause: Throwable?) : AppException(cause)
 
     /** Anything not in this catalog. Always reported. */
     class Unexpected(cause: Throwable? = null) : AppException(cause)
