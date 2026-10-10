@@ -6,13 +6,13 @@ import com.example.dukkanapp.core.error.reporter.ErrorReporter
 import javax.inject.Inject
 
 /** Step 2 of 2: anything a data source threw → [AppFailure]. */
-fun interface FailureMapper {
+fun interface AppFailureMapper {
     fun map(throwable: Throwable): AppFailure
 }
 
 class DefaultFailureMapper @Inject constructor(
     private val reporter: ErrorReporter,
-) : FailureMapper {
+) : AppFailureMapper {
 
     override fun map(throwable: Throwable): AppFailure {
         val failure = (throwable as? AppException)?.toFailure() ?: AppFailure.Unknown
