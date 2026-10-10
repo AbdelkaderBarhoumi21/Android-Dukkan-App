@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -39,7 +40,6 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.iconsCore)
@@ -69,9 +69,14 @@ dependencies {
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
     // Iconsax
     implementation(libs.iconsax.compose)
-    
+    // Firebase
+    implementation(platform(libs.firebase.boom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

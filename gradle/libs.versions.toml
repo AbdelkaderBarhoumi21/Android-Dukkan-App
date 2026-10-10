@@ -34,6 +34,12 @@ coroutines = "1.9.0"
 # Iconsax
 iconsax = "1.0.1"
 
+# Firebase
+firebaseBoom = "34.19.0"
+googleServices = "4.4.4"
+
+
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -72,9 +78,15 @@ androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscree
 # Coroutines
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlin", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 
 # Iconsax
 iconsax-compose = { module = "io.github.yohannestz:iconsax-compose", version.ref = "iconsax" }
+
+# Firebase
+firebase-boom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBoom" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -87,3 +99,5 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 # Serialization
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
+# Firebase
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
