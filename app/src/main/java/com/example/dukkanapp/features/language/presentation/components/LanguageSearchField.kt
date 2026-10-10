@@ -1,23 +1,17 @@
 package com.example.dukkanapp.features.language.presentation.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
+import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.utils.constants.AppDimens
+import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
 fun LanguageSearchField(
@@ -25,35 +19,21 @@ fun LanguageSearchField(
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    OutlinedTextField(
+    AppTextFiled(
         value = query,
         onValueChange = onQueryChange,
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = AppDimens.textFieldMinHeight), // floor, not a hard clip — never cuts off content
-        placeholder = {
-            Text(
-                text = stringResource(R.string.language_selection_search_hint),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        },
+        modifier = modifier,
+        placeHolder = stringResource(R.string.language_selection_search_hint),
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Search,
+                imageVector = Iconsax.Linear.SearchNormal,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(AppDimens.iconSm), // smaller icon shrinks the field's natural size a bit
+                modifier = Modifier.size(AppDimens.iconSm),
             )
         },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        shape = RoundedCornerShape(percent = 50),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.outline,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-        ),
+        keyboardType = KeyboardType.Text,
+        imeAction = ImeAction.Search,
+        singleLine = true
     )
 }
