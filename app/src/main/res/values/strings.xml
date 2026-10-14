@@ -68,4 +68,24 @@
     <string name="signup_error_confirm_password_empty">Please confirm your password</string>
     <string name="signup_error_email_taken">This email is already registered</string>
     <string name="signup_error_network">No internet connection. Please try again.</string>
+
+    <!-- Generic failures (AppFailure.toUiText) -->
+    <string name="error_no_connection">No internet connection. Please check your network and try again.</string>
+    <string name="error_service_unavailable">The service is temporarily unavailable. Please try again later.</string>
+    <string name="error_too_many_requests">Too many attempts. Please wait a moment and try again.</string>
+    <string name="error_invalid_email">Enter a valid email address</string>
+    <string name="error_invalid_credentials">Incorrect email or password</string>
+    <string name="error_email_already_in_use">This email is already registered</string>
+    <string name="error_weak_password">This password is too weak. Please choose a stronger one.</string>
+    <string name="error_user_disabled">This account has been disabled. Please contact support.</string>
+    <string name="error_email_not_verified">Please verify your email address to continue.</string>
+    <string name="error_account_exists_different_credential">An account already exists with this email. Sign in using your original method.</string>
+    <string name="error_requires_recent_login">For your security, please log in again to continue.</string>
+    <string name="error_session_expired">Your session has expired. Please log in again.</string>
+    <string name="error_code_invalid_or_expired">This code is invalid or has expired. Please request a new one.</string>
+    <string name="error_not_found">We couldn\'t find what you were looking for.</string>
+    <string name="error_permission_denied">You don\'t have permission to do this.</string>
+    <string name="error_already_exists">This item already exists.</string>
+    <string name="error_conflict">This was changed elsewhere. Please refresh and try again.</string>
+    <string name="error_unknown">Something went wrong. Please try again.</string>
 </resources>

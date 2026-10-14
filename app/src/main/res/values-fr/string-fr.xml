@@ -76,4 +76,23 @@
     <string name="signup_error_confirm_password_empty">Veuillez confirmer votre mot de passe</string>
     <string name="signup_error_password_weak">Le mot de passe doit contenir des lettres et des chiffres</string>
 
+    <!-- Generic failures (AppFailure.toUiText) -->
+    <string name="error_no_connection">Pas de connexion Internet. Vérifiez votre réseau et réessayez.</string>
+    <string name="error_service_unavailable">Le service est temporairement indisponible. Veuillez réessayer plus tard.</string>
+    <string name="error_too_many_requests">Trop de tentatives. Veuillez patienter un instant et réessayer.</string>
+    <string name="error_invalid_email">Saisissez une adresse e-mail valide</string>
+    <string name="error_invalid_credentials">E-mail ou mot de passe incorrect</string>
+    <string name="error_email_already_in_use">Cette adresse e-mail est déjà utilisée</string>
+    <string name="error_weak_password">Ce mot de passe est trop faible. Veuillez en choisir un plus robuste.</string>
+    <string name="error_user_disabled">Ce compte a été désactivé. Veuillez contacter le support.</string>
+    <string name="error_email_not_verified">Veuillez vérifier votre adresse e-mail pour continuer.</string>
+    <string name="error_account_exists_different_credential">Un compte existe déjà avec cette adresse e-mail. Connectez-vous avec votre méthode d\'origine.</string>
+    <string name="error_requires_recent_login">Pour votre sécurité, veuillez vous reconnecter pour continuer.</string>
+    <string name="error_session_expired">Votre session a expiré. Veuillez vous reconnecter.</string>
+    <string name="error_code_invalid_or_expired">Ce code est invalide ou a expiré. Veuillez en demander un nouveau.</string>
+    <string name="error_not_found">Nous n\'avons pas trouvé ce que vous cherchez.</string>
+    <string name="error_permission_denied">Vous n\'avez pas l\'autorisation d\'effectuer cette action.</string>
+    <string name="error_already_exists">Cet élément existe déjà.</string>
+    <string name="error_conflict">Cet élément a été modifié ailleurs. Veuillez actualiser et réessayer.</string>
+    <string name="error_unknown">Une erreur s\'est produite. Veuillez réessayer.</string>
 </resources>

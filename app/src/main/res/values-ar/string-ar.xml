@@ -75,4 +75,24 @@
     <string name="signup_error_network">لا يوجد اتصال بالإنترنت. حاول مرة أخرى.</string>
     <string name="signup_error_confirm_password_empty">يرجى تأكيد كلمة المرور</string>
     <string name="signup_error_password_weak">يجب أن تحتوي كلمة المرور على أحرف وأرقام</string>
+
+    <!-- Generic failures (AppFailure.toUiText) -->
+    <string name="error_no_connection">لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.</string>
+    <string name="error_service_unavailable">الخدمة غير متاحة مؤقتاً. يرجى المحاولة لاحقاً.</string>
+    <string name="error_too_many_requests">محاولات كثيرة جداً. يرجى الانتظار قليلاً ثم المحاولة مرة أخرى.</string>
+    <string name="error_invalid_email">أدخل بريداً إلكترونياً صالحاً</string>
+    <string name="error_invalid_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة</string>
+    <string name="error_email_already_in_use">هذا البريد الإلكتروني مسجّل مسبقاً</string>
+    <string name="error_weak_password">كلمة المرور ضعيفة جداً. يرجى اختيار كلمة مرور أقوى.</string>
+    <string name="error_user_disabled">تم تعطيل هذا الحساب. يرجى التواصل مع الدعم.</string>
+    <string name="error_email_not_verified">يرجى تأكيد بريدك الإلكتروني للمتابعة.</string>
+    <string name="error_account_exists_different_credential">يوجد حساب مسجّل بهذا البريد الإلكتروني. سجّل الدخول باستخدام طريقتك الأصلية.</string>
+    <string name="error_requires_recent_login">حفاظاً على أمانك، يرجى تسجيل الدخول مرة أخرى للمتابعة.</string>
+    <string name="error_session_expired">انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.</string>
+    <string name="error_code_invalid_or_expired">هذا الرمز غير صالح أو منتهي الصلاحية. يرجى طلب رمز جديد.</string>
+    <string name="error_not_found">لم نتمكن من العثور على ما تبحث عنه.</string>
+    <string name="error_permission_denied">ليس لديك صلاحية للقيام بذلك.</string>
+    <string name="error_already_exists">هذا العنصر موجود مسبقاً.</string>
+    <string name="error_conflict">تم تعديل هذا في مكان آخر. يرجى التحديث والمحاولة مرة أخرى.</string>
+    <string name="error_unknown">حدث خطأ ما. يرجى المحاولة مرة أخرى.</string>
 </resources>
