@@ -6,7 +6,6 @@ import com.example.dukkanapp.R
 import com.example.dukkanapp.core.utils.extension.isValidEmail
 import com.example.dukkanapp.core.utils.extension.isValidPassword
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,12 +14,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor() : ViewModel() {
     private val _state = MutableStateFlow<SignUpUiState>(SignUpUiState())
     val state: StateFlow<SignUpUiState> = _state.asStateFlow()
     private val _effect = Channel<SignUpEffect>(Channel.BUFFERED)
+
     val effect = _effect.receiveAsFlow()
     fun onEmailChanged(email: String) {
         // clear the error as soon as the user edits the field

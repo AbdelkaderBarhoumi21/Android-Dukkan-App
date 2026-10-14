@@ -1024,6 +1024,153 @@ private val AppFailure.messageRes: Int
 
 The `when` is exhaustive. Adding a new `AppFailure` case is a **compile error** until it gets a message.
 
+### The problem
+
+The ViewModel needs to tell the screen: “show this error message.” But the message text lives in `strings.xml`, and there are **three languages** (ar, en, fr).
+
+To turn `R.string.error_wrong_password` into real text, Android needs a **`Context`**. The `Context` knows which language the phone uses right now.
+
+But a ViewModel must **not hold a `Context`**:
+
+- A `Context` is tied to a screen. If the ViewModel keeps it, you can get **memory leaks**.
+- It makes the ViewModel hard to test.
+- If the user changes language, a text already built by the ViewModel would stay in the old language.
+
+### The solution: carry the ID, not the text
+
+`UiText` is a **note** that says what to show, without turning it into text yet. The screen, which has a `Context`, reads the note and builds the final text.
+
+Analogy: instead of sending a translated letter, you send **“use letter #12 from the drawer”**. The reader opens the drawer in their own language.
+
+### The two kinds of note
+
+kotlin
+
+```kotlin
+sealed interface UiText {
+    data class Res(@StringRes val id: Int, val args: List<Any> = emptyList()) : UiText
+    data class Raw(val value: String) : UiText
+}
+```
+
+#### `Res`: text from `strings.xml`
+
+- `id` is the string resource, for example `R.string.error_wrong_password`.
+- `@StringRes` is a label that tells Android Studio “this Int must be a string resource ID”, so it warns you if you pass a random number.
+- `args` are the values to put inside the text. Example in `strings.xml`:
+
+xml
+
+```xml
+<string name="error_out_of_stock">Only %1$d left of %2$s</string>
+```
+
+kotlin
+
+```kotlin
+UiText.Res(R.string.error_out_of_stock, listOf(2, "Shoes"))
+// → "Only 2 left of Shoes"
+```
+
+`= emptyList()` is the default, so for texts with no placeholders you can skip `args`.
+
+#### `Raw`: a plain text that is already ready
+
+`Raw` holds a **finished string**. No lookup, no translation. Use it when the text does **not come from `strings.xml`**:
+
+- a name or text typed by the user (“Ali’s Shop”)
+- a message coming from the server that is already written
+- temporary text during development
+
+kotlin
+
+```kotlin
+UiText.Raw("Ali's Shop")
+```
+
+Prefer `Res` for anything the app says itself, because only `Res` gets translated. A `Raw` text will show the same in every language.
+
+### The two `asString` functions: turning the note into text
+
+#### 1. Inside Compose
+
+kotlin
+
+```kotlin
+@Composable
+fun UiText.asString(): String = when (this) {
+    is UiText.Res -> stringResource(id, *args.toTypedArray())
+    is UiText.Raw -> value
+}
+```
+
+`@Composable` means it can only be called inside another composable. `stringResource` gets the `Context` automatically from Compose, and it updates if the language changes.
+
+kotlin
+
+```kotlin
+Text(text = state.error.asString())
+```
+
+#### 2. Outside Compose (needs a `Context`)
+
+kotlin
+
+```kotlin
+fun UiText.asString(context: Context): String = when (this) {
+    is UiText.Res -> context.getString(id, *args.toTypedArray())
+    is UiText.Raw -> value
+}
+```
+
+For places that are not composables, like a Toast, a notification, or an Activity:
+
+kotlin
+
+```kotlin
+Toast.makeText(context, uiText.asString(context), Toast.LENGTH_SHORT).show()
+```
+
+### What is `Context`?
+
+`Context` is Android’s **connection to the app and the phone**. Through it you can read resources (strings, images), the current language, preferences, and start screens. Without it, you can’t resolve a string ID into text.
+
+### What is `*args.toTypedArray()`?
+
+`stringResource` and `getString` expect the values as separate parameters, not as a list. `*` is the **spread operator**: it unpacks the array into separate values.
+
+```
+listOf(2, "Shoes") → toTypedArray() → [2, "Shoes"] → * → 2, "Shoes"
+```
+
+### The full flow
+
+kotlin
+
+```kotlin
+// 1. Failure → note (no Context needed)
+fun AppFailure.toUiText(): UiText = when (this) {
+    AppFailure.Auth.InvalidCredentials -> UiText.Res(R.string.error_invalid_credentials)
+    ...
+}
+
+// 2. ViewModel stores the note in state
+setState { copy(error = failure.toUiText()) }
+
+// 3. Screen turns the note into text, in the current language
+state.error?.let { Text(it.asString()) }
+```
+
+### Summary
+
+|                         | Meaning                                               |
+| ----------------------- | ----------------------------------------------------- |
+| `UiText`                | a note: “what to show”, without needing a `Context`   |
+| `Res`                   | text from `strings.xml` (translated, can have `args`) |
+| `Raw`                   | a ready-made string (not translated)                  |
+| `asString()` in Compose | builds the text using Compose’s context               |
+| `asString(context)`     | builds the text when you have a `Context` yourself    |
+
 ---
 
 ## 10. Form Validation
