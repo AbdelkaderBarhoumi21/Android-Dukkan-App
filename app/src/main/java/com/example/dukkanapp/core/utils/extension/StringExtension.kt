@@ -14,5 +14,6 @@ import com.example.dukkanapp.core.utils.constants.AppValidationConstants.MIN_PAS
  *
  */
 
-private val EMAIL_REGEX = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")fun String.isValidEmail(): Boolean = isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
+private val EMAIL_REGEX = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+fun String.isValidEmail(): Boolean = isNotEmpty() && EMAIL_REGEX.matches(this)
 fun String.isValidPassword(): Boolean = this.length >= MIN_PASSWORD_LENGTH
