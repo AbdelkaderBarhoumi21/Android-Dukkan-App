@@ -44,7 +44,7 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
                 password = password,
                 passwordError = null,
                 confirmPasswordError = if (current.confirmPassword.isNotEmpty() && password != current.confirmPassword) {
-                    R.string.signup_error_password_mismatch
+                    R.string.validation_passwords_mismatch
 
                 } else {
                     null
@@ -58,7 +58,7 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
             current.copy(
                 confirmPassword = confirmPassword,
                 confirmPasswordError = if (confirmPassword.isNotEmpty() && current.password != confirmPassword) {
-                    R.string.signup_error_password_mismatch
+                    R.string.validation_passwords_mismatch
                 } else {
                     null
                 }
@@ -71,19 +71,19 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
         if (current.isLoading) return
 
         val emailError = when {
-            current.email.isBlank() -> R.string.signup_error_email_empty
-            !current.email.isValidEmail() -> R.string.signup_error_email_invalid
+            current.email.isBlank() -> R.string.validation_email_empty
+            !current.email.isValidEmail() -> R.string.validation_email_invalid
             else -> null
         }
 
         val passwordError = when {
-            current.password.isEmpty() -> R.string.signup_error_confirm_password_empty
-            !current.password.isValidPassword() -> R.string.signup_error_password_short
+            current.password.isEmpty() -> R.string.validation_password_empty
+            !current.password.isValidPassword() -> R.string.validation_password_too_short
             else -> null
         }
         val confirmPasswordError = when {
-            current.confirmPassword.isNotEmpty() -> R.string.signup_error_confirm_password_empty
-            current.password != current.confirmPassword -> R.string.signup_error_password_mismatch
+            current.confirmPassword.isEmpty() -> R.string.validation_confirm_password_empty
+            current.password != current.confirmPassword -> R.string.validation_passwords_mismatch
             else -> null
         }
 

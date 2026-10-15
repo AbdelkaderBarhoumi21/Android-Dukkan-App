@@ -38,12 +38,12 @@ class LoginViewModel @Inject constructor() : ViewModel() {
         val current = _state.value
 
         val emailError = when {
-            current.email.isBlank() -> R.string.login_error_email_empty
-            !current.email.isValidEmail() -> R.string.login_error_email_invalid
+            current.email.isBlank() -> R.string.validation_email_empty
+            !current.email.isValidEmail() -> R.string.validation_email_invalid
             else -> null
         }
         val passwordError = if (!current.password.isValidPassword()) {
-            R.string.login_error_password_short
+            R.string.validation_password_too_short
         } else null
         _state.update { it.copy(emailError = emailError, passwordError = passwordError) }
 
