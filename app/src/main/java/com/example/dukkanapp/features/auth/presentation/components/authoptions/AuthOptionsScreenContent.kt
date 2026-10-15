@@ -43,7 +43,7 @@ fun AuthOptionsScreenContent(
             AppDivider()
             Spacer(Modifier.height(AppDimens.size3Xs))
             AppAuthFooterLink(
-                promptText = stringResource(R.string.onboarding_already_have_account),
+                promptText = stringResource(R.string.auth_already_have_account),
                 actionText = stringResource(R.string.action_log_in),
                 onActionClick = onAlreadyHaveAccountClick
             )

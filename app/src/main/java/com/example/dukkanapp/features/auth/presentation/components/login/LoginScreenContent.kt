@@ -74,7 +74,7 @@ fun LoginScreenContent(
                         modifier = Modifier.size(AppDimens.iconSm)
                     )
                 },
-                placeHolder = stringResource(R.string.login_email_placeholder),
+                placeHolder = stringResource(R.string.auth_email_placeholder),
                 errorText = state.emailError?.let { stringResource(it) },
                 isSuccess = state.isValidEmail,
                 keyboardType = KeyboardType.Email,
@@ -86,7 +86,7 @@ fun LoginScreenContent(
             AppPasswordTextField(
                 value = state.password,
                 onValueChange = onPasswordChanged,
-                placeHolder = stringResource(R.string.login_password_placeholder),
+                placeHolder = stringResource(R.string.auth_password_placeholder),
                 errorText = state.passwordError?.let {
                     stringResource(
                         it,
@@ -127,7 +127,7 @@ fun LoginScreenContent(
             Spacer(Modifier.height(AppDimens.size3Xs))
             AppPrimaryButton(
                 onClick = onLoginClick,
-                text = stringResource(R.string.login_button),
+                text = stringResource(R.string.action_log_in),
             )
             Spacer(Modifier.height(AppDimens.size3Xs))
             AppDivider()

@@ -138,7 +138,7 @@ fun OnboardingScreenContent(
             Spacer(Modifier.height(AppDimens.spaceMd))
             AppAuthFooterLink(
                 onActionClick = { onEvent(OnboardingEvent.OnLoginClicked) },
-                promptText = stringResource(R.string.onboarding_already_have_account),
+                promptText = stringResource(R.string.auth_already_have_account),
                 actionText = stringResource(R.string.action_log_in),
             )
         }

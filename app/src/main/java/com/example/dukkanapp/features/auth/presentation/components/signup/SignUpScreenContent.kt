@@ -69,7 +69,7 @@ fun SignUpScreenContent(
                         modifier = Modifier.size(AppDimens.iconSm)
                     )
                 },
-                placeHolder = stringResource(R.string.signup_email_placeholder),
+                placeHolder = stringResource(R.string.auth_email_placeholder),
                 errorText = state.emailError?.let { stringResource(it) },
                 isSuccess = state.isValidEmail,
                 keyboardType = KeyboardType.Email,
@@ -82,7 +82,7 @@ fun SignUpScreenContent(
             AppPasswordTextField(
                 value = state.password,
                 onValueChange = { onIntent(SignUpIntent.PasswordChanged(it)) },
-                placeHolder = stringResource(R.string.signup_password_placeholder),
+                placeHolder = stringResource(R.string.auth_password_placeholder),
                 errorText = state.passwordError?.let {
                     stringResource(it, AppValidationConstants.MIN_PASSWORD_LENGTH)
                 },
@@ -138,8 +138,8 @@ fun SignUpScreenContent(
             AppDivider()
             Spacer(Modifier.height(AppDimens.size5Xs))
             AppAuthFooterLink(
-                promptText = stringResource(R.string.signup_have_account),
-                actionText = stringResource(R.string.signup_log_in),
+                promptText = stringResource(R.string.auth_already_have_account),
+                actionText = stringResource(R.string.action_log_in),
                 onActionClick = onLoginClick,
             )
         }
