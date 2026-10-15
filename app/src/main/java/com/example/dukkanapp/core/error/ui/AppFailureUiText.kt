@@ -13,7 +13,7 @@ private val AppFailure.messageRes: Int
         AppFailure.Network.NoConnection -> R.string.error_no_connection
         AppFailure.Network.ServiceUnavailable -> R.string.error_service_unavailable
         AppFailure.Network.RateLimited -> R.string.error_too_many_requests
-        AppFailure.Auth.InvalidEmail -> R.string.error_invalid_email
+        AppFailure.Auth.InvalidEmail -> R.string.validation_email_invalid
         AppFailure.Auth.InvalidCredentials -> R.string.error_invalid_credentials
         AppFailure.Auth.EmailAlreadyInUse -> R.string.error_email_already_in_use
         AppFailure.Auth.WeakPassword -> R.string.error_weak_password
