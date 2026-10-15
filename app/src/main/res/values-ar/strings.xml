@@ -1,23 +1,38 @@
 <resources>
     <string name="app_name">تطبيق دكان</string>
+
+    <!-- Common actions -->
+    <string name="action_continue">متابعة</string>
+    <string name="action_next">التالي</string>
+    <string name="action_get_started">ابدأ الآن</string>
+    <string name="action_log_in">تسجيل الدخول</string>
+    <string name="divider_or">أو</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">رجوع</string>
+    <string name="cd_pager_indicator">الصفحة %1$d من %2$d</string>
+    <string name="cd_show_password">إظهار كلمة المرور</string>
+    <string name="cd_hide_password">إخفاء كلمة المرور</string>
+
+    <!-- Language selection -->
     <string name="language_selection_title">اختر اللغة</string>
     <string name="language_selection_subtitle">اختر لغتك المفضلة أدناه. هذا يساعدنا على خدمتك بشكل أفضل.</string>
     <string name="language_selection_you_selected">لقد اخترت</string>
     <string name="language_selection_all_languages">جميع اللغات</string>
     <string name="language_selection_search_hint">بحث</string>
-    <string name="action_continue">متابعة</string>
-    <string name="cd_back">رجوع</string>
+
+    <!-- Onboarding -->
     <string name="onboarding_discover_title">اكتشف منتجاتنا</string>
     <string name="onboarding_discover_subtitle">تصفح آلاف المنتجات، من الموضة إلى التقنية. اعثر على ما تحب بسهولة.</string>
     <string name="onboarding_checkout_title">دفع سهل وسريع</string>
     <string name="onboarding_checkout_subtitle">مدفوعات سلسة وتوصيل سريع. تسوّق بذكاء بدءًا من اليوم.</string>
     <string name="onboarding_shopping_title">تسوق سهل وممتع</string>
     <string name="onboarding_shopping_subtitle">ابدأ التسوق الآن واستمتع بعالم من الراحة!</string>
-    <string name="action_next">التالي</string>
-    <string name="action_get_started">ابدأ الآن</string>
-    <string name="onboarding_already_have_account">لديك حساب بالفعل؟</string>
-    <string name="action_log_in">تسجيل الدخول</string>
-    <string name="cd_pager_indicator">الصفحة %1$d من %2$d</string>
+
+    <!-- Auth (shared by login and sign up) -->
+    <string name="auth_email_placeholder">البريد الإلكتروني</string>
+    <string name="auth_password_placeholder">كلمة المرور</string>
+    <string name="auth_already_have_account">لديك حساب بالفعل؟</string>
 
     <!-- Auth options -->
     <string name="auth_options_title">أهلاً بعودتك</string>
@@ -31,56 +46,31 @@
     <!-- Login -->
     <string name="login_title">لنبدأ التسوق</string>
     <string name="login_subtitle">مفضلاتك ووصولاتك الجديدة وعروضك الحصرية بانتظارك.</string>
-    <string name="login_email_placeholder">البريد الإلكتروني</string>
-    <string name="login_password_placeholder">كلمة المرور</string>
-    <string name="login_show_password">إظهار كلمة المرور</string>
-    <string name="login_hide_password">إخفاء كلمة المرور</string>
     <string name="login_remember_me">تذكّرني</string>
     <string name="login_forgot_password">نسيت كلمة المرور؟</string>
-    <string name="login_button">تسجيل الدخول</string>
     <string name="login_loading">جارٍ تسجيل الدخول…</string>
-    <string name="login_or_divider">أو</string>
     <string name="login_no_account">ليس لديك حساب؟</string>
     <string name="login_sign_up">أنشئ حساباً</string>
-    <string name="login_error_email_empty">يرجى إدخال بريدك الإلكتروني</string>
-    <string name="login_error_email_invalid">أدخل بريداً إلكترونياً صالحاً</string>
-    <string name="login_error_password_empty">يرجى إدخال كلمة المرور</string>
-    <string name="login_error_password_short">يجب أن تتكوّن كلمة المرور من %1$d أحرف على الأقل</string>
-    <string name="login_error_wrong_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة</string>
-    <string name="login_error_network">لا يوجد اتصال بالإنترنت. حاول مرة أخرى.</string>
 
     <!-- Sign up -->
     <string name="signup_title">أنشئ حسابك</string>
     <string name="signup_subtitle">انضم إلى دكان لتكتشف أفضل العروض وتستمتع بتجربة دفع أسرع.</string>
-    <string name="signup_name_placeholder">الاسم الكامل</string>
-    <string name="signup_email_placeholder">البريد الإلكتروني</string>
-    <string name="signup_password_placeholder">كلمة المرور</string>
     <string name="signup_confirm_password_placeholder">تأكيد كلمة المرور</string>
-    <string name="signup_show_password">إظهار كلمة المرور</string>
-    <string name="signup_hide_password">إخفاء كلمة المرور</string>
-    <string name="signup_terms">أوافق على شروط الخدمة وسياسة الخصوصية</string>
     <string name="signup_button">إنشاء حساب</string>
     <string name="signup_loading">جارٍ إنشاء الحساب…</string>
-    <string name="signup_or_divider">أو</string>
-    <string name="signup_have_account">لديك حساب بالفعل؟</string>
-    <string name="signup_log_in">تسجيل الدخول</string>
-    <string name="signup_error_name_empty">يرجى إدخال اسمك الكامل</string>
-    <string name="signup_error_email_empty">يرجى إدخال بريدك الإلكتروني</string>
-    <string name="signup_error_email_invalid">أدخل بريداً إلكترونياً صالحاً</string>
-    <string name="signup_error_password_empty">يرجى إدخال كلمة مرور</string>
-    <string name="signup_error_password_short">يجب أن تتكوّن كلمة المرور من %1$d أحرف على الأقل</string>
-    <string name="signup_error_password_mismatch">كلمتا المرور غير متطابقتين</string>
-    <string name="signup_error_terms">يرجى الموافقة على الشروط للمتابعة</string>
-    <string name="signup_error_email_taken">هذا البريد الإلكتروني مسجّل مسبقاً</string>
-    <string name="signup_error_network">لا يوجد اتصال بالإنترنت. حاول مرة أخرى.</string>
-    <string name="signup_error_confirm_password_empty">يرجى تأكيد كلمة المرور</string>
-    <string name="signup_error_password_weak">يجب أن تحتوي كلمة المرور على أحرف وأرقام</string>
+
+    <!-- Validation (ValidationError.toUiText) -->
+    <string name="validation_email_empty">يرجى إدخال بريدك الإلكتروني</string>
+    <string name="validation_email_invalid">أدخل بريداً إلكترونياً صالحاً</string>
+    <string name="validation_password_empty">يرجى إدخال كلمة المرور</string>
+    <string name="validation_password_too_short">يجب أن تتكوّن كلمة المرور من %1$d أحرف على الأقل</string>
+    <string name="validation_confirm_password_empty">يرجى تأكيد كلمة المرور</string>
+    <string name="validation_passwords_mismatch">كلمتا المرور غير متطابقتين</string>
 
     <!-- Generic failures (AppFailure.toUiText) -->
     <string name="error_no_connection">لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة والمحاولة مرة أخرى.</string>
     <string name="error_service_unavailable">الخدمة غير متاحة مؤقتاً. يرجى المحاولة لاحقاً.</string>
     <string name="error_too_many_requests">محاولات كثيرة جداً. يرجى الانتظار قليلاً ثم المحاولة مرة أخرى.</string>
-    <string name="error_invalid_email">أدخل بريداً إلكترونياً صالحاً</string>
     <string name="error_invalid_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة</string>
     <string name="error_email_already_in_use">هذا البريد الإلكتروني مسجّل مسبقاً</string>
     <string name="error_weak_password">كلمة المرور ضعيفة جداً. يرجى اختيار كلمة مرور أقوى.</string>

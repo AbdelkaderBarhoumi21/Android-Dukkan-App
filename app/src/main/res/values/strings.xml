@@ -1,23 +1,39 @@
 <resources>
     <string name="app_name">Dukkan App</string>
+
+    <!-- Common actions -->
+    <string name="action_continue">Continue</string>
+    <string name="action_next">Next</string>
+    <string name="action_get_started">Get Started</string>
+    <string name="action_log_in">Log In</string>
+    <string name="divider_or">OR</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">Back</string>
+    <string name="cd_pager_indicator">Page %1$d of %2$d</string>
+    <string name="cd_show_password">Show password</string>
+    <string name="cd_hide_password">Hide password</string>
+
+    <!-- Language selection -->
     <string name="language_selection_title">Choose the language</string>
     <string name="language_selection_subtitle">Select your preferred language below. This helps us serve you better.</string>
     <string name="language_selection_you_selected">You Selected</string>
     <string name="language_selection_all_languages">All Languages</string>
     <string name="language_selection_search_hint">Search</string>
-    <string name="action_continue">Continue</string>
-    <string name="cd_back">Back</string>
+
+    <!-- Onboarding -->
     <string name="onboarding_discover_title">Discover Our Products</string>
     <string name="onboarding_discover_subtitle">Browse thousands of products, from fashion to tech. Find what you love, effortlessly.</string>
     <string name="onboarding_checkout_title">Hassle-Free Checkout</string>
     <string name="onboarding_checkout_subtitle">Seamless payments and speedy delivery. Start shopping smarter today.</string>
     <string name="onboarding_shopping_title">Easy and Happy Shopping</string>
     <string name="onboarding_shopping_subtitle">Start shopping now and enjoy a world of convenience!</string>
-    <string name="action_next">Next</string>
-    <string name="action_get_started">Get Started</string>
-    <string name="onboarding_already_have_account">Already have an account?</string>
-    <string name="action_log_in">Log In</string>
-    <string name="cd_pager_indicator">Page %1$d of %2$d</string>
+
+    <!-- Auth (shared by login and sign up) -->
+    <string name="auth_email_placeholder">Email address</string>
+    <string name="auth_password_placeholder">Password</string>
+    <string name="auth_already_have_account">Already have an account?</string>
+
     <!-- Auth options -->
     <string name="auth_options_title">Welcome Back</string>
     <string name="auth_options_subtitle">Please sign in to access your account and resume shopping</string>
@@ -30,50 +46,31 @@
     <!-- Login -->
     <string name="login_title">Let\'s get shopping</string>
     <string name="login_subtitle">Your favorites, new arrivals and exclusive deals are waiting for you.</string>
-    <string name="login_email_placeholder">Email address</string>
-    <string name="login_password_placeholder">Password</string>
-    <string name="login_show_password">Show password</string>
-    <string name="login_hide_password">Hide password</string>
     <string name="login_remember_me">Remember me</string>
     <string name="login_forgot_password">Forgot password?</string>
-    <string name="login_button">Log in</string>
     <string name="login_loading">Logging in…</string>
-    <string name="login_or_divider">OR</string>
     <string name="login_no_account">Don\'t have an account?</string>
     <string name="login_sign_up">Sign up</string>
-    <string name="login_error_email_empty">Please enter your email</string>
-    <string name="login_error_email_invalid">Enter a valid email address</string>
-    <string name="login_error_password_empty">Please enter your password</string>
-    <string name="login_error_password_short">Password must be at least %1$d characters</string>
-    <string name="login_error_wrong_credentials">Incorrect email or password</string>
-    <string name="login_error_network">No internet connection. Please try again.</string>
 
     <!-- Sign up -->
     <string name="signup_title">Create your account</string>
     <string name="signup_subtitle">Join Dukkan to discover great deals and enjoy a faster checkout.</string>
-    <string name="signup_email_placeholder">Email address</string>
-    <string name="signup_password_placeholder">Password</string>
     <string name="signup_confirm_password_placeholder">Confirm password</string>
     <string name="signup_button">Create account</string>
     <string name="signup_loading">Creating account…</string>
-    <string name="signup_have_account">Already have an account?</string>
-    <string name="signup_log_in">Log in</string>
 
-    <!-- Errors -->
-    <string name="signup_error_email_empty">Please enter your email</string>
-    <string name="signup_error_email_invalid">Enter a valid email address</string>
-    <string name="signup_error_password_empty">Please enter a password</string>
-    <string name="signup_error_password_short">Password must be at least %1$d characters</string>
-    <string name="signup_error_password_mismatch">Passwords do not match</string>
-    <string name="signup_error_confirm_password_empty">Please confirm your password</string>
-    <string name="signup_error_email_taken">This email is already registered</string>
-    <string name="signup_error_network">No internet connection. Please try again.</string>
+    <!-- Validation (ValidationError.toUiText) -->
+    <string name="validation_email_empty">Please enter your email</string>
+    <string name="validation_email_invalid">Enter a valid email address</string>
+    <string name="validation_password_empty">Please enter your password</string>
+    <string name="validation_password_too_short">Password must be at least %1$d characters</string>
+    <string name="validation_confirm_password_empty">Please confirm your password</string>
+    <string name="validation_passwords_mismatch">Passwords do not match</string>
 
     <!-- Generic failures (AppFailure.toUiText) -->
     <string name="error_no_connection">No internet connection. Please check your network and try again.</string>
     <string name="error_service_unavailable">The service is temporarily unavailable. Please try again later.</string>
     <string name="error_too_many_requests">Too many attempts. Please wait a moment and try again.</string>
-    <string name="error_invalid_email">Enter a valid email address</string>
     <string name="error_invalid_credentials">Incorrect email or password</string>
     <string name="error_email_already_in_use">This email is already registered</string>
     <string name="error_weak_password">This password is too weak. Please choose a stronger one.</string>
