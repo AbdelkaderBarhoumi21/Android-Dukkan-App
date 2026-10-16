@@ -1,4 +1,4 @@
-package com.example.dukkanapp.core.di
+package com.example.dukkanapp.features.auth.di
 
 import com.example.dukkanapp.features.auth.data.repository.AuthRepositoryImpl
 import com.example.dukkanapp.features.auth.domain.repository.AuthRepository
