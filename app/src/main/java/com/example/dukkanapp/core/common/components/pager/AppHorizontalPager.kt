@@ -1,4 +1,4 @@
-package com.example.dukkanapp.core.common.pager
+package com.example.dukkanapp.core.common.components.pager
 
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerScope

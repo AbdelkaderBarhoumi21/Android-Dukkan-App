@@ -20,9 +20,9 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.common.components.CheckBox.AppCheckBox
 import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
 import com.example.dukkanapp.core.common.components.buttons.AppTextButton
+import com.example.dukkanapp.core.common.components.checkbox.AppCheckBox
 import com.example.dukkanapp.core.common.components.dividers.AppDivider
 import com.example.dukkanapp.core.common.components.headers.AppAuthHeader
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold

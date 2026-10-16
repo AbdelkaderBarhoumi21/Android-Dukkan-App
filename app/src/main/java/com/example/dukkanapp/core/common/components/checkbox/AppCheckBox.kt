@@ -1,4 +1,4 @@
-package com.example.dukkanapp.core.common.components.CheckBox
+package com.example.dukkanapp.core.common.components.checkbox
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
