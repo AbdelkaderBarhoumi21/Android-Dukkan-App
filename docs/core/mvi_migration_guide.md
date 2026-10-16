@@ -2,11 +2,11 @@
 
 Dukkan App (`com.example.dukkanapp`). Moves the four existing screens onto one MVI pattern, so every screen in the app is built the same way.
 
-This guide follows the **current code**. Two names differ from older docs:
+This guide follows the **current code**, after the moves in the [Project Structure guide](project_structure_guide.md) (do that one first). Two names differ from older docs:
 
 | Older docs say | Code (and this guide) uses |
 |---|---|
-| `UiText` in `core/common/text/` | `AppUiText` in `core/common/components/texts/` |
+| `UiText` in `core/common/text/` | `AppUiText` in `core/common/text/` |
 | `R.string.signup_error_*`, `login_error_*` | `R.string.validation_*` (strings cleanup) |
 
 Related guides:
@@ -38,7 +38,7 @@ Related guides:
 | **Language** | `onEvent(LanguageSelectionEvent)`, hand-made `MutableStateFlow` | Intent naming, no Effect: "Continue" bypasses the ViewModel |
 | **Onboarding** | `onEvent(OnboardingEvent)`, hand-made `MutableStateFlow` | No Effect: the Screen intercepts events and navigates itself |
 | **Login** | Old style: `onEmailChanged()`, `onPasswordChanged()`, ... | Everything: no Intent, no Effect, `@StringRes` errors |
-| **Sign Up** | Has `SignUpIntent` + `SignUpEffect` (closest to done) | Not on `MviViewModel`, public `onX()` functions, `@StringRes` errors, navigation lambdas bypass the ViewModel, bugs below |
+| **Sign Up** | Has `SignUpIntent` + `SignUpEffect` (closest to done) | Not on `AppViewModel`, public `onX()` functions, `@StringRes` errors, navigation lambdas bypass the ViewModel, bugs below |
 | **Auth Options** | Stateless screen, no ViewModel | Nothing. No logic to own yet. It gets MVI when Google/Apple sign-in arrives |
 
 ### Bugs found while auditing (all fixed by the code in this guide)
@@ -70,7 +70,7 @@ NavHost ──► XxxScreen ──► XxxScreenContent(state, onIntent)         
    ▲             │                    │
    │             │                    └── user taps ──► XxxIntent ──► ViewModel.onIntent()
    │             │                                                        │
-   │             └── CollectEffect ◄── effect: Flow<XxxEffect> ◄──────────┘ (one-shot)
+   │             └── AppCollectEffect ◄── effect: Flow<XxxEffect> ◄──────────┘ (one-shot)
    │                       │
    └─── onNavigateToX() ◄──┘
 ```
@@ -82,7 +82,7 @@ NavHost ──► XxxScreen ──► XxxScreenContent(state, onIntent)         
 | `XxxUiState` | Everything the screen shows. One immutable `data class` | `email`, `emailError`, `isLoading` |
 | `XxxIntent` | Everything the user can do. A `sealed interface` | `EmailChanged(email)`, `LoginClicked` |
 | `XxxEffect` | Things that happen once (navigation, snackbar). A `sealed interface` | `NavigateToHome` |
-| `XxxViewModel` | Turns intents into new state and effects. Extends `MviViewModel` | |
+| `XxxViewModel` | Turns intents into new state and effects. Extends `AppViewModel` | |
 
 ### Rules
 
@@ -107,11 +107,11 @@ NavHost ──► XxxScreen ──► XxxScreenContent(state, onIntent)         
 
 ## 2. Core Setup
 
-### Step 2.1: MviViewModel
+### Step 2.1: AppViewModel
 
-Same code as [Error Handling §11](error_handling_architecture.md#11-mvi-base-mviviewmodel-and-collecteffect). Not in the code base yet.
+Same idea as [Error Handling §11](error_handling_architecture.md#11-mvi-base-mviviewmodel-and-collecteffect) (called `MviViewModel` / `CollectEffect` there). Location and names follow the [Project Structure guide, Step 8.3](project_structure_guide.md#step-83-corecommonlogic--corecommonmvi).
 
-**File:** `core/common/mvi/MviViewModel.kt`
+**File:** `core/common/mvi/AppViewModel.kt`
 
 ```kotlin
 package com.example.dukkanapp.core.common.mvi
@@ -129,7 +129,7 @@ import kotlinx.coroutines.flow.update
  * MVI base: the screen sends [I]ntents, renders [S]tate, and handles one-shot [E]ffects
  * (navigation, snackbars, opening other apps).
  */
-abstract class MviViewModel<S, I, E>(initialState: S) : ViewModel() {
+abstract class AppViewModel<S, I, E>(initialState: S) : ViewModel() {
 
     private val _state = MutableStateFlow(initialState)
     val state: StateFlow<S> = _state.asStateFlow()
@@ -153,9 +153,9 @@ abstract class MviViewModel<S, I, E>(initialState: S) : ViewModel() {
 
 **Why a `Channel` and not a `SharedFlow`?** A `SharedFlow` with no collector drops the value. If the effect is sent while the screen is in the background, the navigation would be lost. A `Channel` keeps it until the screen comes back.
 
-### Step 2.2: CollectEffect
+### Step 2.2: AppCollectEffect
 
-**File:** `core/common/mvi/CollectEffect.kt`
+**File:** `core/common/mvi/AppCollectEffect.kt`
 
 ```kotlin
 package com.example.dukkanapp.core.common.mvi
@@ -176,7 +176,7 @@ import kotlinx.coroutines.withContext
  * fires in the background. Effects sent meanwhile wait in the channel and are delivered on return.
  */
 @Composable
-fun <E> CollectEffect(effect: Flow<E>, onEffect: suspend (E) -> Unit) {
+fun <E> AppCollectEffect(effect: Flow<E>, onEffect: suspend (E) -> Unit) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnEffect by rememberUpdatedState(onEffect)
 
@@ -197,10 +197,10 @@ It replaces the hand-written `LaunchedEffect` + `rememberUpdatedState` block in 
 
 The Compose version ignores `args`. Change one line.
 
-**File:** `core/common/components/texts/AppUiText.kt`
+**File:** `core/common/text/AppUiText.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.common.components.texts
+package com.example.dukkanapp.core.common.text
 
 import android.content.Context
 import androidx.annotation.StringRes
@@ -341,7 +341,7 @@ Delete `LanguageSelectionEvent.kt`.
 package com.example.dukkanapp.features.language.presentation.logic
 
 import androidx.lifecycle.viewModelScope
-import com.example.dukkanapp.core.common.mvi.MviViewModel
+import com.example.dukkanapp.core.common.mvi.AppViewModel
 import com.example.dukkanapp.features.language.domain.usecase.GetSupportedLanguagesUseCase
 import com.example.dukkanapp.features.language.domain.usecase.ObserveSelectedLanguageUseCase
 import com.example.dukkanapp.features.language.domain.usecase.SelectLanguageUseCase
@@ -355,7 +355,7 @@ class LanguageSelectionViewModel @Inject constructor(
     getSupportedLanguages: GetSupportedLanguagesUseCase,
     private val observeSelectedLanguage: ObserveSelectedLanguageUseCase,
     private val selectLanguage: SelectLanguageUseCase,
-) : MviViewModel<LanguageSelectionUiState, LanguageSelectionIntent, LanguageSelectionEffect>(
+) : AppViewModel<LanguageSelectionUiState, LanguageSelectionIntent, LanguageSelectionEffect>(
     LanguageSelectionUiState(languages = getSupportedLanguages().map { it.toUiModel() })
 ) {
 
@@ -407,7 +407,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.dukkanapp.core.common.mvi.CollectEffect
+import com.example.dukkanapp.core.common.mvi.AppCollectEffect
 import com.example.dukkanapp.features.language.presentation.components.LanguageSelectionScreenContent
 import com.example.dukkanapp.features.language.presentation.logic.LanguageSelectionEffect
 import com.example.dukkanapp.features.language.presentation.logic.LanguageSelectionViewModel
@@ -419,7 +419,7 @@ fun LanguageSelectionScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    CollectEffect(viewModel.effect) { effect ->
+    AppCollectEffect(viewModel.effect) { effect ->
         when (effect) {
             LanguageSelectionEffect.NavigateToOnboarding -> onNavigateToOnboarding()
         }
@@ -640,9 +640,9 @@ Delete `OnboardingEvent.kt`.
 package com.example.dukkanapp.features.onboarding.presentation.logic
 
 import androidx.lifecycle.viewModelScope
-import com.example.dukkanapp.core.common.mvi.MviViewModel
-import com.example.dukkanapp.features.onboarding.domain.usecases.GetOnboardingPagesUseCase
-import com.example.dukkanapp.features.onboarding.domain.usecases.SetOnboardingCompletedUseCase
+import com.example.dukkanapp.core.common.mvi.AppViewModel
+import com.example.dukkanapp.features.onboarding.domain.usecase.GetOnboardingPagesUseCase
+import com.example.dukkanapp.features.onboarding.domain.usecase.SetOnboardingCompletedUseCase
 import com.example.dukkanapp.features.onboarding.presentation.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -652,7 +652,7 @@ import javax.inject.Inject
 class OnboardingViewModel @Inject constructor(
     getOnboardingPages: GetOnboardingPagesUseCase,
     private val setOnboardingCompleted: SetOnboardingCompletedUseCase,
-) : MviViewModel<OnboardingUiState, OnboardingIntent, OnboardingEffect>(
+) : AppViewModel<OnboardingUiState, OnboardingIntent, OnboardingEffect>(
     OnboardingUiState(pages = getOnboardingPages().map { it.toUiModel() })
 ) {
 
@@ -701,7 +701,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.dukkanapp.core.common.mvi.CollectEffect
+import com.example.dukkanapp.core.common.mvi.AppCollectEffect
 import com.example.dukkanapp.features.onboarding.presentation.components.OnboardingScreenContent
 import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingEffect
 import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingViewModel
@@ -714,7 +714,7 @@ fun OnboardingScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    CollectEffect(viewModel.effect) { effect ->
+    AppCollectEffect(viewModel.effect) { effect ->
         when (effect) {
             OnboardingEffect.NavigateToAuthOptions -> onNavigateToAuthOptions()
             OnboardingEffect.NavigateToLogin -> onNavigateToLogin()
@@ -764,8 +764,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
 import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
-import com.example.dukkanapp.core.common.pager.AppHorizontalPager
-import com.example.dukkanapp.core.common.pager.AppPagerIndicator
+import com.example.dukkanapp.core.common.components.pager.AppHorizontalPager
+import com.example.dukkanapp.core.common.components.pager.AppPagerIndicator
 import com.example.dukkanapp.core.config.theme.AppTheme
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingIntent
@@ -925,7 +925,7 @@ features/auth/presentation/logic/login/
 ```kotlin
 package com.example.dukkanapp.features.auth.presentation.logic.login
 
-import com.example.dukkanapp.core.common.components.texts.AppUiText
+import com.example.dukkanapp.core.common.text.AppUiText
 import com.example.dukkanapp.core.utils.extension.isValidEmail
 
 data class LoginUiState(
@@ -982,7 +982,7 @@ sealed interface LoginEffect {
 package com.example.dukkanapp.features.auth.presentation.logic.login
 
 import androidx.lifecycle.viewModelScope
-import com.example.dukkanapp.core.common.mvi.MviViewModel
+import com.example.dukkanapp.core.common.mvi.AppViewModel
 import com.example.dukkanapp.core.error.ui.toUiText
 import com.example.dukkanapp.features.auth.domain.validation.AuthFormValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -992,7 +992,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     // TODO(firebase): private val signIn: SignInUseCase, see firebase_auth_integration_guide.md §7
-) : MviViewModel<LoginUiState, LoginIntent, LoginEffect>(LoginUiState()) {
+) : AppViewModel<LoginUiState, LoginIntent, LoginEffect>(LoginUiState()) {
 
     override fun onIntent(intent: LoginIntent) {
         when (intent) {
@@ -1043,7 +1043,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.dukkanapp.core.common.mvi.CollectEffect
+import com.example.dukkanapp.core.common.mvi.AppCollectEffect
 import com.example.dukkanapp.features.auth.presentation.components.login.LoginScreenContent
 import com.example.dukkanapp.features.auth.presentation.logic.login.LoginEffect
 import com.example.dukkanapp.features.auth.presentation.logic.login.LoginViewModel
@@ -1058,7 +1058,7 @@ fun LoginScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    CollectEffect(viewModel.effect) { effect ->
+    AppCollectEffect(viewModel.effect) { effect ->
         when (effect) {
             LoginEffect.NavigateBack -> onNavigateBack()
             LoginEffect.NavigateToHome -> onNavigateToHome()
@@ -1104,7 +1104,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.common.components.CheckBox.AppCheckBox
+import com.example.dukkanapp.core.common.components.checkbox.AppCheckBox
 import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
 import com.example.dukkanapp.core.common.components.buttons.AppTextButton
 import com.example.dukkanapp.core.common.components.dividers.AppDivider
@@ -1113,7 +1113,7 @@ import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
-import com.example.dukkanapp.core.common.components.texts.asString
+import com.example.dukkanapp.core.common.text.asString
 import com.example.dukkanapp.core.config.theme.AppTheme
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
@@ -1232,13 +1232,13 @@ private fun LoginScreenPreview() {
 }
 ```
 
-> `AppCheckBox` lives in package `components.CheckBox` (capital C) today. Leave the import as is, or rename the folder and package to `checkbox` in a separate commit.
+> `checkbox` (lowercase) comes from the [Project Structure guide](project_structure_guide.md#step-81-fix-folder-and-package-names), Step 8.1. Do that guide first.
 
 ---
 
 ## 6. Sign Up
 
-**Changes:** move to `MviViewModel`, private handlers, `AppUiText?` errors, bugs 1, 2 and 12, all navigation through effects. Intent and Effect files already exist and grow.
+**Changes:** move to `AppViewModel`, private handlers, `AppUiText?` errors, bugs 1, 2 and 12, all navigation through effects. Intent and Effect files already exist and grow.
 
 ```
 features/auth/presentation/logic/signup/
@@ -1257,7 +1257,7 @@ Bug 2 fixed: `== null`, not `!= null`.
 ```kotlin
 package com.example.dukkanapp.features.auth.presentation.logic.signup
 
-import com.example.dukkanapp.core.common.components.texts.AppUiText
+import com.example.dukkanapp.core.common.text.AppUiText
 import com.example.dukkanapp.core.utils.extension.isValidEmail
 import com.example.dukkanapp.core.utils.extension.isValidPassword
 
@@ -1320,8 +1320,8 @@ Bug 1 fixed by `||` on one line. Validation moves to `AuthFormValidator`.
 package com.example.dukkanapp.features.auth.presentation.logic.signup
 
 import androidx.lifecycle.viewModelScope
-import com.example.dukkanapp.core.common.components.texts.AppUiText
-import com.example.dukkanapp.core.common.mvi.MviViewModel
+import com.example.dukkanapp.core.common.text.AppUiText
+import com.example.dukkanapp.core.common.mvi.AppViewModel
 import com.example.dukkanapp.core.error.ui.toUiText
 import com.example.dukkanapp.core.error.validation.ValidationError
 import com.example.dukkanapp.features.auth.domain.validation.AuthFormValidator
@@ -1332,7 +1332,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     // TODO(firebase): private val signUp: SignUpUseCase, see firebase_auth_integration_guide.md §6
-) : MviViewModel<SignUpUiState, SignUpIntent, SignUpEffect>(SignUpUiState()) {
+) : AppViewModel<SignUpUiState, SignUpIntent, SignUpEffect>(SignUpUiState()) {
 
     override fun onIntent(intent: SignUpIntent) {
         when (intent) {
@@ -1400,7 +1400,7 @@ The old `delay(2000)` fake request is gone. The loading state now covers only re
 
 ### Step 6.4: SignUpScreen
 
-`CollectEffect` replaces the manual `LaunchedEffect` + `rememberUpdatedState`.
+`AppCollectEffect` replaces the manual `LaunchedEffect` + `rememberUpdatedState`.
 
 **File:** `features/auth/presentation/screens/SignUpScreen.kt`
 
@@ -1411,7 +1411,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.dukkanapp.core.common.mvi.CollectEffect
+import com.example.dukkanapp.core.common.mvi.AppCollectEffect
 import com.example.dukkanapp.features.auth.presentation.components.signup.SignUpScreenContent
 import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpEffect
 import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpViewModel
@@ -1426,7 +1426,7 @@ fun SignUpScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    CollectEffect(viewModel.effect) { effect ->
+    AppCollectEffect(viewModel.effect) { effect ->
         when (effect) {
             SignUpEffect.NavigateBack -> onNavigateBack()
             SignUpEffect.NavigateToHome -> onNavigateToHome()
@@ -1477,7 +1477,7 @@ import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
-import com.example.dukkanapp.core.common.components.texts.asString
+import com.example.dukkanapp.core.common.text.asString
 import com.example.dukkanapp.core.config.theme.AppTheme
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
@@ -1616,10 +1616,10 @@ private fun SignUpScreenPreview() {
 
 `LoginScreen` and `SignUpScreen` now implement `AppRoute`.
 
-**File:** `core/navigation/AppRoutes.kt`
+**File:** `navigation/AppRoute.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.navigation
+package com.example.dukkanapp.navigation
 
 import kotlinx.serialization.Serializable
 
@@ -1648,10 +1648,10 @@ sealed interface AppRoute {
 
 The NavHost only maps effects to `navController` calls.
 
-**File:** `core/navigation/AppNavHost.kt`
+**File:** `navigation/AppNavHost.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.navigation
+package com.example.dukkanapp.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
@@ -1784,7 +1784,7 @@ Then search the project for leftovers. Each should return **no results**:
 onEvent(
 LanguageSelectionEvent
 OnboardingEvent
-MutableStateFlow          (only inside MviViewModel and AppStartViewModel)
+MutableStateFlow          (only inside AppViewModel and AppStartViewModel)
 @StringRes val emailError
 components.SignUp
 ```
@@ -1798,8 +1798,8 @@ components.SignUp
 The order keeps the project compiling after every step. **Each feature's screen and its NavHost block change together**, because the screen's parameters change.
 
 **Core**
-- [ ] `core/common/mvi/MviViewModel.kt` (Step 2.1)
-- [ ] `core/common/mvi/CollectEffect.kt` (Step 2.2)
+- [ ] `core/common/mvi/AppViewModel.kt` (Step 2.1)
+- [ ] `core/common/mvi/AppCollectEffect.kt` (Step 2.2)
 - [ ] `AppUiText.asString()` passes `args` (Step 2.3)
 - [ ] `features/auth/domain/validation/AuthFormValidator.kt` (Step 2.4)
 
