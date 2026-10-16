@@ -1,4 +1,4 @@
-package com.example.dukkanapp.core.common.logic
+package com.example.dukkanapp.core.common.mvi
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
