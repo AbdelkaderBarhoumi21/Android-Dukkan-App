@@ -1,4 +1,4 @@
-package com.example.dukkanapp.core.common.components.texts
+package com.example.dukkanapp.core.common.text
 
 import android.content.Context
 import androidx.annotation.StringRes
