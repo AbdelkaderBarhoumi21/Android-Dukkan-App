@@ -2,7 +2,7 @@ package com.example.dukkanapp.core.error.ui
 
 import androidx.annotation.StringRes
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.common.components.texts.AppUiText
+import com.example.dukkanapp.core.common.text.AppUiText
 import com.example.dukkanapp.core.error.AppFailure
 
 /** Generic user message for any [AppFailure]. Features map their own [AppFailure.Feature] first. */

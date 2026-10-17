@@ -1,4 +1,4 @@
-package com.example.dukkanapp.core.di
+package com.example.dukkanapp.features.onboarding.di
 
 import com.example.dukkanapp.features.onboarding.data.repository.OnboardingRepositoryImpl
 import com.example.dukkanapp.features.onboarding.domain.repository.OnboardingRepository

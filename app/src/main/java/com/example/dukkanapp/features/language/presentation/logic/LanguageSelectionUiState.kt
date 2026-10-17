@@ -5,7 +5,8 @@ import com.example.dukkanapp.features.language.presentation.model.LanguageUiMode
 data class LanguageSelectionUiState(
     val query: String = "",
     val selectedCode: String = "en",
-    val languages: List<LanguageUiModel> = emptyList()
+    val languages: List<LanguageUiModel> = emptyList(),
+    val isSaving: Boolean = false
 ) {
     val filteredLanguages: List<LanguageUiModel>
         get() = if (query.isBlank()) languages

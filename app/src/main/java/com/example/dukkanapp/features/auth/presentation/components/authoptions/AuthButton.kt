@@ -1,5 +1,3 @@
-package com.example.dukkanapp.core.common.components.buttons
-
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth

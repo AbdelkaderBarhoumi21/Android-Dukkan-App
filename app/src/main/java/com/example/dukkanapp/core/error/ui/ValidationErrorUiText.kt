@@ -1,7 +1,7 @@
 package com.example.dukkanapp.core.error.ui
 
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.common.components.texts.AppUiText
+import com.example.dukkanapp.core.common.text.AppUiText
 import com.example.dukkanapp.core.error.validation.ValidationError
 
 fun ValidationError.toUiText(): AppUiText = when (this) {

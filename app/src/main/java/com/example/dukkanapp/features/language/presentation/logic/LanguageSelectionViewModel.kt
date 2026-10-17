@@ -1,53 +1,48 @@
 package com.example.dukkanapp.features.language.presentation.logic
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dukkanapp.core.common.mvi.AppViewModel
 import com.example.dukkanapp.features.language.domain.usecase.GetSupportedLanguagesUseCase
 import com.example.dukkanapp.features.language.domain.usecase.ObserveSelectedLanguageUseCase
 import com.example.dukkanapp.features.language.domain.usecase.SelectLanguageUseCase
 import com.example.dukkanapp.features.language.presentation.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class LanguageSelectionViewModel @Inject constructor(
-    private val getSupportedLanguages: GetSupportedLanguagesUseCase,
+    getSupportedLanguagesUseCase: GetSupportedLanguagesUseCase,
     private val observeSelectedLanguage: ObserveSelectedLanguageUseCase,
-    private val selectLanguage: SelectLanguageUseCase,
-) : ViewModel() {
-    private val _state = MutableStateFlow(
-        LanguageSelectionUiState(
-            languages = getSupportedLanguages().map { it.toUiModel() }
-        )
-    )
-    val state: StateFlow<LanguageSelectionUiState> = _state.asStateFlow()
+    private val selectLanguage: SelectLanguageUseCase
 
-    init {
+) :
+    AppViewModel<LanguageSelectionUiState, LanguageSelectionIntent, LanguageSelectionEffect>(
+        initialState = LanguageSelectionUiState(languages = getSupportedLanguagesUseCase().map { it.toUiModel() })
+    ) {
+    override fun onIntent(intent: LanguageSelectionIntent) {
+        when (intent) {
+            is LanguageSelectionIntent.QueryChanged -> setState { copy(query = intent.query) }
+            is LanguageSelectionIntent.LanguageSelected -> onLanguageSelected(intent.code)
+            is LanguageSelectionIntent.ContinueClicked -> onContinueClicked()
+        }
+    }
+
+    private fun onLanguageSelected(code: String) {
+        if (code == currentState.selectedCode) return
+        setState { copy(selectedCode = code) }
         viewModelScope.launch {
-            observeSelectedLanguage().collect { code ->
-                _state.update {
-                    it.copy(selectedCode = code)
-                }
-            }
+            selectLanguage(code)
         }
     }
 
-    fun onEvent(event: LanguageSelectionEvent) {
-        when (event) {
-            is LanguageSelectionEvent.OnQueryChanged -> _state.update { it.copy(query = event.query) }
-            is LanguageSelectionEvent.OnLanguageSelected -> {
-                _state.update { it.copy(selectedCode = event.code) }
-                viewModelScope.launch {
-                    selectLanguage(event.code)
-                }
-            }
-            
+    private fun onContinueClicked() {
+        if (currentState.isSaving) return
+        setState { copy(isSaving = true) }
+        viewModelScope.launch {
+            selectLanguage(currentState.selectedCode)
+            setState { copy(isSaving = false) }
+            sendEffect(LanguageSelectionEffect.NavigateToOnboarding)
         }
     }
-
 }

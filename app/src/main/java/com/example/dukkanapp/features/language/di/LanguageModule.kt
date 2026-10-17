@@ -1,4 +1,4 @@
-package com.example.dukkanapp.core.di
+package com.example.dukkanapp.features.language.di
 
 import com.example.dukkanapp.features.language.data.repository.LanguageRepositoryImpl
 import com.example.dukkanapp.features.language.domain.repository.LanguageRepository
