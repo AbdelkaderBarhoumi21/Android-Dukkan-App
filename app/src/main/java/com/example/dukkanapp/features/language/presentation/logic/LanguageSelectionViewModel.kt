@@ -20,6 +20,12 @@ class LanguageSelectionViewModel @Inject constructor(
     AppViewModel<LanguageSelectionUiState, LanguageSelectionIntent, LanguageSelectionEffect>(
         initialState = LanguageSelectionUiState(languages = getSupportedLanguagesUseCase().map { it.toUiModel() })
     ) {
+    init {
+        viewModelScope.launch {
+            observeSelectedLanguage().collect { code -> setState { copy(selectedCode = code) } }
+        }
+    }
+
     override fun onIntent(intent: LanguageSelectionIntent) {
         when (intent) {
             is LanguageSelectionIntent.QueryChanged -> setState { copy(query = intent.query) }
