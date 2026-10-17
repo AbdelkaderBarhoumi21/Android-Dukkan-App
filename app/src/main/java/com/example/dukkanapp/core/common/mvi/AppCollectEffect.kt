@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 @Composable
-fun <E> appCollectEffect(effect: Flow<E>, onEffect: suspend (E) -> Unit) {
+fun <E> AppCollectEffect(effect: Flow<E>, onEffect: suspend (E) -> Unit) {
     val lifeCycleOwner = LocalLifecycleOwner.current
     val currentOnEffect by rememberUpdatedState(onEffect)
 
