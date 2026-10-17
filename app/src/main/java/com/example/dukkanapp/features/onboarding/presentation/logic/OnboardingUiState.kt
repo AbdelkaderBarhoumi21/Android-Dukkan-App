@@ -5,7 +5,8 @@ import com.example.dukkanapp.features.onboarding.presentation.model.OnboardingPa
 
 data class OnboardingUiState(
     val currentPage: Int = 0,
-    val pages: List<OnboardingPageUiModel> = emptyList()
+    val pages: List<OnboardingPageUiModel> = emptyList(),
+    val isFinishing: Boolean = false
 ) {
     val isLastPage: Boolean get() = pages.isNotEmpty() && currentPage >= pages.lastIndex
     val primaryActionRes: Int get() = if (isLastPage) R.string.action_get_started else R.string.action_next
