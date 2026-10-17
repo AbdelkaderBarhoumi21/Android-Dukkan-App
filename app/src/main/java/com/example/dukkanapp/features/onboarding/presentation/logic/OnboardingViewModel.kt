@@ -19,8 +19,8 @@ class OnboardingViewModel @Inject constructor(
     override fun onIntent(intent: OnboardingIntent) {
         when (intent) {
             is OnboardingIntent.PageChanged -> onPageChanged(intent.page)
-            OnboardingIntent.PrimaryActionClick -> onPrimaryActionClicked()
-            OnboardingIntent.LoginClick -> finish(OnboardingEffect.NavigateToLogin)
+            OnboardingIntent.PrimaryActionClicked -> onPrimaryActionClicked()
+            OnboardingIntent.LoginClicked -> finish(OnboardingEffect.NavigateToLogin)
         }
     }
 

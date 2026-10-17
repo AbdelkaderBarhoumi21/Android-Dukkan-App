@@ -4,29 +4,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.dukkanapp.core.common.mvi.AppCollectEffect
 import com.example.dukkanapp.features.onboarding.presentation.components.OnboardingScreenContent
-import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingEvent
+import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingEffect
 import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingViewModel
 
 @Composable
 fun OnboardingScreen(
-    onFinished: () -> Unit,
+    onNavigateToAuthOptions: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    AppCollectEffect<OnboardingEffect>(viewModel.effect) { effect ->
+        when (effect) {
+            is OnboardingEffect.NavigateToAuthOptions -> onNavigateToAuthOptions()
+            is OnboardingEffect.NavigateToLogin -> onNavigateToLogin()
+        }
+    }
 
     OnboardingScreenContent(
         state = state,
-        onEvent = { event ->
-            when (event) {
-                OnboardingEvent.OnGetStartedClick,
-                OnboardingEvent.OnLoginClicked -> {
-                    viewModel.onEvent(event) // Make sure ViewModel saves state
-                    onFinished() // Bubbles up to AppNavHost to navigate to "Login"
-                }
-
-                else -> viewModel.onEvent(event) // Handle normal page changes
-            }
-        }
+        onIntent = viewModel::onIntent
     )
 }

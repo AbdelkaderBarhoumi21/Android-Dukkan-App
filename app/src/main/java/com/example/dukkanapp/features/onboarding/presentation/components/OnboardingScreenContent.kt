@@ -16,6 +16,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +31,7 @@ import com.example.dukkanapp.core.common.components.pager.AppPagerIndicator
 import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
 import com.example.dukkanapp.core.config.theme.AppTheme
 import com.example.dukkanapp.core.utils.constants.AppDimens
-import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingEvent
+import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingIntent
 import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingUiState
 import com.example.dukkanapp.features.onboarding.presentation.model.OnboardingPageUiModel
 import kotlinx.coroutines.flow.collectLatest
@@ -38,19 +40,18 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @Composable
 fun OnboardingScreenContent(
     state: OnboardingUiState,
-    onEvent: (OnboardingEvent) -> Unit,
+    onIntent: (OnboardingIntent) -> Unit,
 ) {
     if (state.pages.isEmpty()) return
     val pagerState = rememberPagerState(
         initialPage = state.currentPage,
         pageCount = { state.pages.size }
     )
-    // Direction 1: pager -> ViewModel (user swipes)
+    val currentOnIntent by rememberUpdatedState(onIntent)
+    // Direction 1: pager -> ViewModel (user swipes). One collector for the screen's lifetime.
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collectLatest { page ->
-            onEvent(
-                OnboardingEvent.OnPageChanged(page)
-            )
+            currentOnIntent(OnboardingIntent.PageChanged(page))
         }
     }
 
@@ -128,18 +129,14 @@ fun OnboardingScreenContent(
                 text = stringResource(state.primaryActionRes),
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    if (state.isLastPage) {
-                        onEvent(OnboardingEvent.OnGetStartedClick)
-                    } else {
-                        onEvent(OnboardingEvent.OnNextClicked)
-                    }
+                    onIntent(OnboardingIntent.PrimaryActionClicked)
                 }
             )
             Spacer(Modifier.height(AppDimens.spaceMd))
             AppAuthFooterLink(
-                onActionClick = { onEvent(OnboardingEvent.OnLoginClicked) },
                 promptText = stringResource(R.string.auth_already_have_account),
                 actionText = stringResource(R.string.action_log_in),
+                onActionClick = { onIntent(OnboardingIntent.LoginClicked) },
             )
         }
 
@@ -176,7 +173,7 @@ private fun OnboardingScreenPreview() {
                 ),
                 currentPage = 0,
             ),
-            onEvent = {},
+            onIntent = {},
         )
     }
 }
