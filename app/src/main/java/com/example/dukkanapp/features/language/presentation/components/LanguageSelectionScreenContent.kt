@@ -18,23 +18,21 @@ import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.config.theme.AppTheme
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
-import com.example.dukkanapp.features.language.presentation.logic.LanguageSelectionEvent
+import com.example.dukkanapp.features.language.presentation.logic.LanguageSelectionIntent
 import com.example.dukkanapp.features.language.presentation.logic.LanguageSelectionUiState
 
 
 @Composable
 fun LanguageSelectionScreenContent(
     state: LanguageSelectionUiState,
-    onEvent: (LanguageSelectionEvent) -> Unit,
-    onBack: () -> Unit,
-    onContinue: () -> Unit,
+    onIntent: (LanguageSelectionIntent) -> Unit,
 ) {
     AppScaffold(
-        onNavigateBack = onBack,
         bottomBar = {
             AppPrimaryButton(
                 text = stringResource(R.string.action_continue),
-                onClick = onContinue,
+                onClick = { onIntent(LanguageSelectionIntent.ContinueClicked) },
+                isLoading = state.isSaving,
                 modifier = Modifier
                     .padding(horizontal = AppDimens.spaceMd, vertical = AppDimens.spaceLg)
 
@@ -104,7 +102,7 @@ fun LanguageSelectionScreenContent(
             item {
                 LanguageSearchField(
                     query = state.query,
-                    onQueryChange = { onEvent(LanguageSelectionEvent.OnQueryChanged(it)) },
+                    onQueryChange = { onIntent(LanguageSelectionIntent.QueryChanged(it)) },
                 )
             }
 
@@ -113,7 +111,7 @@ fun LanguageSelectionScreenContent(
                     language = language,
                     isSelected = language.code == state.selectedCode,
                     isHighlightedStyle = false,
-                    onClick = { onEvent(LanguageSelectionEvent.OnLanguageSelected(language.code)) },
+                    onClick = { onIntent(LanguageSelectionIntent.LanguageSelected(language.code)) },
                     modifier = Modifier.padding(vertical = AppDimens.space2Xs)
                 )
             }
@@ -132,9 +130,7 @@ private fun LanguageSelectionScreenPreview() {
                 selectedCode = "ar",
                 languages = emptyList(), // swap in fake LanguageUiModel list to preview real rows
             ),
-            onEvent = {},
-            onBack = {},
-            onContinue = {},
+            onIntent = {},
         )
     }
 }
