@@ -1,55 +1,47 @@
 package com.example.dukkanapp.features.onboarding.presentation.logic
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dukkanapp.core.common.mvi.AppViewModel
 import com.example.dukkanapp.features.onboarding.domain.usecases.GetOnboardingPagesUseCase
 import com.example.dukkanapp.features.onboarding.domain.usecases.SetOnboardingCompletedUseCase
 import com.example.dukkanapp.features.onboarding.presentation.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     private val getOnboardingPages: GetOnboardingPagesUseCase,
     private val setOnboardingCompletedUseCase: SetOnboardingCompletedUseCase
-) : ViewModel() {
+) : AppViewModel<OnboardingUiState, OnboardingIntent, OnboardingEffect>(
+    initialState = OnboardingUiState(pages = getOnboardingPages().map { it.toUiModel() })
+) {
+    override fun onIntent(intent: OnboardingIntent) {
+        when (intent) {
+            is OnboardingIntent.PageChanged -> onPageChanged(intent.page)
+            OnboardingIntent.PrimaryActionClick -> onPrimaryActionClicked()
+            OnboardingIntent.LoginClick -> finish(OnboardingEffect.NavigateToLogin)
+        }
+    }
 
-    private val _state = MutableStateFlow(
-        OnboardingUiState(
-            pages = getOnboardingPages().map { it.toUiModel() },
-        )
-    )
+    private fun onPageChanged(page: Int) {
+        if (currentState.pages.isNotEmpty()) return // coerceIn(0, -1) would throw
+        setState { copy(currentPage = page.coerceIn(0, pages.lastIndex)) }
+    }
 
-    val state: StateFlow<OnboardingUiState> = _state.asStateFlow()
+    private fun onPrimaryActionClicked() {
+        if (currentState.isLastPage) finish(OnboardingEffect.NavigateToAuthOptions)
+        else setState { copy(currentPage = currentPage + 1) }
+    }
 
-    fun onEvent(event: OnboardingEvent) {
-        when (event) {
-            is OnboardingEvent.OnPageChanged -> {
-                _state.update { current ->
-                    val safePage = event.page.coerceIn(0, current.pages.lastIndex)
-                    if (current.currentPage == safePage) current
-                    else current.copy(currentPage = safePage)
-
-                }
-            }
-
-            is OnboardingEvent.OnNextClicked -> {
-                _state.update { current ->
-                    if (current.isLastPage) current
-                    else current.copy(currentPage = current.currentPage + 1)
-                }
-            }
-
-            is OnboardingEvent.OnGetStartedClick, is OnboardingEvent.OnLoginClicked -> {
-                viewModelScope.launch { setOnboardingCompletedUseCase() }
-            }
+    /** Save first, navigate after: the "seen" flag is on disk before the screen leaves. */
+    private fun finish(destination: OnboardingEffect) {
+        if (currentState.isFinishing) return
+        setState { copy(isFinishing = true) }
+        viewModelScope.launch {
+            setOnboardingCompletedUseCase()
+            sendEffect(destination)
 
         }
-
     }
 }
