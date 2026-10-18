@@ -12,6 +12,7 @@ object AuthFormValidator {
         else -> null
     }
 
+    /** Sign up: enforce the password policy. */
     fun validateNewPassword(password: String): ValidationError? = when {
         password.isBlank() -> ValidationError.PasswordEmpty
         !password.trim().isValidPassword() -> ValidationError.PasswordTooShort(
@@ -20,6 +21,10 @@ object AuthFormValidator {
 
         else -> null
     }
+
+    /** Login: only require a value. Older accounts may predate the current policy. */
+    fun validateExistingPassword(password: String): ValidationError? =
+        if (password.isEmpty()) ValidationError.PasswordEmpty else null
 
     fun validateConfirmPassword(password: String, confirmPassword: String): ValidationError? =
         when {
