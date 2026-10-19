@@ -29,27 +29,24 @@ import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
+import com.example.dukkanapp.core.common.text.asString
 import com.example.dukkanapp.core.utils.constants.AppDimens
-import com.example.dukkanapp.core.utils.constants.AppValidationConstants
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
+import com.example.dukkanapp.features.auth.presentation.logic.Login.LoginIntent
 import com.example.dukkanapp.features.auth.presentation.logic.login.LoginUiState
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
 fun LoginScreenContent(
     state: LoginUiState,
-    onLoginClick: () -> Unit,
-    onForgetPasswordClick: () -> Unit,
-    onEmailChanged: (String) -> Unit,
-    onPasswordChanged: (String) -> Unit,
-    onRememberMeChanged: (Boolean) -> Unit,
-    onNavigationBack: () -> Unit,
-    onSignupClick: () -> Unit,
+    onIntent: (LoginIntent) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
     AppScaffold(
-        onNavigateBack = onNavigationBack
+        onNavigateBack = {
+            onIntent(LoginIntent.BackClicked)
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -65,7 +62,7 @@ fun LoginScreenContent(
             Spacer(Modifier.height(AppDimens.sizeMd))
             AppTextFiled(
                 value = state.email,
-                onValueChange = onEmailChanged,
+                onValueChange = { onIntent(LoginIntent.EmailChanged(it)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Iconsax.Linear.Sms,
@@ -75,7 +72,7 @@ fun LoginScreenContent(
                     )
                 },
                 placeHolder = stringResource(R.string.auth_email_placeholder),
-                errorText = state.emailError?.let { stringResource(it) },
+                errorText = state.emailError?.asString(),
                 isSuccess = state.isValidEmail,
                 keyboardType = KeyboardType.Email,
                 keyboardActions = KeyboardActions(
@@ -85,14 +82,9 @@ fun LoginScreenContent(
             Spacer(Modifier.height(AppDimens.sizeXs))
             AppPasswordTextField(
                 value = state.password,
-                onValueChange = onPasswordChanged,
+                onValueChange = { onIntent(LoginIntent.PasswordChanged(it)) },
                 placeHolder = stringResource(R.string.auth_password_placeholder),
-                errorText = state.passwordError?.let {
-                    stringResource(
-                        it,
-                        AppValidationConstants.MIN_PASSWORD_LENGTH
-                    )
-                },
+                errorText = state.passwordError?.asString(),
                 isSuccess = state.isValidPassword,
                 leadingIcon = {
                     Icon(
@@ -104,7 +96,7 @@ fun LoginScreenContent(
                 }, keyboardActions = KeyboardActions(
                     onDone = {
                         focusManager.clearFocus()
-                        onLoginClick()
+                        onIntent(LoginIntent.LoginClicked)
                     }
                 )
             )
@@ -116,17 +108,17 @@ fun LoginScreenContent(
             ) {
                 AppCheckBox(
                     checked = state.rememberMe,
-                    onCheckChanged = onRememberMeChanged,
+                    onCheckChanged = { onIntent(LoginIntent.RememberMeChanged(it)) },
                     label = stringResource(R.string.login_remember_me),
                 )
                 AppTextButton(
-                    onClick = onForgetPasswordClick,
+                    onClick = { onIntent(LoginIntent.ForgotPasswordClicked) },
                     text = stringResource(R.string.login_forgot_password),
                 )
             }
             Spacer(Modifier.height(AppDimens.size3Xs))
             AppPrimaryButton(
-                onClick = onLoginClick,
+                onClick = { onIntent(LoginIntent.LoginClicked) },
                 text = stringResource(R.string.action_log_in),
             )
             Spacer(Modifier.height(AppDimens.size3Xs))
@@ -135,7 +127,7 @@ fun LoginScreenContent(
             AppAuthFooterLink(
                 promptText = stringResource(R.string.login_no_account),
                 actionText = stringResource(R.string.login_sign_up),
-                onActionClick = onSignupClick
+                onActionClick = { onIntent(LoginIntent.SignUpClicked) }
             )
         }
     }
