@@ -1,110 +1,89 @@
 package com.example.dukkanapp.features.auth.presentation.logic.signup
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dukkanapp.R
-import com.example.dukkanapp.core.utils.extension.isValidEmail
-import com.example.dukkanapp.core.utils.extension.isValidPassword
+import com.example.dukkanapp.core.common.mvi.AppViewModel
+import com.example.dukkanapp.core.common.text.AppUiText
+import com.example.dukkanapp.core.error.ui.toUiText
+import com.example.dukkanapp.core.error.validation.ValidationError
+import com.example.dukkanapp.features.auth.domain.validation.AuthFormValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor() : ViewModel() {
-    private val _state = MutableStateFlow<SignUpUiState>(SignUpUiState())
-    val state: StateFlow<SignUpUiState> = _state.asStateFlow()
-    private val _effect = Channel<SignUpEffect>(Channel.BUFFERED)
-
-    val effect = _effect.receiveAsFlow()
-    fun onEmailChanged(email: String) {
-        // clear the error as soon as the user edits the field
-        _state.update { current -> current.copy(email = email, emailError = null) }
-    }
-
-    /** Single entry point: the screen only sends intents. */
-    fun onIntent(intent: SignUpIntent) {
+class SignUpViewModel @Inject constructor() :
+    AppViewModel<SignUpUiState, SignUpIntent, SignUpEffect>(
+        initialState = SignUpUiState()
+    ) {
+    override fun onIntent(intent: SignUpIntent) {
         when (intent) {
-            is SignUpIntent.EmailChanged -> onEmailChanged(intent.email)
-            is SignUpIntent.PasswordChanged -> onPasswordChanged(intent.password)
-            is SignUpIntent.ConfirmPasswordChanged -> onConfirmPasswordChanged(intent.confirmPassword)
-            is SignUpIntent.SignUpClicked -> onSignUpClicked()
+            is SignUpIntent.EmailChanged -> setState {
+                copy(
+                    email = intent.email,
+                    emailError = null
+                )
+            }
+
+            is SignUpIntent.PasswordChanged -> setState {
+                copy(
+                    password = intent.password,
+                    passwordError = null,
+                    confirmPasswordError = liveMismatchError(intent.password, confirmPassword)
+                )
+            }
+
+            is SignUpIntent.ConfirmPasswordChanged -> setState {
+                copy(
+                    confirmPassword = intent.confirmPassword,
+                    confirmPasswordError = liveMismatchError(password, intent.confirmPassword)
+                )
+            }
+
+            SignUpIntent.SignUpClicked -> onSignUpClicked()
+            SignUpIntent.LoginClicked -> sendEffect(SignUpEffect.NavigateToLogin)
+            SignUpIntent.BackClicked -> sendEffect(SignUpEffect.NavigateBack)
+
         }
     }
 
-    fun onPasswordChanged(password: String) {
-        _state.update { current ->
-            current.copy(
-                password = password,
-                passwordError = null,
-                confirmPasswordError = if (current.confirmPassword.isNotEmpty() && password != current.confirmPassword) {
-                    R.string.validation_passwords_mismatch
-
-                } else {
-                    null
-                }
-            )
-        }
-    }
-
-    fun onConfirmPasswordChanged(confirmPassword: String) {
-        _state.update { current ->
-            current.copy(
-                confirmPassword = confirmPassword,
-                confirmPasswordError = if (confirmPassword.isNotEmpty() && current.password != confirmPassword) {
-                    R.string.validation_passwords_mismatch
-                } else {
-                    null
-                }
-            )
-        }
-    }
-
-    fun onSignUpClicked() {
-        val current = _state.value
+    private fun onSignUpClicked() {
+        val current = currentState
         if (current.isLoading) return
 
-        val emailError = when {
-            current.email.isBlank() -> R.string.validation_email_empty
-            !current.email.isValidEmail() -> R.string.validation_email_invalid
-            else -> null
-        }
+        // Values
+        val email = current.email.trim()
+        val password = current.password.trim()
+        val confirmPassword = current.confirmPassword.trim()
 
-        val passwordError = when {
-            current.password.isEmpty() -> R.string.validation_password_empty
-            !current.password.isValidPassword() -> R.string.validation_password_too_short
-            else -> null
-        }
-        val confirmPasswordError = when {
-            current.confirmPassword.isEmpty() -> R.string.validation_confirm_password_empty
-            current.password != current.confirmPassword -> R.string.validation_passwords_mismatch
-            else -> null
-        }
+        // Errors
+        val emailError = AuthFormValidator.validateEmail(email)
+        val passwordError = AuthFormValidator.validateEmail(password)
+        val confirmPasswordError =
+            AuthFormValidator.validateConfirmPassword(password, confirmPassword)
 
-        _state.update {
-            it.copy(
-                emailError = emailError,
-                passwordError = passwordError,
-                confirmPasswordError = confirmPasswordError
-            )
-        }
-        if (emailError != null && passwordError != null && confirmPasswordError != null) return
-        viewModelScope.launch {
-            _state.update {
-                it.copy(isLoading = true)
+        if (emailError != null || passwordError != null || confirmPassword != null) {
+            setState {
+                copy(
+                    emailError = emailError?.toUiText(),
+                    passwordError = passwordError?.toUiText(),
+                    confirmPasswordError = confirmPasswordError?.toUiText()
+                )
             }
-            // TODO: Implement actual signup logic using Firebase Auth later
-            delay(2000)
-            _state.update { it.copy(isLoading = false) }
-            _effect.send(SignUpEffect.NavigateToHome)
+            return
         }
 
+        setState { copy(isLoading = true) }
+        viewModelScope.launch {
+            // TODO : Add Firebase auth
+            setState { copy(isLoading = false) }
+            sendEffect(SignUpEffect.NavigateToHome)
+        }
     }
 
+    private fun liveMismatchError(password: String, confirmPassword: String): AppUiText? =
+        if (confirmPassword.isNotEmpty() && password != confirmPassword) {
+            ValidationError.PasswordsMismatch.toUiText()
+        } else {
+            null
+        }
 }
