@@ -20,7 +20,9 @@ class LoginViewModel @Inject constructor() : AppViewModel<LoginUiState, LoginInt
             is LoginIntent.PasswordChanged -> setState { copy(password = intent.password) }
             is LoginIntent.RememberMeChanged -> setState { copy(rememberMe = intent.checked) }
             LoginIntent.LoginClicked -> onLoginClick()
-
+            LoginIntent.SignUpClicked -> sendEffect(LoginEffect.NavigateToSignUp)
+            LoginIntent.ForgotPasswordClicked -> sendEffect(LoginEffect.NavigateToForgotPassword)
+            LoginIntent.BackClicked -> sendEffect(LoginEffect.NavigateBack)
         }
     }
 
@@ -32,7 +34,7 @@ class LoginViewModel @Inject constructor() : AppViewModel<LoginUiState, LoginInt
         val password = current.password
         val emailError = AuthFormValidator.validateEmail(email)
         val passwordError = AuthFormValidator.validateExistingPassword(password)
-        if (email != null || password != null) {
+        if (emailError != null || passwordError != null) {
             setState {
                 copy(
                     emailError = emailError?.toUiText(),
