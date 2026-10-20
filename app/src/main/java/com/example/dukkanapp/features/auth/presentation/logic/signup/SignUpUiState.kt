@@ -8,6 +8,7 @@ data class SignUpUiState(
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "",
+    val rememberMe: Boolean = false,
     val emailError: AppUiText? = null,
     val passwordError: AppUiText? = null,
     val confirmPasswordError: AppUiText? = null,

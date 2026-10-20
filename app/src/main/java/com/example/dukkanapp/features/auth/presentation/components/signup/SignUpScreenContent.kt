@@ -10,7 +10,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
@@ -18,15 +17,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
-import com.example.dukkanapp.core.common.components.buttons.AppTextButton
+import com.example.dukkanapp.core.common.components.checkbox.AppCheckBox
 import com.example.dukkanapp.core.common.components.dividers.AppDivider
 import com.example.dukkanapp.core.common.components.headers.AppAuthHeader
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
+import com.example.dukkanapp.core.common.text.asString
 import com.example.dukkanapp.core.utils.constants.AppDimens
-import com.example.dukkanapp.core.utils.constants.AppValidationConstants
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpIntent
 import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpUiState
@@ -36,14 +35,14 @@ import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 fun SignUpScreenContent(
     state: SignUpUiState,
     onIntent: (SignUpIntent) -> Unit,
-    onNavigationBack: () -> Unit,
-    onForgetPasswordClick: () -> Unit,
-    onLoginClick: () -> Unit,
-) {
+
+    ) {
     val focusManager = LocalFocusManager.current
 
     AppScaffold(
-        onNavigateBack = onNavigationBack
+        onNavigateBack = {
+            onIntent(SignUpIntent.BackClicked)
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -70,7 +69,7 @@ fun SignUpScreenContent(
                     )
                 },
                 placeHolder = stringResource(R.string.auth_email_placeholder),
-                errorText = state.emailError?.let { stringResource(it) },
+                errorText = state.emailError?.asString(),
                 isSuccess = state.isValidEmail,
                 keyboardType = KeyboardType.Email,
                 keyboardActions = KeyboardActions(
@@ -83,9 +82,7 @@ fun SignUpScreenContent(
                 value = state.password,
                 onValueChange = { onIntent(SignUpIntent.PasswordChanged(it)) },
                 placeHolder = stringResource(R.string.auth_password_placeholder),
-                errorText = state.passwordError?.let {
-                    stringResource(it, AppValidationConstants.MIN_PASSWORD_LENGTH)
-                },
+                errorText = state.passwordError?.asString(),
                 isSuccess = state.isValidPassword,
                 leadingIcon = {
                     Icon(
@@ -105,7 +102,7 @@ fun SignUpScreenContent(
                 value = state.confirmPassword,
                 onValueChange = { onIntent(SignUpIntent.ConfirmPasswordChanged(it)) },
                 placeHolder = stringResource(R.string.signup_confirm_password_placeholder),
-                errorText = state.confirmPasswordError?.let { stringResource(it) },
+                errorText = state.confirmPasswordError?.asString(),
                 isSuccess = state.isValidConfirmPassword,
                 leadingIcon = {
                     Icon(
@@ -123,10 +120,10 @@ fun SignUpScreenContent(
                 )
             )
             Spacer(Modifier.height(AppDimens.spaceSm))
-            AppTextButton(
-                onClick = onForgetPasswordClick,
-                text = stringResource(R.string.login_forgot_password),
-                modifier = Modifier.align(Alignment.End)
+            AppCheckBox(
+                checked = state.rememberMe,
+                onCheckChanged = { onIntent(SignUpIntent.RememberMeChanged(it)) },
+                label = stringResource(R.string.login_remember_me),
             )
             Spacer(Modifier.height(AppDimens.size3Xs))
             AppPrimaryButton(
@@ -140,7 +137,7 @@ fun SignUpScreenContent(
             AppAuthFooterLink(
                 promptText = stringResource(R.string.auth_already_have_account),
                 actionText = stringResource(R.string.action_log_in),
-                onActionClick = onLoginClick,
+                onActionClick = { onIntent(SignUpIntent.LoginClicked) },
             )
         }
     }

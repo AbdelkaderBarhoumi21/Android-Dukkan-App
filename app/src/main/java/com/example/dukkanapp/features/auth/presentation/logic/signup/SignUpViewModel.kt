@@ -39,9 +39,12 @@ class SignUpViewModel @Inject constructor() :
                 )
             }
 
+            is SignUpIntent.RememberMeChanged -> setState { copy(rememberMe = intent.checked) }
+
             SignUpIntent.SignUpClicked -> onSignUpClicked()
             SignUpIntent.LoginClicked -> sendEffect(SignUpEffect.NavigateToLogin)
             SignUpIntent.BackClicked -> sendEffect(SignUpEffect.NavigateBack)
+
 
         }
     }
