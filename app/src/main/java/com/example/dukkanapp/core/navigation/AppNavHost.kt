@@ -1,6 +1,7 @@
 package com.example.dukkanapp.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -11,9 +12,10 @@ import com.example.dukkanapp.features.language.presentation.screens.LanguageSele
 import com.example.dukkanapp.features.onboarding.presentation.screens.OnboardingScreen
 
 /*
-   NavHost (AppNavHost)      -> owns navigation only (lambdas: onFinished, onEmailClick...)
-   OnboardingScreen          -> stateful: gets ViewModel, collects state, handles events
-   OnboardingScreenContent   -> stateless: pure UI, takes state + onEvent
+   AppNavHost                -> HOW to navigate (popUpTo, launchSingleTop). Knows routes.
+   XxxScreen                 -> glue: collects state + effects, maps effects to the lambdas below
+   XxxViewModel              -> WHEN and WHERE to navigate (sends an Effect). Never sees NavController.
+   XxxScreenContent          -> stateless UI: state + onIntent
  */
 @Composable
 fun AppNavHost(startDestination: AppRoute) {
@@ -26,13 +28,10 @@ fun AppNavHost(startDestination: AppRoute) {
         //  Language Selection Screen
         composable<AppRoute.LanguageSelectionScreen> {
             LanguageSelectionScreen(
-                onBack = {},
-                onContinue = {
+
+                onNavigationToOnboarding = {
                     navController.navigate(AppRoute.OnboardingScreen) {
-                        // Navigate to Onboarding and remove LanguageSelection from the backstack
-                        popUpTo(AppRoute.LanguageSelectionScreen) {
-                            inclusive = true
-                        }
+                        popUpTo(AppRoute.LanguageSelectionScreen) { inclusive = true }
                     }
                 }
             )
@@ -41,7 +40,12 @@ fun AppNavHost(startDestination: AppRoute) {
         //  Onboarding Screen
         composable<AppRoute.OnboardingScreen> {
             OnboardingScreen(
-                onFinished = {
+                onNavigateToLogin = {
+                    navController.navigate(AppRoute.LoginScreen) {
+                        popUpTo(AppRoute.OnboardingScreen) { inclusive = true }
+                    }
+                },
+                onNavigateToAuthOptions = {
                     navController.navigate(AppRoute.AuthOptionsScreen) {
                         popUpTo(AppRoute.OnboardingScreen) { inclusive = true }
                     }
@@ -68,44 +72,40 @@ fun AppNavHost(startDestination: AppRoute) {
         composable<AppRoute.HomeScreen> {
 
         }
-        // Login Screen
         composable<AppRoute.LoginScreen> {
             LoginScreen(
-                onForgetPasswordClick = {},
-                onNavigationBack = {
-                    navController.popBackStack()
-                },
-                onSignupClick = {
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToHome = { navController.navigateToHome() },
+                onNavigateToSignUp = {
                     navController.navigate(AppRoute.SignUpScreen) {
-                        popUpTo(AppRoute.LoginScreen) {
-                            inclusive = true
-                        }
-                        launchSingleTop =
-                            true // prevent pushing a second copy of that screen if that screen already in the top
+                        popUpTo(AppRoute.LoginScreen) { inclusive = true }
+                        launchSingleTop = true // no second copy if it's already on top
                     }
-                }
+                },
+                onNavigateToForgetPassword = { /* TODO: ForgotPassword route */ },
             )
         }
 
-        // SignUp screen
         composable<AppRoute.SignUpScreen> {
             SignUpScreen(
                 onNavigationBack = { navController.popBackStack() },
-                onNavigateToHome = {
-                    navController.navigate(AppRoute.HomeScreen) {
-                        // Todo
-                    }
-                },
-                onForgetPasswordClick = {},
-                onLoginClick = {
+                onNavigateToHome = { navController.navigateToHome() },
+                onNavigateToLogin = {
                     navController.navigate(AppRoute.LoginScreen) {
-                        popUpTo(AppRoute.SignUpScreen) {
-                            inclusive = true
-                        }
+                        popUpTo(AppRoute.SignUpScreen) { inclusive = true }
                         launchSingleTop = true
                     }
                 },
             )
         }
+    }
+
+
+}
+
+/** Home becomes the only screen: "back" from Home exits the app instead of returning to Login. */
+private fun NavController.navigateToHome() {
+    navigate(AppRoute.HomeScreen) {
+        popUpTo(graph.id) { inclusive = true }
     }
 }
