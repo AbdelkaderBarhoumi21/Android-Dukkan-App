@@ -14,8 +14,8 @@ object AuthFormValidator {
 
     /** Sign up: enforce the password policy. */
     fun validateNewPassword(password: String): ValidationError? = when {
-        password.isBlank() -> ValidationError.PasswordEmpty
-        !password.trim().isValidPassword() -> ValidationError.PasswordTooShort(
+        password.isEmpty() -> ValidationError.PasswordEmpty
+        !password.isValidPassword() -> ValidationError.PasswordTooShort(
             AppValidationConstants.MIN_PASSWORD_LENGTH
         )
 

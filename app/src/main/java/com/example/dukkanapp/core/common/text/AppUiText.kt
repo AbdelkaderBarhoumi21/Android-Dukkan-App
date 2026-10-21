@@ -12,7 +12,7 @@ sealed interface AppUiText {
 
 @Composable
 fun AppUiText.asString(): String = when (this) {
-    is AppUiText.Res -> stringResource(id)
+    is AppUiText.Res -> stringResource(id, *args.toTypedArray())
     is AppUiText.Raw -> value
 }
 
