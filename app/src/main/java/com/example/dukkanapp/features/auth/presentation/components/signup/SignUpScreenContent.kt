@@ -1,4 +1,4 @@
-package com.example.dukkanapp.features.auth.presentation.components.SignUp
+package com.example.dukkanapp.features.auth.presentation.components.signup
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
