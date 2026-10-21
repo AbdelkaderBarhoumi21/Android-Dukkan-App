@@ -55,12 +55,13 @@ class SignUpViewModel @Inject constructor() :
 
         // Values
         val email = current.email.trim()
-        val password = current.password.trim()
-        val confirmPassword = current.confirmPassword.trim()
+        // Passwords are never trimmed: a space is a valid password character.
+        val password = current.password
+        val confirmPassword = current.confirmPassword
 
         // Errors
         val emailError = AuthFormValidator.validateEmail(email)
-        val passwordError = AuthFormValidator.validateEmail(password)
+        val passwordError = AuthFormValidator.validateNewPassword(password)
         val confirmPasswordError =
             AuthFormValidator.validateConfirmPassword(password, confirmPassword)
 

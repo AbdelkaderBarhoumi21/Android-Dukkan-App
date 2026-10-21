@@ -14,8 +14,8 @@ data class SignUpUiState(
     val confirmPasswordError: AppUiText? = null,
     val isLoading: Boolean = false
 ) {
-    val isValidEmail: Boolean get() = emailError != null && email.trim().isValidEmail()
-    val isValidPassword: Boolean get() = passwordError != null && password.trim().isValidPassword()
-    val isValidConfirmPassword: Boolean get() = confirmPasswordError != null && confirmPassword.isNotEmpty() && password == confirmPassword
-
+    val isValidEmail: Boolean get() = emailError == null && email.trim().isValidEmail()
+    val isValidPassword: Boolean get() = passwordError == null && password.isValidPassword()
+    val isValidConfirmPassword: Boolean
+        get() = confirmPasswordError == null && confirmPassword.isNotEmpty() && password == confirmPassword
 }
