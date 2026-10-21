@@ -6,7 +6,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.dukkanapp.core.common.mvi.AppCollectEffect
 import com.example.dukkanapp.features.auth.presentation.components.login.LoginScreenContent
-import com.example.dukkanapp.features.auth.presentation.logic.Login.LoginEffect
+import com.example.dukkanapp.features.auth.presentation.logic.login.LoginEffect
 import com.example.dukkanapp.features.auth.presentation.logic.login.LoginViewModel
 
 @Composable

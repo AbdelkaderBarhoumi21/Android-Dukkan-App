@@ -1,4 +1,4 @@
-package com.example.dukkanapp.features.auth.presentation.logic.Login
+package com.example.dukkanapp.features.auth.presentation.logic.login
 
 sealed interface LoginEffect {
     data object NavigateToHome : LoginEffect

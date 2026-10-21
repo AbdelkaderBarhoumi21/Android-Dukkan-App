@@ -1,4 +1,4 @@
-package com.example.dukkanapp.features.auth.presentation.logic.Login
+package com.example.dukkanapp.features.auth.presentation.logic.login
 
 sealed interface LoginIntent {
     data class EmailChanged(val email: String) : LoginIntent

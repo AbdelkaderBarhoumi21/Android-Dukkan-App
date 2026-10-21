@@ -4,8 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.dukkanapp.core.common.mvi.AppViewModel
 import com.example.dukkanapp.core.error.ui.toUiText
 import com.example.dukkanapp.features.auth.domain.validation.AuthFormValidator
-import com.example.dukkanapp.features.auth.presentation.logic.Login.LoginEffect
-import com.example.dukkanapp.features.auth.presentation.logic.Login.LoginIntent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
