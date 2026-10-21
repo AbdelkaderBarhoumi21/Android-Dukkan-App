@@ -1,3 +1,5 @@
+package com.example.dukkanapp.features.auth.presentation.components.authoptions
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth

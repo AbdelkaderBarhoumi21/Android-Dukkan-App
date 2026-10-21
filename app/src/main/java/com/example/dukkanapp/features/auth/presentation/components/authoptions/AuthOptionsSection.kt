@@ -1,6 +1,5 @@
 package com.example.dukkanapp.features.auth.presentation.components.authoptions
 
-import AuthButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
