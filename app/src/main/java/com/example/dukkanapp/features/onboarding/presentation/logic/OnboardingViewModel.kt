@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
-    private val getOnboardingPages: GetOnboardingPagesUseCase,
+    getOnboardingPages: GetOnboardingPagesUseCase,
     private val setOnboardingCompletedUseCase: SetOnboardingCompletedUseCase
 ) : AppViewModel<OnboardingUiState, OnboardingIntent, OnboardingEffect>(
     initialState = OnboardingUiState(pages = getOnboardingPages().map { it.toUiModel() })
