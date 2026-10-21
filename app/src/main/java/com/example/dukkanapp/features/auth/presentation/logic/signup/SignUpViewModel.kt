@@ -64,7 +64,7 @@ class SignUpViewModel @Inject constructor() :
         val confirmPasswordError =
             AuthFormValidator.validateConfirmPassword(password, confirmPassword)
 
-        if (emailError != null || passwordError != null || confirmPassword != null) {
+        if (emailError != null || passwordError != null || confirmPasswordError != null) {
             setState {
                 copy(
                     emailError = emailError?.toUiText(),
