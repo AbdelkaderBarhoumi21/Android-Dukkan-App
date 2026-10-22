@@ -55,6 +55,8 @@
     <!-- Forget password -->
     <string name="forgetpassword_title">Forgot Your Password?</string>
     <string name="forgetpassword_subtitle">No worries! Enter your email, and we\'ll send you a reset link.</string>
+    <string name="forgetpassword_send_reset_link">Send Reset Link</string>
+    <string name="forgetpassword_back_to_login">Back to Login</string>
 
     <!-- Sign up -->
     <string name="signup_title">Create your account</string>

@@ -55,6 +55,8 @@
     <!-- Forget password -->
     <string name="forgetpassword_title">هل نسيت كلمة المرور؟</string>
     <string name="forgetpassword_subtitle">لا تقلق! أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين.</string>
+    <string name="forgetpassword_send_reset_link">إرسال رابط إعادة التعيين</string>
+    <string name="forgetpassword_back_to_login">العودة لتسجيل الدخول</string>
 
     <!-- Sign up -->
     <string name="signup_title">أنشئ حسابك</string>

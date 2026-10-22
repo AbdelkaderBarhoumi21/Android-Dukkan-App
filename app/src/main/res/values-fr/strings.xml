@@ -55,6 +55,8 @@
     <!-- Forget password -->
     <string name="forgetpassword_title">Mot de passe oublié ?</string>
     <string name="forgetpassword_subtitle">Pas d\'inquiétude ! Saisissez votre e-mail et nous vous enverrons un lien de réinitialisation.</string>
+    <string name="forgetpassword_send_reset_link">Envoyer le lien de réinitialisation</string>
+    <string name="forgetpassword_back_to_login">Retour à la connexion</string>
 
     <!-- Sign up -->
     <string name="signup_title">Créez votre compte</string>
