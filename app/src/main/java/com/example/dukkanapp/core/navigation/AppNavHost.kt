@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dukkanapp.features.auth.presentation.screens.AuthOptionsScreen
+import com.example.dukkanapp.features.auth.presentation.screens.ForgetPasswordScreen
 import com.example.dukkanapp.features.auth.presentation.screens.LoginScreen
 import com.example.dukkanapp.features.auth.presentation.screens.SignUpScreen
 import com.example.dukkanapp.features.language.presentation.screens.LanguageSelectionScreen
@@ -82,7 +83,7 @@ fun AppNavHost(startDestination: AppRoute) {
                         launchSingleTop = true // no second copy if it's already on top
                     }
                 },
-                onNavigateToForgetPassword = { /* TODO: ForgotPassword route */ },
+                onNavigateToForgetPassword = { navController.navigate(AppRoute.ForgetPasswordScreen) },
             )
         }
 
@@ -98,6 +99,12 @@ fun AppNavHost(startDestination: AppRoute) {
                 },
             )
         }
+        composable<AppRoute.ForgetPasswordScreen> {
+            ForgetPasswordScreen(onNavigateBack = {
+                navController.popBackStack()
+            })
+        }
+
     }
 
 

@@ -21,4 +21,7 @@ sealed interface AppRoute {
 
     @Serializable
     data object SignUpScreen
+
+    @Serializable
+    data object ForgetPasswordScreen
 }
