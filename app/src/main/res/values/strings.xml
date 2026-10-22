@@ -52,6 +52,10 @@
     <string name="login_no_account">Don\'t have an account?</string>
     <string name="login_sign_up">Sign up</string>
 
+    <!-- Forget password -->
+    <string name="forgetpassword_title">Forgot Your Password?</string>
+    <string name="forgetpassword_subtitle">No worries! Enter your email, and we\'ll send you a reset link.</string>
+
     <!-- Sign up -->
     <string name="signup_title">Create your account</string>
     <string name="signup_subtitle">Join Dukkan to discover great deals and enjoy a faster checkout.</string>

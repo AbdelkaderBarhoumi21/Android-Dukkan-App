@@ -52,6 +52,10 @@
     <string name="login_no_account">Vous n\'avez pas de compte ?</string>
     <string name="login_sign_up">S\'inscrire</string>
 
+    <!-- Forget password -->
+    <string name="forgetpassword_title">Mot de passe oublié ?</string>
+    <string name="forgetpassword_subtitle">Pas d\'inquiétude ! Saisissez votre e-mail et nous vous enverrons un lien de réinitialisation.</string>
+
     <!-- Sign up -->
     <string name="signup_title">Créez votre compte</string>
     <string name="signup_subtitle">Rejoignez Dukkan pour profiter des meilleures offres et d\'un paiement plus rapide.</string>
