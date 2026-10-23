@@ -4,12 +4,12 @@ import com.example.dukkanapp.core.common.text.AppUiText
 import com.example.dukkanapp.core.utils.extension.isValidPassword
 
 data class ResetPasswordUiState(
-    val newPassword: String = "",
+    val password: String = "",
     val confirmPassword: String = "",
-    val newPasswordError: AppUiText? = null,
+    val passwordError: AppUiText? = null,
     val confirmPasswordError: AppUiText? = null,
     val isLoading: Boolean = false
 ) {
-    val isValidNewPassword: Boolean get() = newPasswordError == null && newPassword.isValidPassword()
-    val isValidConfirmPassword: Boolean get() = confirmPasswordError == null && confirmPassword.isNotBlank() && newPassword == confirmPassword
+    val isValidNewPassword: Boolean get() = passwordError == null && password.isValidPassword()
+    val isValidConfirmPassword: Boolean get() = confirmPasswordError == null && confirmPassword.isNotBlank() && password == confirmPassword
 }
