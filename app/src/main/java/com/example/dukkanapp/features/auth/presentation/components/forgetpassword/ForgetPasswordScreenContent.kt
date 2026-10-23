@@ -23,6 +23,7 @@ import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
 import com.example.dukkanapp.core.common.components.buttons.AppTextButton
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
+import com.example.dukkanapp.core.common.text.asString
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.auth.presentation.logic.forgetpassword.ForgetPasswordIntent
@@ -87,8 +88,8 @@ fun ForgetPasswordScreenContent(
                     )
                 },
                 placeHolder = stringResource(R.string.auth_email_placeholder),
-                errorText = "",
-                isSuccess = true,
+                errorText = state.emailError?.asString(),
+                isSuccess = state.isValidEmail,
                 keyboardType = KeyboardType.Email,
                 keyboardActions = KeyboardActions(
                     onDone = {
