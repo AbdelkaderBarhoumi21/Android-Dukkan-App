@@ -24,11 +24,11 @@ import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
 import com.example.dukkanapp.core.common.components.buttons.AppTextButton
 import com.example.dukkanapp.core.common.components.checkbox.AppCheckBox
 import com.example.dukkanapp.core.common.components.dividers.AppDivider
-import com.example.dukkanapp.core.common.components.headers.AppAuthHeader
+import com.example.dukkanapp.core.common.components.footer.AppAuthFooterLink
+import com.example.dukkanapp.core.common.components.header.AppAuthHeader
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
-import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
 import com.example.dukkanapp.core.common.text.asString
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap

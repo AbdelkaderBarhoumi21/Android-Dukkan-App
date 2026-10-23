@@ -10,9 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.dividers.AppDivider
-import com.example.dukkanapp.core.common.components.headers.AppAuthHeader
+import com.example.dukkanapp.core.common.components.footer.AppAuthFooterLink
+import com.example.dukkanapp.core.common.components.header.AppAuthHeader
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
-import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
 import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable

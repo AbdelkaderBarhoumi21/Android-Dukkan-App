@@ -26,9 +26,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
+import com.example.dukkanapp.core.common.components.footer.AppAuthFooterLink
 import com.example.dukkanapp.core.common.components.pager.AppHorizontalPager
 import com.example.dukkanapp.core.common.components.pager.AppPagerIndicator
-import com.example.dukkanapp.core.common.components.texts.AppAuthFooterLink
 import com.example.dukkanapp.core.config.theme.AppTheme
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingIntent

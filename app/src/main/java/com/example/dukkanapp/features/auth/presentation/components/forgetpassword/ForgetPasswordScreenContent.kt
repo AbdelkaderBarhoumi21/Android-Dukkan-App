@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
 import com.example.dukkanapp.core.common.components.buttons.AppTextButton
+import com.example.dukkanapp.core.common.components.header.AppAccountRecoveryHeader
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.common.text.asString
@@ -71,7 +72,7 @@ fun ForgetPasswordScreenContent(
                 .padding(padding)
                 .padding(horizontal = AppDimens.size2Xs)
         ) {
-            ForgetPasswordHeader(
+            AppAccountRecoveryHeader(
                 title = stringResource(R.string.forgetpassword_title),
                 subTitle = stringResource(R.string.forgetpassword_subtitle),
             )
