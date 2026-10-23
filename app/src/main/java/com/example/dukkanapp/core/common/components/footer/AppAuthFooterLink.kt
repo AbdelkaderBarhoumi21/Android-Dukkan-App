@@ -1,4 +1,4 @@
-package com.example.dukkanapp.core.common.components.texts
+package com.example.dukkanapp.core.common.components.footer
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
