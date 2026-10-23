@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.dukkanapp.features.auth.presentation.screens.AuthOptionsScreen
 import com.example.dukkanapp.features.auth.presentation.screens.ForgetPasswordScreen
 import com.example.dukkanapp.features.auth.presentation.screens.LoginScreen
+import com.example.dukkanapp.features.auth.presentation.screens.ResetPasswordScreen
 import com.example.dukkanapp.features.auth.presentation.screens.SignUpScreen
 import com.example.dukkanapp.features.language.presentation.screens.LanguageSelectionScreen
 import com.example.dukkanapp.features.onboarding.presentation.screens.OnboardingScreen
@@ -105,6 +106,12 @@ fun AppNavHost(startDestination: AppRoute) {
                     navController.popBackStack()
                 },
                 onNavigateToChangePassword = {}
+            )
+        }
+        composable<AppRoute.ResetPasswordScreen> {
+            ResetPasswordScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToLogin = { navController.navigate(AppRoute.LoginScreen) }
             )
         }
 

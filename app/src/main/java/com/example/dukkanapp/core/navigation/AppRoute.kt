@@ -24,4 +24,7 @@ sealed interface AppRoute {
 
     @Serializable
     data object ForgetPasswordScreen
+
+    @Serializable
+    data object ResetPasswordScreen
 }
