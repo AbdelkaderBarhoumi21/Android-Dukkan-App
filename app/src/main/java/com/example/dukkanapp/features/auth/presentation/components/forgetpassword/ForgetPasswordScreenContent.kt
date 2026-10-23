@@ -25,11 +25,14 @@ import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
+import com.example.dukkanapp.features.auth.presentation.logic.forgetpassword.ForgetPasswordIntent
+import com.example.dukkanapp.features.auth.presentation.logic.forgetpassword.ForgetPasswordUiState
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
 fun ForgetPasswordScreenContent(
-    onNavigateBack: () -> Unit
+    state: ForgetPasswordUiState,
+    onIntent: (ForgetPasswordIntent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     AppScaffold(
@@ -46,12 +49,15 @@ fun ForgetPasswordScreenContent(
             ) {
                 AppPrimaryButton(
                     text = stringResource(R.string.forgetpassword_send_reset_link),
-                    onClick = {},
+                    onClick = {
+                        onIntent(ForgetPasswordIntent.ForgetPasswordClicked)
+                    },
                 )
-                Spacer(Modifier.height(AppDimens.size3Xs))
+                Spacer(Modifier.height(AppDimens.size4Xs))
                 AppTextButton(
                     text = stringResource(R.string.forgetpassword_back_to_login),
-                    onClick = onNavigateBack,
+                    textStyle = MaterialTheme.typography.labelLarge,
+                    onClick = { onIntent(ForgetPasswordIntent.BackClicked) },
                 )
 
             }
@@ -70,8 +76,8 @@ fun ForgetPasswordScreenContent(
             )
             Spacer(Modifier.height(AppDimens.spaceXl))
             AppTextFiled(
-                value = "",
-                onValueChange = {},
+                value = state.email,
+                onValueChange = { onIntent(ForgetPasswordIntent.EmailChanged(it)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Iconsax.Linear.Sms,
