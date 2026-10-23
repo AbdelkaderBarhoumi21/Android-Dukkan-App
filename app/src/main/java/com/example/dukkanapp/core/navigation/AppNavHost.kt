@@ -100,9 +100,12 @@ fun AppNavHost(startDestination: AppRoute) {
             )
         }
         composable<AppRoute.ForgetPasswordScreen> {
-            ForgetPasswordScreen(onNavigateBack = {
-                navController.popBackStack()
-            })
+            ForgetPasswordScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToChangePassword = {}
+            )
         }
 
     }
