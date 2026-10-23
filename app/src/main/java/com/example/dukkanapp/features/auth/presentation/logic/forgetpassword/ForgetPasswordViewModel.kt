@@ -37,6 +37,7 @@ class ForgetPasswordViewModel :
                     isLoading = false
                 )
             }
+            // TODO firebase logic
             sendEffect(ForgetPasswordEffect.NavigateToChangePassword)
         }
     }
