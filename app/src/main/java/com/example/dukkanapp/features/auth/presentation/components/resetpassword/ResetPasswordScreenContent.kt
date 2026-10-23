@@ -23,22 +23,21 @@ import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextFie
 import com.example.dukkanapp.core.common.text.asString
 import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
-import com.example.dukkanapp.features.auth.presentation.logic.forgetpassword.ForgetPasswordIntent
-import com.example.dukkanapp.features.auth.presentation.logic.forgetpassword.ForgetPasswordUiState
-import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpIntent
+import com.example.dukkanapp.features.auth.presentation.logic.resetpassword.ResetPasswordIntent
+import com.example.dukkanapp.features.auth.presentation.logic.resetpassword.ResetPasswordUiState
 import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
 fun ResetPasswordScreenContent(
-    state: ForgetPasswordUiState,
-    onIntent: (ForgetPasswordIntent) -> Unit,
+    state: ResetPasswordUiState,
+    onIntent: (ResetPasswordIntent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     AppScaffold(
         bottomBar = {
             AppAccountRecoveryFooter(
-                onActionClick = { onIntent(ForgetPasswordIntent.ForgetPasswordClicked) },
-                onBackClick = { onIntent(ForgetPasswordIntent.BackClicked) },
+                onActionClick = { onIntent(ResetPasswordIntent.ResetPasswordClicked) },
+                onBackClick = { onIntent(ResetPasswordIntent.BackClicked) },
                 actionButtonLabel = stringResource(R.string.forgetpassword_send_reset_link),
                 backButtonLabel = stringResource(R.string.forgetpassword_back_to_login)
             )
@@ -58,10 +57,10 @@ fun ResetPasswordScreenContent(
             Spacer(Modifier.height(AppDimens.spaceXl))
             AppPasswordTextField(
                 value = state.password,
-                onValueChange = { onIntent(SignUpIntent.PasswordChanged(it)) },
+                onValueChange = { onIntent(ResetPasswordIntent.PasswordChanged(it)) },
                 placeHolder = stringResource(R.string.auth_password_placeholder),
                 errorText = state.passwordError?.asString(),
-                isSuccess = state.isValidPassword,
+                isSuccess = state.isValidNewPassword,
                 leadingIcon = {
                     Icon(
                         imageVector = Iconsax.Linear.PasswordCheck,
@@ -77,7 +76,7 @@ fun ResetPasswordScreenContent(
             Spacer(Modifier.height(AppDimens.sizeXs))
             AppPasswordTextField(
                 value = state.confirmPassword,
-                onValueChange = { onIntent(SignUpIntent.ConfirmPasswordChanged(it)) },
+                onValueChange = { onIntent(ResetPasswordIntent.ConfirmPasswordChanged(it)) },
                 placeHolder = stringResource(R.string.signup_confirm_password_placeholder),
                 errorText = state.confirmPasswordError?.asString(),
                 isSuccess = state.isValidConfirmPassword,
@@ -92,7 +91,7 @@ fun ResetPasswordScreenContent(
                 keyboardActions = KeyboardActions(
                     onDone = {
                         focusManager.clearFocus()
-                        onIntent(SignUpIntent.SignUpClicked)
+                        onIntent(ResetPasswordIntent.ResetPasswordClicked)
                     }
                 )
             )

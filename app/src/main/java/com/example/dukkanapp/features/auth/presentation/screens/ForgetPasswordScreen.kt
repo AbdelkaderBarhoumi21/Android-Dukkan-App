@@ -19,8 +19,8 @@ fun ForgetPasswordScreen(
 
     AppCollectEffect(effect = viewModel.effect) { effect ->
         when (effect) {
-            is ForgetPasswordEffect.NavigateToChangePassword -> onNavigateToChangePassword()
-            is ForgetPasswordEffect.NavigateBack -> onNavigateBack()
+            ForgetPasswordEffect.NavigateToChangePassword -> onNavigateToChangePassword()
+            ForgetPasswordEffect.NavigateBack -> onNavigateBack()
         }
     }
     ForgetPasswordScreenContent(

@@ -19,10 +19,10 @@ fun LoginScreen(
 ) {
     AppCollectEffect(effect = viewModel.effect) { effect ->
         when (effect) {
-            is LoginEffect.NavigateToHome -> onNavigateToHome()
-            is LoginEffect.NavigateToForgotPassword -> onNavigateToForgetPassword()
-            is LoginEffect.NavigateToSignUp -> onNavigateToSignUp()
-            is LoginEffect.NavigateBack -> onNavigateBack()
+            LoginEffect.NavigateToHome -> onNavigateToHome()
+            LoginEffect.NavigateToForgotPassword -> onNavigateToForgetPassword()
+            LoginEffect.NavigateToSignUp -> onNavigateToSignUp()
+            LoginEffect.NavigateBack -> onNavigateBack()
         }
     }
     val state by viewModel.state.collectAsStateWithLifecycle()
