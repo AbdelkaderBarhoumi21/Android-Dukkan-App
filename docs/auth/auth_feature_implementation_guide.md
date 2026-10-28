@@ -661,6 +661,26 @@ interface UserRepository {
 
 **File:** `features/user/domain/repository/DeviceRepository.kt`
 
+`languageCode` is there so the backend can send push notifications to each device in the language the user picked in the app.
+
+## Why store it on the device doc
+
+When you later send a push such as "Your order is on its way", the server (a Cloud Function or your backend) needs to know which language to write it in. It can't ask the phone, so the phone saves its language in Firestore:
+
+
+
+```
+users/{uid}/devices/{installationId}
+   ├── fcmToken
+   ├── deviceName        "Pixel 8"
+   ├── languageCode      "fr"      ← server picks the fr template
+   └── ...
+```
+
+The language is stored **per device** because one person can use two phones set to different languages. A push to the French phone gets the French text, and a push to the Arabic phone gets the Arabic text. The guide's schema table says the same (line 424: "Per-device language (one person, two phones, two languages)").
+
+Each time the user signs in, the app refreshes this value. If they switched from English to Arabic since the last login, the device doc stays correct.
+
 ```kotlin
 package com.example.dukkanapp.features.user.domain.repository
 
