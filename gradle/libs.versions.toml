@@ -86,6 +86,7 @@ iconsax-compose = { module = "io.github.yohannestz:iconsax-compose", version.ref
 firebase-boom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBoom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+firebase-installations = { group = "com.google.firebase", name = "firebase-installations" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
