@@ -105,7 +105,9 @@ fun AppNavHost(startDestination: AppRoute) {
                 onNavigateBack = {
                     navController.popBackStack()
                 },
-                onNavigateToChangePassword = {}
+                onNavigateToChangePassword = {
+                    navController.navigate(AppRoute.ResetPasswordScreen)
+                }
             )
         }
         composable<AppRoute.ResetPasswordScreen> {
