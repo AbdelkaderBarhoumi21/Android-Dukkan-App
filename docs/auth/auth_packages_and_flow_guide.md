@@ -71,19 +71,19 @@ No layer above data ever sees a Firebase class. That is what lets you test ViewM
 
 ### 2.1 At a glance
 
-| Dependency | Gradle alias | Status | Used by |
-|---|---|---|---|
-| Firebase BoM | `libs.firebase.boom` | already added | Gradle (versions only) |
-| Firebase Auth | `libs.firebase.auth` | already added | `AuthRemoteDataSource`, `AuthUserMapper`, `AppFirebaseExceptionMapper` |
-| Cloud Firestore | `libs.firebase.firestore` | already added | `UserRemoteDataSource`, `DeviceRemoteDataSource`, `UserDto`, `DeviceMapper` |
-| Firebase Installations | `libs.firebase.installations` | **new** | `DeviceRemoteDataSource` |
-| Coroutines Play Services | `libs.kotlinx.coroutines.play.services` | already added | every `.await()` |
-| Google Services plugin | `libs.plugins.google.services` | already added | Gradle (reads `google-services.json`) |
-| DataStore Preferences | `libs.androidx.datastore.preferences` | already added | `SessionPreferenceLocalDataSource` |
-| Hilt | `libs.hilt.android`, `libs.hilt.compiler`, `libs.hilt.navigation.compose` | already added | every `@Inject`, `@HiltViewModel`, module |
-| Navigation Compose + Serialization | `libs.androidx.navigation.compose`, `libs.kotlinx.serialization.json` | already added | `AppRoute`, `AppNavHost`, `toRoute()` |
-| Lifecycle Compose | comes with navigation/hilt compose | already available | `collectAsStateWithLifecycle`, `LifecycleResumeEffect` |
-| BuildConfig | `buildFeatures.buildConfig = true` | **new flag** | `AndroidDeviceInfoProvider` |
+| Dependency                         | Gradle alias                                                              | Status            | Used by                                                                     |
+| ---------------------------------- | ------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------- |
+| Firebase BoM                       | `libs.firebase.boom`                                                      | already added     | Gradle (versions only)                                                      |
+| Firebase Auth                      | `libs.firebase.auth`                                                      | already added     | `AuthRemoteDataSource`, `AuthUserMapper`, `AppFirebaseExceptionMapper`      |
+| Cloud Firestore                    | `libs.firebase.firestore`                                                 | already added     | `UserRemoteDataSource`, `DeviceRemoteDataSource`, `UserDto`, `DeviceMapper` |
+| Firebase Installations             | `libs.firebase.installations`                                             | **new**           | `DeviceRemoteDataSource`                                                    |
+| Coroutines Play Services           | `libs.kotlinx.coroutines.play.services`                                   | already added     | every `.await()`                                                            |
+| Google Services plugin             | `libs.plugins.google.services`                                            | already added     | Gradle (reads `google-services.json`)                                       |
+| DataStore Preferences              | `libs.androidx.datastore.preferences`                                     | already added     | `SessionPreferenceLocalDataSource`                                          |
+| Hilt                               | `libs.hilt.android`, `libs.hilt.compiler`, `libs.hilt.navigation.compose` | already added     | every `@Inject`, `@HiltViewModel`, module                                   |
+| Navigation Compose + Serialization | `libs.androidx.navigation.compose`, `libs.kotlinx.serialization.json`     | already added     | `AppRoute`, `AppNavHost`, `toRoute()`                                       |
+| Lifecycle Compose                  | comes with navigation/hilt compose                                        | already available | `collectAsStateWithLifecycle`, `LifecycleResumeEffect`                      |
+| BuildConfig                        | `buildFeatures.buildConfig = true`                                        | **new flag**      | `AndroidDeviceInfoProvider`                                                 |
 
 ### 2.2 Firebase BoM (`firebase-bom`)
 
@@ -114,16 +114,16 @@ implementation(libs.firebase.installations)    // no version
 
 **Where we use it:**
 
-| API | Our code | What it does |
-|---|---|---|
-| `createUserWithEmailAndPassword` | `AuthRemoteDataSource.signUpWithEmail` | Creates the account **and signs it in** |
-| `signInWithEmailAndPassword` | `AuthRemoteDataSource.signInWithEmail` | Signs in, persists the session |
-| `currentUser` | `AuthRemoteDataSource.currentUser` | Cached user, no network |
-| `setLanguageCode` | `AuthRemoteDataSource.sendEmailVerification` | Language of Firebase's emails |
-| `FirebaseUser.sendEmailVerification` | same | Sends the link |
-| `FirebaseUser.reload` | `AuthRemoteDataSource.reloadCurrentUser` | Fetches fresh `isEmailVerified` |
-| `signOut` | `AuthRemoteDataSource.signOut` | Deletes the local session |
-| `FirebaseAuthException.errorCode` | `AppFirebaseExceptionMapper` | Error codes → `AppException` |
+| API                                  | Our code                                     | What it does                            |
+| ------------------------------------ | -------------------------------------------- | --------------------------------------- |
+| `createUserWithEmailAndPassword`     | `AuthRemoteDataSource.signUpWithEmail`       | Creates the account **and signs it in** |
+| `signInWithEmailAndPassword`         | `AuthRemoteDataSource.signInWithEmail`       | Signs in, persists the session          |
+| `currentUser`                        | `AuthRemoteDataSource.currentUser`           | Cached user, no network                 |
+| `setLanguageCode`                    | `AuthRemoteDataSource.sendEmailVerification` | Language of Firebase's emails           |
+| `FirebaseUser.sendEmailVerification` | same                                         | Sends the link                          |
+| `FirebaseUser.reload`                | `AuthRemoteDataSource.reloadCurrentUser`     | Fetches fresh `isEmailVerified`         |
+| `signOut`                            | `AuthRemoteDataSource.signOut`               | Deletes the local session               |
+| `FirebaseAuthException.errorCode`    | `AppFirebaseExceptionMapper`                 | Error codes → `AppException`            |
 
 Details in [section 4](#4-example-the-firebaseauth-instance-up-close).
 
@@ -133,15 +133,15 @@ Details in [section 4](#4-example-the-firebaseauth-instance-up-close).
 
 **Where we use it:**
 
-| API | Our code | Why this API |
-|---|---|---|
-| `collection("users").document(uid)` | both remote data sources | Address of a document; no network by itself |
-| `runTransaction { get → set/update }` | `UserRemoteDataSource.syncProfile` | Atomic "create if absent": two devices can't both create and overwrite `createdAt` |
-| `set(map, SetOptions.merge())` | `DeviceRemoteDataSource.upsertDevice` | Creates or updates **only the given fields**: `fcmToken` survives |
-| `delete()` | `DeviceRemoteDataSource.deleteDevice` | Removes the device on sign-out |
-| `FieldValue.serverTimestamp()` | update maps | The **server** writes the time: the phone's clock can be wrong |
-| `@ServerTimestamp` | `UserDto` | Same, when writing a whole object |
-| `FirebaseFirestoreException.code` | `AppFirebaseExceptionMapper` | Error codes → `AppException` |
+| API                                   | Our code                              | Why this API                                                                       |
+| ------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------- |
+| `collection("users").document(uid)`   | both remote data sources              | Address of a document; no network by itself                                        |
+| `runTransaction { get → set/update }` | `UserRemoteDataSource.syncProfile`    | Atomic "create if absent": two devices can't both create and overwrite `createdAt` |
+| `set(map, SetOptions.merge())`        | `DeviceRemoteDataSource.upsertDevice` | Creates or updates **only the given fields**: `fcmToken` survives                  |
+| `delete()`                            | `DeviceRemoteDataSource.deleteDevice` | Removes the device on sign-out                                                     |
+| `FieldValue.serverTimestamp()`        | update maps                           | The **server** writes the time: the phone's clock can be wrong                     |
+| `@ServerTimestamp`                    | `UserDto`                             | Same, when writing a whole object                                                  |
+| `FirebaseFirestoreException.code`     | `AppFirebaseExceptionMapper`          | Error codes → `AppException`                                                       |
 
 **Built in:** an offline cache. See [section 12](#12-firestore-writes-and-offline-behavior).
 
@@ -151,11 +151,11 @@ Details in [section 4](#4-example-the-firebaseauth-instance-up-close).
 
 **Why we use it** as the `devices/{installationId}` document id:
 
-| Alternative | Problem |
-|---|---|
-| `Settings.Secure.ANDROID_ID` | Shared by all apps of the same signing key; privacy-sensitive; Play policy discourages it |
-| Our own UUID in DataStore | `android:allowBackup="true"` restores DataStore onto a **new phone** → two phones share one id → one overwrites the other's push token |
-| **FID** | Per install, **not** backed up, cached after first call, and the same id FCM uses internally |
+| Alternative                  | Problem                                                                                                                                |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `Settings.Secure.ANDROID_ID` | Shared by all apps of the same signing key; privacy-sensitive; Play policy discourages it                                              |
+| Our own UUID in DataStore    | `android:allowBackup="true"` restores DataStore onto a **new phone** → two phones share one id → one overwrites the other's push token |
+| **FID**                      | Per install, **not** backed up, cached after first call, and the same id FCM uses internally                                           |
 
 **Where:** `DeviceRemoteDataSource.installationId()` → `installations.id.await()`.
 
@@ -191,16 +191,16 @@ val result = auth.signInWithEmailAndPassword(email, password).await()
 
 **What:** compile-time dependency injection. You declare what a class needs in its constructor; Hilt generates the code that builds it.
 
-| Annotation | Meaning | Example |
-|---|---|---|
-| `@HiltAndroidApp` | Root of the object graph | `DukkanApplication` |
-| `@AndroidEntryPoint` | Activity can receive injected objects | `MainActivity` |
-| `@HiltViewModel` + `@Inject constructor` | ViewModel built by Hilt | `LoginViewModel` |
-| `@Inject constructor` | "Hilt, you may build this class" | data sources, use cases |
-| `@Binds` | "When someone asks for this interface, give this implementation" | `AuthRepository` → `AuthRepositoryImpl` |
-| `@Provides` | "Build it with this function" (for classes you can't annotate) | `FirebaseAuth.getInstance()` |
-| `@Singleton` | One instance for the whole app | repositories, Firebase |
-| `@ApplicationContext` | The application `Context` (never an Activity: no leaks) | `AndroidDeviceInfoProvider` |
+| Annotation                               | Meaning                                                          | Example                                 |
+| ---------------------------------------- | ---------------------------------------------------------------- | --------------------------------------- |
+| `@HiltAndroidApp`                        | Root of the object graph                                         | `DukkanApplication`                     |
+| `@AndroidEntryPoint`                     | Activity can receive injected objects                            | `MainActivity`                          |
+| `@HiltViewModel` + `@Inject constructor` | ViewModel built by Hilt                                          | `LoginViewModel`                        |
+| `@Inject constructor`                    | "Hilt, you may build this class"                                 | data sources, use cases                 |
+| `@Binds`                                 | "When someone asks for this interface, give this implementation" | `AuthRepository` → `AuthRepositoryImpl` |
+| `@Provides`                              | "Build it with this function" (for classes you can't annotate)   | `FirebaseAuth.getInstance()`            |
+| `@Singleton`                             | One instance for the whole app                                   | repositories, Firebase                  |
+| `@ApplicationContext`                    | The application `Context` (never an Activity: no leaks)          | `AndroidDeviceInfoProvider`             |
 
 `hiltViewModel()` in a screen creates the ViewModel **scoped to its navigation destination**, and fills its `SavedStateHandle` with the route's arguments (that's how `toRoute()` reads `emailJustSent`).
 
@@ -221,11 +221,11 @@ No string keys, no `Bundle`: a typo is a compile error.
 
 ### 2.11 Lifecycle Compose
 
-| API | Where | Why |
-|---|---|---|
-| `collectAsStateWithLifecycle()` | every screen | Stops collecting state while the app is in the background |
-| `LifecycleResumeEffect` | `EmailVerificationScreen` | Runs on **every** `ON_RESUME`: first display and every return from the mail app |
-| `repeatOnLifecycle(STARTED)` | `AppCollectEffect` | Effects (navigation) are only handled while visible, never lost, never run in the background |
+| API                             | Where                     | Why                                                                                          |
+| ------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------- |
+| `collectAsStateWithLifecycle()` | every screen              | Stops collecting state while the app is in the background                                    |
+| `LifecycleResumeEffect`         | `EmailVerificationScreen` | Runs on **every** `ON_RESUME`: first display and every return from the mail app              |
+| `repeatOnLifecycle(STARTED)`    | `AppCollectEffect`        | Effects (navigation) are only handled while visible, never lost, never run in the background |
 
 ### 2.12 BuildConfig — new flag
 
@@ -235,12 +235,12 @@ No string keys, no `Bundle`: a typo is a compile error.
 
 ### 2.13 Android APIs used without a dependency
 
-| API | Where | Note |
-|---|---|---|
-| `Build.MANUFACTURER`, `MODEL`, `VERSION.RELEASE`, `VERSION.SDK_INT` | `AndroidDeviceInfoProvider` | Static fields |
-| `Settings.Global.DEVICE_NAME` | same | The name the user gave the phone. API 25+, hence the version check |
-| `TimeZone.getDefault().id` | same | `"Africa/Tunis"`; for sending pushes at a sensible local time |
-| `Intent.makeMainSelectorActivity(ACTION_MAIN, CATEGORY_APP_EMAIL)` | `EmailVerificationScreen` | Opens the default mail app's **inbox**. `ActivityNotFoundException` if none |
+| API                                                                 | Where                       | Note                                                                        |
+| ------------------------------------------------------------------- | --------------------------- | --------------------------------------------------------------------------- |
+| `Build.MANUFACTURER`, `MODEL`, `VERSION.RELEASE`, `VERSION.SDK_INT` | `AndroidDeviceInfoProvider` | Static fields                                                               |
+| `Settings.Global.DEVICE_NAME`                                       | same                        | The name the user gave the phone. API 25+, hence the version check          |
+| `TimeZone.getDefault().id`                                          | same                        | `"Africa/Tunis"`; for sending pushes at a sensible local time               |
+| `Intent.makeMainSelectorActivity(ACTION_MAIN, CATEGORY_APP_EMAIL)`  | `EmailVerificationScreen`   | Opens the default mail app's **inbox**. `ActivityNotFoundException` if none |
 
 ---
 
@@ -248,19 +248,19 @@ No string keys, no `Bundle`: a typo is a compile error.
 
 ### 3.1 The instance table
 
-| Instance | Created by | Lifetime | Why that lifetime |
-|---|---|---|---|
-| `FirebaseAuth` | `FirebaseModule.provideFirebaseAuth()` → `FirebaseAuth.getInstance()` | App (`@Singleton`) | The SDK keeps **one** session per app; a second instance would be the same object anyway |
-| `FirebaseFirestore` | `FirebaseModule.provideFirebaseFirestore()` | App | Owns the local cache, the network connection and the pending-write queue |
-| `FirebaseInstallations` | `FirebaseModule.provideFirebaseInstallations()` | App | Caches the FID |
-| `DataStore<Preferences>` | `DataStoreModule.provideDataStore()` | App | **Must** be one instance per file: two instances on the same file corrupt it |
-| `AppFailureMapper` / `ErrorReporter` | `ErrorModule` | App | Stateless, shared |
-| `AuthRepositoryImpl`, `SessionRepositoryImpl`, `UserRepositoryImpl`, `DeviceRepositoryImpl` | `@Binds @Singleton` | App | Stateless facades over singletons; one is enough |
-| `AndroidDeviceInfoProvider` | `@Binds @Singleton` | App | Holds the application `Context` only |
-| Data sources (`AuthRemoteDataSource`...) | `@Inject constructor` (unscoped) | New each time it's injected | Stateless and tiny; scoping adds nothing |
-| Use cases (`SignInWithEmailUseCase`...) | `@Inject constructor` (unscoped) | New per ViewModel | Stateless; no reason to keep them |
-| ViewModels | `hiltViewModel()` | Navigation destination | Survives rotation; cleared when the screen leaves the back stack |
-| `AppStartViewModel` | `by viewModels()` in `MainActivity` | Activity | Decides the first screen once |
+| Instance                                                                                    | Created by                                                            | Lifetime                    | Why that lifetime                                                                        |
+| ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------- | ---------------------------------------------------------------------------------------- |
+| `FirebaseAuth`                                                                              | `FirebaseModule.provideFirebaseAuth()` → `FirebaseAuth.getInstance()` | App (`@Singleton`)          | The SDK keeps **one** session per app; a second instance would be the same object anyway |
+| `FirebaseFirestore`                                                                         | `FirebaseModule.provideFirebaseFirestore()`                           | App                         | Owns the local cache, the network connection and the pending-write queue                 |
+| `FirebaseInstallations`                                                                     | `FirebaseModule.provideFirebaseInstallations()`                       | App                         | Caches the FID                                                                           |
+| `DataStore<Preferences>`                                                                    | `DataStoreModule.provideDataStore()`                                  | App                         | **Must** be one instance per file: two instances on the same file corrupt it             |
+| `AppFailureMapper` / `ErrorReporter`                                                        | `ErrorModule`                                                         | App                         | Stateless, shared                                                                        |
+| `AuthRepositoryImpl`, `SessionRepositoryImpl`, `UserRepositoryImpl`, `DeviceRepositoryImpl` | `@Binds @Singleton`                                                   | App                         | Stateless facades over singletons; one is enough                                         |
+| `AndroidDeviceInfoProvider`                                                                 | `@Binds @Singleton`                                                   | App                         | Holds the application `Context` only                                                     |
+| Data sources (`AuthRemoteDataSource`...)                                                    | `@Inject constructor` (unscoped)                                      | New each time it's injected | Stateless and tiny; scoping adds nothing                                                 |
+| Use cases (`SignInWithEmailUseCase`...)                                                     | `@Inject constructor` (unscoped)                                      | New per ViewModel           | Stateless; no reason to keep them                                                        |
+| ViewModels                                                                                  | `hiltViewModel()`                                                     | Navigation destination      | Survives rotation; cleared when the screen leaves the back stack                         |
+| `AppStartViewModel`                                                                         | `by viewModels()` in `MainActivity`                                   | Activity                    | Decides the first screen once                                                            |
 
 ### 3.2 Why inject instead of calling `getInstance()` everywhere?
 
@@ -352,14 +352,14 @@ The session ends only on `signOut()`, uninstall / clear data, or when the server
 
 ### 4.3 The calls we make, with their results
 
-| Call | Returns | Typical failure → our `AppFailure` |
-|---|---|---|
-| `createUserWithEmailAndPassword(e, p).await()` | `AuthResult` → `.user` | `ERROR_EMAIL_ALREADY_IN_USE` → `EmailAlreadyInUse`; `FirebaseAuthWeakPasswordException` → `WeakPassword` |
-| `signInWithEmailAndPassword(e, p).await()` | `AuthResult` → `.user` | `ERROR_INVALID_CREDENTIAL` → `InvalidCredentials`; `ERROR_USER_DISABLED` → `UserDisabled` |
-| `user.sendEmailVerification().await()` | `Void` | `FirebaseTooManyRequestsException` → `RateLimited` |
-| `user.reload().await()` | `Void` (updates `user` in place) | `ERROR_USER_NOT_FOUND` (deleted) → `InvalidCredentials`; `ERROR_USER_TOKEN_EXPIRED` → `SessionExpired` |
-| `signOut()` | `Unit`, synchronous | never fails |
-| any call, offline | — | `FirebaseNetworkException` → `NoConnection` |
+| Call                                           | Returns                          | Typical failure → our `AppFailure`                                                                       |
+| ---------------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `createUserWithEmailAndPassword(e, p).await()` | `AuthResult` → `.user`           | `ERROR_EMAIL_ALREADY_IN_USE` → `EmailAlreadyInUse`; `FirebaseAuthWeakPasswordException` → `WeakPassword` |
+| `signInWithEmailAndPassword(e, p).await()`     | `AuthResult` → `.user`           | `ERROR_INVALID_CREDENTIAL` → `InvalidCredentials`; `ERROR_USER_DISABLED` → `UserDisabled`                |
+| `user.sendEmailVerification().await()`         | `Void`                           | `FirebaseTooManyRequestsException` → `RateLimited`                                                       |
+| `user.reload().await()`                        | `Void` (updates `user` in place) | `ERROR_USER_NOT_FOUND` (deleted) → `InvalidCredentials`; `ERROR_USER_TOKEN_EXPIRED` → `SessionExpired`   |
+| `signOut()`                                    | `Unit`, synchronous              | never fails                                                                                              |
+| any call, offline                              | —                                | `FirebaseNetworkException` → `NoConnection`                                                              |
 
 ### 4.4 Why `reload()` then `requireUser()` again
 
@@ -378,22 +378,22 @@ suspend fun reloadCurrentUser(): FirebaseUser = guardException {
 
 The user taps **Log In** with a correct password and an unverified email.
 
-| # | Layer | Code | What happens |
-|---|---|---|---|
-| 1 | UI | `LoginScreenContent` → `onIntent(LoginIntent.LoginClicked)` | Content only reports the tap |
-| 2 | ViewModel | `LoginViewModel.onLoginClicked()` | Validates email/password with `AuthFormValidator` (pure) |
-| 3 | ViewModel | `setState { copy(isLoading = true) }` **before** `launch` | Button shows spinner; a second tap returns early (`if (current.isLoading) return`) |
-| 4 | ViewModel | `viewModelScope.launch { signInWithEmail(...) }` | Coroutine on Main; suspends, doesn't block |
-| 5 | Use case | `authRepository.signInWithEmail(email, password)` | |
-| 6 | Repository | `failureMapper.guardFailure { remote.signInWithEmail(...).toAuthUser() }` | Any exception becomes `AppResult.Failure` |
-| 7 | Data source | `guardException { auth.signInWithEmailAndPassword(...).await().user }` | Any SDK exception becomes `AppException` |
-| 8 | Firebase | network call on Firebase's threads | Main thread free, UI animates |
-| 9 | Repository | `FirebaseUser.toAuthUser()` → `AppResult.Success(AuthUser(isEmailVerified = false))` | Firebase types stop here |
-| 10 | Use case | `.onSuccess { sessionRepository.setRememberMe(...); syncSignedInUser(user) }` | DataStore write; profile transaction and device write **in parallel** |
-| 11 | ViewModel | `.onSuccess { user -> sendEffect(NavigateToEmailVerification) }` | Effect into the `Channel` |
-| 12 | ViewModel | `setState { copy(isLoading = false) }` | |
-| 13 | Screen | `AppCollectEffect` → `onNavigateToEmailVerification()` | Only while STARTED |
-| 14 | NavHost | `navigateAsRoot(EmailVerificationScreen(emailJustSent = false))` | Verification becomes the only screen |
+| #   | Layer       | Code                                                                                 | What happens                                                                       |
+| --- | ----------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| 1   | UI          | `LoginScreenContent` → `onIntent(LoginIntent.LoginClicked)`                          | Content only reports the tap                                                       |
+| 2   | ViewModel   | `LoginViewModel.onLoginClicked()`                                                    | Validates email/password with `AuthFormValidator` (pure)                           |
+| 3   | ViewModel   | `setState { copy(isLoading = true) }` **before** `launch`                            | Button shows spinner; a second tap returns early (`if (current.isLoading) return`) |
+| 4   | ViewModel   | `viewModelScope.launch { signInWithEmail(...) }`                                     | Coroutine on Main; suspends, doesn't block                                         |
+| 5   | Use case    | `authRepository.signInWithEmail(email, password)`                                    |                                                                                    |
+| 6   | Repository  | `failureMapper.guardFailure { remote.signInWithEmail(...).toAuthUser() }`            | Any exception becomes `AppResult.Failure`                                          |
+| 7   | Data source | `guardException { auth.signInWithEmailAndPassword(...).await().user }`               | Any SDK exception becomes `AppException`                                           |
+| 8   | Firebase    | network call on Firebase's threads                                                   | Main thread free, UI animates                                                      |
+| 9   | Repository  | `FirebaseUser.toAuthUser()` → `AppResult.Success(AuthUser(isEmailVerified = false))` | Firebase types stop here                                                           |
+| 10  | Use case    | `.onSuccess { sessionRepository.setRememberMe(...); syncSignedInUser(user) }`        | DataStore write; profile transaction and device write **in parallel**              |
+| 11  | ViewModel   | `.onSuccess { user -> sendEffect(NavigateToEmailVerification) }`                     | Effect into the `Channel`                                                          |
+| 12  | ViewModel   | `setState { copy(isLoading = false) }`                                               |                                                                                    |
+| 13  | Screen      | `AppCollectEffect` → `onNavigateToEmailVerification()`                               | Only while STARTED                                                                 |
+| 14  | NavHost     | `navigateAsRoot(EmailVerificationScreen(emailJustSent = false))`                     | Verification becomes the only screen                                               |
 
 Same tap, wrong password: step 7 throws `AppException.Auth.InvalidCredential`, step 6 returns `Failure(InvalidCredentials)`, step 10 is skipped (`onSuccess` doesn't run), the ViewModel's `onFailure` sets `generalError`, and the banner shows "Incorrect email or password". Nothing crashed, nothing was caught in the ViewModel.
 
@@ -422,6 +422,7 @@ navigateAsRoot(EmailVerificationScreen(emailJustSent = true))
 ```
 
 **Why the order:**
+
 - Remember Me is saved first: it's local and instant, and the start-up logic needs it even if everything after fails.
 - Profile, device and email are independent, so they run in parallel (`coroutineScope { launch; launch }`). `coroutineScope` waits for both, so the spinner stays until all writes finished and nothing is cancelled by navigation.
 - `emailJustSent = true` starts the Resend cooldown: Firebase rate-limits verification emails, and the user just got one.
@@ -459,6 +460,7 @@ navigateAsRoot(EmailVerificationScreen(emailJustSent = true))
 3. User switches back to Dukkan → `ON_RESUME` → `LifecycleResumeEffect` → silent `reload()` → `isEmailVerified = true` → Home.
 
 **Guards:**
+
 - `checkJob?.isActive == true` → return: a resume during a manual check doesn't run two reloads, and can't navigate twice.
 - Silent checks never show messages: the user didn't ask, so "not verified yet" on every resume would be noise.
 - `meansAccountIsGone`: if the account was deleted or disabled, the screen could never succeed; we sign out and leave.
@@ -507,14 +509,14 @@ Everything above reads **local** data (DataStore + Firebase's cached user): no n
 
 ### 9.2 Fresh launch vs restore
 
-| What the user did | `savedInstanceState` | `isFreshLaunch` | Remember Me ⬜ result |
-|---|---|---|---|
-| Tapped the icon, app wasn't running | none | `true` | Signed out → AuthOptions |
-| Swiped the app away in recents, reopened | none | `true` | Signed out → AuthOptions |
-| Pressed back on the root screen, reopened | none | `true` | Signed out → AuthOptions |
-| Rotated the phone | ViewModel survives; `init` doesn't run again | — | Nothing changes |
-| Went to the mail app; Android killed Dukkan; came back | restored | `false` | **Session kept**, back on the screen they left |
-| Phone rebooted, tapped the icon | none | `true` | Signed out → AuthOptions |
+| What the user did                                      | `savedInstanceState`                         | `isFreshLaunch` | Remember Me ⬜ result                           |
+| ------------------------------------------------------ | -------------------------------------------- | --------------- | ---------------------------------------------- |
+| Tapped the icon, app wasn't running                    | none                                         | `true`          | Signed out → AuthOptions                       |
+| Swiped the app away in recents, reopened               | none                                         | `true`          | Signed out → AuthOptions                       |
+| Pressed back on the root screen, reopened              | none                                         | `true`          | Signed out → AuthOptions                       |
+| Rotated the phone                                      | ViewModel survives; `init` doesn't run again | —               | Nothing changes                                |
+| Went to the mail app; Android killed Dukkan; came back | restored                                     | `false`         | **Session kept**, back on the screen they left |
+| Phone rebooted, tapped the icon                        | none                                         | `true`          | Signed out → AuthOptions                       |
 
 Without the `isFreshLaunch` check, row 5 would sign the user out in the middle of email verification, which is exactly when Android is most likely to kill the app.
 
@@ -546,15 +548,15 @@ HomeViewModel / EmailVerificationViewModel / GetSessionStateUseCase
 
 ### 11.1 Where each piece of work runs
 
-| Code | Thread | Blocking? |
-|---|---|---|
-| `onIntent`, `setState`, `sendEffect` | Main | No (in-memory) |
-| `viewModelScope.launch { }` | `Dispatchers.Main.immediate` | — |
-| Firebase `Task` work | Firebase's internal thread pool | Not on our threads |
-| `.await()` | suspends the Main coroutine | **No**: Main is free while waiting |
-| DataStore `data.first()` / `edit {}` | DataStore's internal IO dispatcher | No |
-| `AndroidDeviceInfoProvider.current()` | Main | Microseconds |
-| `AuthFormValidator` | Main | Microseconds |
+| Code                                  | Thread                             | Blocking?                          |
+| ------------------------------------- | ---------------------------------- | ---------------------------------- |
+| `onIntent`, `setState`, `sendEffect`  | Main                               | No (in-memory)                     |
+| `viewModelScope.launch { }`           | `Dispatchers.Main.immediate`       | —                                  |
+| Firebase `Task` work                  | Firebase's internal thread pool    | Not on our threads                 |
+| `.await()`                            | suspends the Main coroutine        | **No**: Main is free while waiting |
+| DataStore `data.first()` / `edit {}`  | DataStore's internal IO dispatcher | No                                 |
+| `AndroidDeviceInfoProvider.current()` | Main                               | Microseconds                       |
+| `AuthFormValidator`                   | Main                               | Microseconds                       |
 
 ### 11.2 So we don't inject dispatchers
 
@@ -598,17 +600,169 @@ Injected (not `Dispatchers.IO` directly) so tests can pass a `StandardTestDispat
 
 Firestore keeps a local cache and a queue of pending writes. What `await()` waits for depends on the call:
 
-| Call | Online | Offline |
-|---|---|---|
+| Call                                | Online                                              | Offline                                                                                                                |
+| ----------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `runTransaction { }` (profile sync) | Reads + writes on the server, retries on contention | **Fails fast** with `UNAVAILABLE` → `AppException.Firestore.Unavailable` → ignored (best effort), retried next sign-in |
-| `set(merge)` (device) | Resumes when the server confirms | Applied to cache immediately, queued; `await()` resumes **only when back online** |
-| `delete()` (device) | Resumes when the server confirms | Same: queued, `await()` waits → that's why sign-out has a timeout |
+| `set(merge)` (device)               | Resumes when the server confirms                    | Applied to cache immediately, queued; `await()` resumes **only when back online**                                      |
+| `delete()` (device)                 | Resumes when the server confirms                    | Same: queued, `await()` waits → that's why sign-out has a timeout                                                      |
 
 **Sign-in and sign-up need the network anyway** (Firebase Auth is online-only), so the device write in `SyncSignedInUserUseCase` normally completes in a few hundred ms. If the connection drops in between, the spinner waits until it's back; the write is never lost.
 
 **Why server timestamps:** `createdAt`, `updatedAt`, `lastLoginAt` use `@ServerTimestamp` / `FieldValue.serverTimestamp()`. The phone's clock can be wrong or deliberately changed; the server's can't. The security rule `createdAt == request.time` enforces it.
 
 ---
+
+## Firestore, injection, and login flows
+
+1. Firestore, simply
+
+--------------------
+
+Firestore is a database shaped like folders and files:
+    users (collection = folder)
+     └── uid_123 (document = file)
+          ├── email: "a@b.com"
+          ├── createdAt: ...
+          └── devices (subcollection = folder inside a file)
+               └── fid_abc (document)
+                    └── fcmToken: "xyz"
+
+| API                                 | Plain meaning                                                      | Example                                                                                                                      |
+| ----------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `collection("users").document(uid)` | Writes the address of the file. Nothing goes over the network yet. | "Go to users/uid_123"                                                                                                        |
+| `runTransaction { get → set }`      | Reads the document, then writes it, as one indivisible step.       | Two phones sign up at once. Only one creates the profile, so `createdAt` isn't overwritten.                                  |
+| `set(map, SetOptions.merge())`      | Changes only the fields you give and keeps the rest.               | Update `deviceName` and keep the existing `fcmToken`. Without `merge`, the whole document is replaced and the token is lost. |
+| `delete()`                          | Deletes the document.                                              | On sign-out, delete this phone's device document.                                                                            |
+| `FieldValue.serverTimestamp()`      | The server writes the time, not the phone.                         | A user who sets their phone clock to 2030 can't corrupt `createdAt`.                                                         |
+| `@ServerTimestamp`                  | The same thing, but on a data class field.                         | `UserDto.createdAt`                                                                                                          |
+| `FirebaseFirestoreException.code`   | The error code, which we map to our own error.                     | `UNAVAILABLE` becomes `AppException.Firestore.Unavailable`                                                                   |
+
+2. What "inject" and "Provider" mean
+
+------------------------------------
+
+**The problem:** `AuthRemoteDataSource` needs a `FirebaseAuth` object.
+    // ❌ The class builds its own dependency. It is hard to test and the dependency is hidden.
+    class AuthRemoteDataSource {
+        private val auth = FirebaseAuth.getInstance()
+    }
+
+    // ✅ The class only says what it needs. Someone else supplies it.
+    class AuthRemoteDataSource @Inject constructor(
+        private val auth: FirebaseAuth
+    )
+
+That "someone else" is **Hilt**. Hilt reads constructors and builds the objects for you. It can only build classes you own, because you put `@Inject` on them. It can't build `FirebaseAuth`, since that is Google's class and you can't edit it. So you tell Hilt how to get one, in a module:
+    @Module
+    @InstallIn(SingletonComponent::class)   // lives as long as the app
+    object FirebaseModule {
+
+        @Provides @Singleton                // "Hilt, to make a FirebaseAuth, call this function"
+        fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+        @Provides @Singleton
+        fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+
+        @Provides @Singleton
+        fun provideFirebaseInstallations(): FirebaseInstallations = FirebaseInstallations.getInstance()
+    }
+
+`@Provides` means "I'll show you how to build a class I can't annotate". `@Binds` is for interfaces:
+    @Module
+    @InstallIn(SingletonComponent::class)
+    abstract class AuthModule {
+        @Binds @Singleton
+        abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
+    }
+
+That tells Hilt to give `AuthRepositoryImpl` to anyone who asks for `AuthRepository`.
+
+**Which one do I use?**
+
+* A class of mine with an `@Inject constructor` needs no module.
+
+* An interface needs `@Binds`.
+
+* A third-party class (Firebase, DataStore) needs `@Provides`.
+3. How the objects get created (the flow)
+
+-----------------------------------------
+
+You never write `LoginViewModel(SignInUseCase(AuthRepositoryImpl(AuthRemoteDataSource(FirebaseAuth...))))`. Hilt does this when the screen opens and calls `hiltViewModel()`:
+    hiltViewModel() in LoginScreen
+       │ Hilt: "LoginViewModel needs SignInWithEmailUseCase"
+       ▼
+    SignInWithEmailUseCase           needs AuthRepository, SessionRepository, SyncSignedInUserUseCase
+       │ "AuthRepository is an interface → @Binds says use AuthRepositoryImpl"
+       ▼
+    AuthRepositoryImpl               needs AuthRemoteDataSource
+       ▼
+    AuthRemoteDataSource             needs FirebaseAuth
+       ▼
+    FirebaseAuth  ◄── @Provides in FirebaseModule: FirebaseAuth.getInstance()   (one for the whole app)
+
+Hilt builds the chain from the bottom up and hands the finished `LoginViewModel` to the screen. If a link is missing, you get a compile error such as `MissingBinding`, not a crash.
+
+4. Login with email and password (what your project has now)
+
+------------------------------------------------------------
+
+You type the email and password and tap **Log In**:
+    LoginScreen        → onIntent(LoginClicked)
+    LoginViewModel     → validates the form, sets isLoading = true, launches a coroutine
+    SignInWithEmailUseCase
+      └─ AuthRepository.signInWithEmail()
+           └─ AuthRemoteDataSource: auth.signInWithEmailAndPassword(email, pw).await()
+                                             │
+                                             ▼ Firebase checks it on the server
+      ◄── AuthUser (FirebaseUser converted to our own class)
+      ├─ SessionRepository.setRememberMe()      → DataStore
+      └─ SyncSignedInUserUseCase                → Firestore
+            ├─ users/{uid}    (transaction: create if absent)
+            └─ devices/{fid}  (set with merge)
+    ViewModel: email verified? → Home, otherwise EmailVerification screen
+
+On a wrong password, Firebase throws an exception. Each layer converts it, and the screen shows the banner "Incorrect email or password".
+
+5. Login with OTP and Gmail
+
+---------------------------
+
+Your doc covers email and password only. OTP and Gmail aren't implemented yet. They would use the **same layers and the same injection**. Only the data source calls change.
+
+**Gmail (Google Sign-In):**
+    Tap "Continue with Google"
+     → ViewModel → SignInWithGoogleUseCase → AuthRepository.signInWithGoogle()
+         → GoogleDataSource (Credential Manager) shows the Google account picker
+         → returns an idToken
+         → AuthRemoteDataSource: auth.signInWithCredential(GoogleAuthProvider.getCredential(idToken, null)).await()
+     → same as before: sync profile + device → Home
+     (Google emails are already verified, so there is no EmailVerification screen)
+
+It needs the dependencies `androidx.credentials` and `googleid`, plus the Web client ID from Firebase.
+
+**OTP (phone SMS):**
+    Step 1: user enters their phone number
+     → PhoneAuthProvider.verifyPhoneNumber(...)  → Firebase sends the SMS
+     → callback gives a verificationId (a receipt for this attempt)
+
+    Step 2: user enters the 6-digit code
+     → PhoneAuthProvider.getCredential(verificationId, code)
+     → auth.signInWithCredential(credential).await()
+     → sync profile + device → Home
+
+`verifyPhoneNumber` needs an `Activity` and uses callbacks. Wrap it in a data source with `callbackFlow` or `suspendCancellableCoroutine`.
+
+**Adding a new login method means adding:**
+
+1. A new use case, for example `SignInWithGoogleUseCase`.
+2. A new method on `AuthRepository`, with its implementation.
+3. A new call in `AuthRemoteDataSource`, or a new data source.
+4. Nothing new in the injection setup. `FirebaseAuth` is already provided, and new `@Inject` classes are built automatically.
+
+The sync step (`SyncSignedInUserUseCase`) is reused by every method. All methods end up as "a signed-in Firebase user", so everything after sign-in is identical.
+
+I can write the Google or OTP code for your project if you want it.
 
 ## 13. FAQ
 
