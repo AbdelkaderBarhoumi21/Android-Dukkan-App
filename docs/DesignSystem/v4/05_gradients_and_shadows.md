@@ -1,6 +1,7 @@
 # 05 — Gradients and shadows
 
 **Files (new):**
+
 - `core/designsystem/theme/AppGradients.kt`
 - `core/designsystem/theme/AppShadows.kt`
 
@@ -18,24 +19,24 @@ Both have a light and a dark instance, so a component never checks the mode.
 
 ### Gradients (`01 · Foundations → Gradients`, "every stop is a primitive")
 
-| Field | Stops | Direction | Compose brush |
-|---|---|---|---|
-| `brand` | azure-400 `#4F8BFF` → blue-700 `#1D4ED8` | 135° | `Brush.linearGradient` top-start → bottom-end |
-| `button` | azure-500 `#3B82F6` → blue-700 `#1D4ED8` | horizontal | `Brush.horizontalGradient` |
-| `screenTint` | azure-100 `#DCE7FF` → slate-50 `#F7F9FB` | vertical | `Brush.verticalGradient` |
-| `bottomFade` | background 0 % → background 100 % | vertical | fades the aurora header into the page (the 90 dp band at the bottom of the header) |
-| `deal` | orange-400 `#FB923C` → rose-500 `#F43F5E` | 135° | `Brush.linearGradient` |
-| `gold` | amber-300 `#FCD34D` → amber-500 `#F59E0B` | 135° | `Brush.linearGradient` |
-| `navy` | blue-900 `#1E3A8A` → blue-950 `#172554` | 135° | `Brush.linearGradient` |
-| `imageScrim` | slate-900 0 % → slate-900 72 % | vertical | `Brush.verticalGradient` |
+| Field        | Stops                                     | Direction  | Compose brush                                                                      |
+| ------------ | ----------------------------------------- | ---------- | ---------------------------------------------------------------------------------- |
+| `brand`      | azure-400 `#4F8BFF` → blue-700 `#1D4ED8`  | 135°       | `Brush.linearGradient` top-start → bottom-end                                      |
+| `button`     | azure-500 `#3B82F6` → blue-700 `#1D4ED8`  | horizontal | `Brush.horizontalGradient`                                                         |
+| `screenTint` | azure-100 `#DCE7FF` → slate-50 `#F7F9FB`  | vertical   | `Brush.verticalGradient`                                                           |
+| `bottomFade` | background 0 % → background 100 %         | vertical   | fades the aurora header into the page (the 90 dp band at the bottom of the header) |
+| `deal`       | orange-400 `#FB923C` → rose-500 `#F43F5E` | 135°       | `Brush.linearGradient`                                                             |
+| `gold`       | amber-300 `#FCD34D` → amber-500 `#F59E0B` | 135°       | `Brush.linearGradient`                                                             |
+| `navy`       | blue-900 `#1E3A8A` → blue-950 `#172554`   | 135°       | `Brush.linearGradient`                                                             |
+| `imageScrim` | slate-900 0 % → slate-900 72 %            | vertical   | `Brush.verticalGradient`                                                           |
 
 **Aurora blobs (header)**: exactly **3** radial blobs, from the color at the given alpha to fully transparent. Same positions in light and dark (Figma `13.1b · Header glow · spec`); only the colors change.
 
-| Field (`aurora`) | Figma | Light | Dark |
-|---|---|---|---|
-| `blue` | Blob blue | azure-300 `#7EA6FF` · 62 % | blue-500 `#3B6FF6` · 35 % |
-| `sky` | Blob sky | azure-200 `#A9C4FF` · 55 % | blue-800 `#1E40AF` · 45 % |
-| `sun` | Blob warm | amber-200 `#FDE68A` · 42 % | amber-300 `#FCD34D` · 8 % |
+| Field (`aurora`) | Figma     | Light                      | Dark                      |
+| ---------------- | --------- | -------------------------- | ------------------------- |
+| `blue`           | Blob blue | azure-300 `#7EA6FF` · 62 % | blue-500 `#3B6FF6` · 35 % |
+| `sky`            | Blob sky  | azure-200 `#A9C4FF` · 55 % | blue-800 `#1E40AF` · 45 % |
+| `sun`            | Blob warm | amber-200 `#FDE68A` · 42 % | amber-300 `#FCD34D` · 8 % |
 
 Doc 13 (`AppScreenBackground`) places the blobs. This doc only defines the colors and a small brush helper.
 
@@ -43,30 +44,30 @@ Doc 13 (`AppScreenBackground`) places the blobs. This doc only defines the color
 
 ### Shadows (`01 · Foundations → Elevation`: x 0 · y · blur · color)
 
-| Field | Color | Offset Y | Blur | Used by |
-|---|---|---|---|---|
-| `card` | slate-900 @ 6 % | 4 | 14 | product cards, white icon buttons, add button |
-| `float` | slate-900 @ 12 % | 10 | 28 | elevated search bar, bottom sheets, floating nav |
-| `button` | blue-600 @ 30 % | 8 | 20 | primary / checkout / slide buttons |
-| `deal` | orange-500 @ 30 % | 8 | 20 | deal button |
-| `screen` (**new**) | slate-900 @ 10 % | 18 | 44 | the phone frame / full-screen surfaces (e.g. a raised sheet over the map) |
+| Field              | Color             | Offset Y | Blur | Used by                                                                   |
+| ------------------ | ----------------- | -------- | ---- | ------------------------------------------------------------------------- |
+| `card`             | slate-900 @ 6 %   | 4        | 14   | product cards, white icon buttons, add button                             |
+| `float`            | slate-900 @ 12 %  | 10       | 28   | elevated search bar, bottom sheets, floating nav                          |
+| `button`           | blue-600 @ 30 %   | 8        | 20   | primary / checkout / slide buttons                                        |
+| `deal`             | orange-500 @ 30 % | 8        | 20   | deal button                                                               |
+| `screen` (**new**) | slate-900 @ 10 %  | 18       | 44   | the phone frame / full-screen surfaces (e.g. a raised sheet over the map) |
 
 ### Dark mode (`01b · Dark mode → Gradients & elevation · dark`)
 
 Figma: "Brand, button, deal and gold gradients stay the same. Tint and fades go to night. Shadows go black; cards add a 1 px night-700 border."
 
-| Token | Light | Dark | Source |
-|---|---|---|---|
-| `brand`, `button`, `deal`, `gold`, `navy`, `imageScrim` | as above | same | Figma |
-| `screenTint` | azure-100 → slate-50 | **blue-950 → night-950** | Figma |
-| `bottomFade` | slate-50 0 % → 100 % | **night-950 0 % → 100 %** | Figma |
-| `card` shadow | slate-900 6 % | **black 45 %**, y 4, blur 14, **+ 1 dp night-700 border** | Figma |
-| `float` shadow | slate-900 12 % | **black 55 %**, y 10, blur 28, **+ 1 dp night-700 border** | Figma |
-| `screen` shadow | slate-900 10 % | **black 60 %**, y 18, blur 44, **+ 1 dp night-700 border** | Figma |
-| `button` shadow | blue-600 30 % | **azure-400 25 %**, y 8, blur 20 (no border) | Figma |
-| `deal` shadow | orange-500 30 % | **orange-400 25 %**, y 8, blur 20 (no border) | Figma |
-| `aurora` blobs | azure-300 62 %, azure-200 55 %, amber-200 42 % | blue-500 35 %, blue-800 45 %, amber-300 8 % | Figma `13.1b` |
-| `cardHighlight` | white 35 % | same | Figma `13.1b` |
+| Token                                                   | Light                                          | Dark                                                       | Source        |
+| ------------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------- | ------------- |
+| `brand`, `button`, `deal`, `gold`, `navy`, `imageScrim` | as above                                       | same                                                       | Figma         |
+| `screenTint`                                            | azure-100 → slate-50                           | **blue-950 → night-950**                                   | Figma         |
+| `bottomFade`                                            | slate-50 0 % → 100 %                           | **night-950 0 % → 100 %**                                  | Figma         |
+| `card` shadow                                           | slate-900 6 %                                  | **black 45 %**, y 4, blur 14, **+ 1 dp night-700 border**  | Figma         |
+| `float` shadow                                          | slate-900 12 %                                 | **black 55 %**, y 10, blur 28, **+ 1 dp night-700 border** | Figma         |
+| `screen` shadow                                         | slate-900 10 %                                 | **black 60 %**, y 18, blur 44, **+ 1 dp night-700 border** | Figma         |
+| `button` shadow                                         | blue-600 30 %                                  | **azure-400 25 %**, y 8, blur 20 (no border)               | Figma         |
+| `deal` shadow                                           | orange-500 30 %                                | **orange-400 25 %**, y 8, blur 20 (no border)              | Figma         |
+| `aurora` blobs                                          | azure-300 62 %, azure-200 55 %, amber-200 42 % | blue-500 35 %, blue-800 45 %, amber-300 8 %                | Figma `13.1b` |
+| `cardHighlight`                                         | white 35 %                                     | same                                                       | Figma `13.1b` |
 
 Figma's rule: **all dark surfaces (card, float/sheet, screen) add a 1 px night-700 border; Button and Deal keep their coloured glow.** Every value in this table is official; nothing is derived any more.
 
@@ -353,3 +354,88 @@ A shadow is four values that only make sense together (color + y + blur + spread
 - [ ] Every color comes from `AppPalette`.
 - [ ] Dark preview: a card, a bottom sheet (`float`) and a `screen` surface each have a black shadow **and** a thin `#24314F` outline; the primary button glow is a soft azure and the deal glow a soft orange, with no outline.
 - [ ] A promo banner shows the white highlight in its top-right corner (top-left in Arabic); the header aurora has only 3 blobs.
+
+This file is the **gradients layer** of the design system: the same pattern as `AppColors`, but for gradients instead of single colors. I'll go through it piece by piece.
+The big picture
+---------------
+
+    AppGradients  = a bag of ready-made gradients (brand, button, deal...)
+    Light/Dark    = two instances, same names, slightly different values
+    LocalAppGradients = the "drawer" (CompositionLocal)
+    AppTheme.gradients.button = how a screen reads one
+
+Screens never build a gradient. They only write `AppTheme.gradients.button`.
+What is a `Brush`?
+------------------
+
+A `Brush` is "how to paint an area". A `Color` paints one flat color. A `Brush` can paint a gradient, which is a smooth blend from one color to another.
+`diagonal(start, end)`
+----------------------
+
+    Brush.linearGradient(colors = listOf(start, end), start = Offset.Zero, end = Offset.Infinite)
+
+It blends from `start` to `end` along a diagonal, from the top-left corner to the bottom-right corner (135° in Figma).
+    ┌──────────┐
+    │start     │      start color  ──────►  end color
+    │    ╲     │      (diagonal)
+    │      ╲ end│
+    └──────────┘
+
+It's used for `brand`, `deal`, `gold` and `navy`.
+`fadeTo(color)`
+---------------
+
+    Brush.verticalGradient(listOf(color.copy(alpha = 0f), color))
+
+It goes from fully transparent at the top to solid `color` at the bottom.
+    top:    invisible
+              ↓
+    bottom: solid color
+
+It's used for `bottomFade`. For example, a list scrolls under a bottom bar, and `fadeTo(background)` softly hides the content so it doesn't end in a hard line.
+What is an aurora blob?
+-----------------------
+
+`AppAurora` is the soft, glowing, blurry colored circles behind the header of the auth and home screens, like northern lights.
+    ┌────────────────────┐
+    │  🔵 blue blob      │
+    │        🔷 sky blob │   ← blurry colored circles
+    │  🟡 sun blob       │
+    │                    │
+    │   Welcome back     │
+    └────────────────────┘
+
+* `blue`, `sky` and `sun` are the three blob colors, with their transparency already applied.
+* `blob(color, center, radius)` makes one blob. It's a **radial gradient**: the color is solid in the center and fades to transparent at the edge, which gives the glow.
+
+In light mode the blobs are bright (azure and amber, about 40–60% opaque). In dark mode they're subtle (blue at 35%, and amber only 8%), so they don't glare on the dark background.
+`cardHighlight`
+---------------
+
+This is a soft white glow in the **top corner of gradient cards**, such as promo banners and the wallet card. It makes the card look glossy.
+    ┌─────────────────(✨)┐   ← white glow at the top-end corner
+    │  50% OFF            │
+    │  Deal card          │
+    └─────────────────────┘
+
+There are two parts:
+
+1. `cardHighlight: Color` in `AppGradients` is just the white at 35% opacity. It's the same in light and dark.
+2. `Modifier.cardHighlight(color, radius)` draws it:
+   * `drawBehind` draws behind the content, on top of the background.
+   * The center is the top-end corner: `x = width` in LTR, `x = 0` in RTL, so it mirrors automatically for Arabic.
+   * `drawCircle` with a radial gradient gives a white center that fades to transparent at 90dp.
+
+The order matters (as the doc comment says):
+    Modifier
+      .clip(shape)                            // 1. cut the card shape
+      .background(AppTheme.gradients.deal)    // 2. paint the gradient
+      .cardHighlight(AppTheme.gradients.cardHighlight)  // 3. glow on top, clipped to the card
+
+If you put the glow before `clip`, it spills outside the rounded corners.
+Why `Shared...` and `Light.../Dark...`?
+---------------------------------------
+
+Some gradients are identical in both modes (`brand`, `button`, `deal`, `gold`, `navy`), so they're defined once as `SharedX` and reused. Only the ones that must change are different: `screenTint`, `bottomFade` and `aurora`. They use the light background `Slate50` or the dark `Night950`.
+
+Is there a part you want me to go deeper on, for example `Offset.Infinite` or how the radial gradient works?
