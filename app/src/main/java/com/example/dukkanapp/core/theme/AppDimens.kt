@@ -23,20 +23,49 @@ object AppDimens {
     val radiusLg = 16.dp
     val radiusCard = 20.dp
     val radiusSheet = 28.dp
+    val radiusScreen = 44.dp // device frame, Figma only
     val radiusFull = 999.dp
 
-    // Control heights: Button L / input, Button M / icon button, Button S / chip
+    // Control heights: Button L / input, Button M / icon button, Button S
     val controlLg = 52.dp
     val controlMd = 44.dp
     val controlSm = 36.dp
 
-    // Icons (Lucide, 24 grid)
+    // Component sizes: Figma size/* (01c · Size tokens)
+    val buttonLg = 52.dp       // primary & outline buttons
+    val buttonCompact = 48.dp  // danger / compact buttons
+    val buttonMd = 44.dp       // secondary buttons
+    val buttonSm = 36.dp       // small buttons
+    val buttonXs = 26.dp       // inline "Apply" on coupons
+    val buttonSlide = 58.dp    // slide to order / accept
+    val input = 52.dp          // text fields
+    val inputSearch = 44.dp    // map & header search pill
+    val iconButton = 44.dp     // back, close, actions
+    val iconButtonSm = 36.dp   // sheet close
+    val chip = 34.dp           // filter & choice chips
+    val badge = 20.dp          // status & deal badges
+    val optionLg = 66.dp       // option row with subtitle
+    val optionMd = 52.dp       // single-line option row
+    val optionSm = 48.dp       // language rows
+    val stepper = 32.dp        // qty stepper
+    val addButton = 32.dp      // + on product card
+    val wishlist = 28.dp       // heart on product card
+    val checkbox = 20.dp       // checkbox
+    val switchHeight = 28.dp   // switch track
+    val switchWidth = 46.dp    // switch track
+    val toast = 58.dp          // toast
+    val screenWidth = 393.dp   // design frame (previews only)
+    val screenHeight = 852.dp  // design frame (previews only)
+
+    // Icons (Lucide, 24 grid): Figma icon/sm, md, lg, xl
     val iconSm = 16.dp
-    val icon = 20.dp
-    val iconLg = 24.dp
+    val iconMd = 18.dp
+    val icon = 20.dp   // Figma icon/lg
+    val iconLg = 24.dp // Figma icon/xl
 
     // Layout
-    val navBar = 64.dp
+    val navBar = 66.dp      // customer bottom nav
+    val teamNavBar = 64.dp  // staff bottom nav
     val screenPadding = 20.dp
 
     // Strokes: not part of the 4 dp grid on purpose
