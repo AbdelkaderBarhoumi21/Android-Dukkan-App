@@ -30,19 +30,70 @@ v4 names spacing **by value**, exactly like Figma: `space/16` → `space16`. Rad
 | | `radiusLg` | radius/lg | 16 |
 | | `radiusCard` | radius/card | 20 |
 | | `radiusSheet` | radius/sheet | 28 |
+| | `radiusScreen` | radius/screen | 44 (device frame, **Figma only**, not used in the app) |
 | | `radiusFull` | radius/full | 999 (pill) |
 | Sizes | `controlLg` | Button L / input | 52 |
 | | `controlMd` | Button M / icon button | 44 |
-| | `controlSm` | Button S / chip | 36 |
-| Icons | `iconSm` | small icons in badges / steppers | 16 |
-| | `icon` | icon | 20 |
-| | `iconLg` | Lucide grid | 24 |
-| Layout | `navBar` | Nav bar | **64** |
+| | `controlSm` | Button S | 36 |
+| Component sizes | `buttonLg` | size/button-lg (primary & outline buttons) | 52 |
+| | `buttonCompact` | size/button-compact (danger / compact buttons) | 48 |
+| | `buttonMd` | size/button-md (secondary buttons) | 44 |
+| | `buttonSm` | size/button-sm (small buttons) | 36 |
+| | `buttonXs` | size/button-xs (inline "Apply" on coupons) | 26 |
+| | `buttonSlide` | size/button-slide (slide to order / accept) | 58 |
+| | `input` | size/input (text fields) | 52 |
+| | `inputSearch` | size/input-search (map & header search pill) | 44 |
+| | `iconButton` | size/icon-button (back, close, actions) | 44 |
+| | `iconButtonSm` | size/icon-button-sm (sheet close) | 36 |
+| | `chip` | size/chip (filter & choice chips) | **34** |
+| | `badge` | size/badge (status & deal badges) | 20 |
+| | `optionLg` | size/option-lg (option row with subtitle) | 66 |
+| | `optionMd` | size/option-md (single-line option row) | 52 |
+| | `optionSm` | size/option-sm (language rows) | 48 |
+| | `stepper` | size/stepper (qty stepper) | 32 |
+| | `addButton` | size/add-button (+ on product card) | 32 |
+| | `wishlist` | size/wishlist (heart on product card) | 28 |
+| | `checkbox` | size/checkbox | 20 |
+| | `switchHeight` | size/switch-height (switch track) | 28 |
+| | `switchWidth` | size/switch-width (switch track) | 46 |
+| | `toast` | size/toast | 58 |
+| | `screenWidth` | size/screen-width (design frame, previews only) | 393 |
+| | `screenHeight` | size/screen-height (design frame, previews only) | 852 |
+| Icons | `iconSm` | icon/sm: small icons in badges / steppers | 16 |
+| | `iconMd` | icon/md (**new**) | 18 |
+| | `icon` | icon/lg: fields, buttons, rows | 20 |
+| | `iconLg` | icon/xl: app bar, bottom nav | 24 |
+| Layout | `navBar` | size/nav-bar (customer bottom nav) | **66** |
+| | `teamNavBar` | size/team-nav-bar (staff bottom nav) | 64 |
 | | `screenPadding` | screen padding | 20 |
 | Strokes | `strokeThin` | outline / chip / social border | 1.2 |
 | | `strokeFocus` | focused / error / success input border | 1.5 |
 | | `focusRing` | focus ring around a field | 3 |
 | A11y | `touchTargetMin` | Material minimum | 48 |
+
+### Figma `01c · Size tokens`
+
+Figma now has a **Size tokens** chapter: every radius, component size, spacing and icon size, stored as local variables (collection "Sizes"). Select a layer in Figma and its W / H / corner-radius field shows a token chip, for example `size/button-lg`.
+In code, every token stays in the one `AppDimens` object. The name is the Figma name in camelCase: `size/button-lg` → `AppDimens.buttonLg`, `size/option-md` → `AppDimens.optionMd`, `radius/screen` → `AppDimens.radiusScreen`.
+
+Two old names don't follow that rule, because renaming them would silently change every caller:
+
+| Figma | Kotlin | dp |
+|---|---|---|
+| icon/lg | `icon` (not `iconLg`) | 20 |
+| icon/xl | `iconLg` (not `iconXl`) | 24 |
+
+**What changed in this Figma update:**
+
+| Token | Before | Now |
+|---|---|---|
+| `navBar` | 64 | **66** (customer app). Team app keeps 64 as `teamNavBar` |
+| chip height | `controlSm` 36 | **`chip` 34** |
+| `iconMd` | — | **18** (new) |
+| `radiusScreen` | — | 44 (Figma device frame only) |
+| component sizes | 3 `control*` sizes | the 26 `size/*` tokens above |
+
+`controlLg` / `controlMd` / `controlSm` stay: they have the same values as `buttonLg` / `buttonMd` / `buttonSm`. Prefer the Figma name in new code (`input` for a field, `iconButton` for an icon button), so each token follows its own Figma variable.
 
 ### One radius scale (Figma: "Radius · one scale")
 
@@ -105,20 +156,49 @@ object AppDimens {
     val radiusLg = 16.dp
     val radiusCard = 20.dp
     val radiusSheet = 28.dp
+    val radiusScreen = 44.dp // device frame, Figma only
     val radiusFull = 999.dp
 
-    // Control heights: Button L / input, Button M / icon button, Button S / chip
+    // Control heights: Button L / input, Button M / icon button, Button S
     val controlLg = 52.dp
     val controlMd = 44.dp
     val controlSm = 36.dp
 
-    // Icons (Lucide, 24 grid)
+    // Component sizes: Figma size/* (01c · Size tokens)
+    val buttonLg = 52.dp       // primary & outline buttons
+    val buttonCompact = 48.dp  // danger / compact buttons
+    val buttonMd = 44.dp       // secondary buttons
+    val buttonSm = 36.dp       // small buttons
+    val buttonXs = 26.dp       // inline "Apply" on coupons
+    val buttonSlide = 58.dp    // slide to order / accept
+    val input = 52.dp          // text fields
+    val inputSearch = 44.dp    // map & header search pill
+    val iconButton = 44.dp     // back, close, actions
+    val iconButtonSm = 36.dp   // sheet close
+    val chip = 34.dp           // filter & choice chips
+    val badge = 20.dp          // status & deal badges
+    val optionLg = 66.dp       // option row with subtitle
+    val optionMd = 52.dp       // single-line option row
+    val optionSm = 48.dp       // language rows
+    val stepper = 32.dp        // qty stepper
+    val addButton = 32.dp      // + on product card
+    val wishlist = 28.dp       // heart on product card
+    val checkbox = 20.dp       // checkbox
+    val switchHeight = 28.dp   // switch track
+    val switchWidth = 46.dp    // switch track
+    val toast = 58.dp          // toast
+    val screenWidth = 393.dp   // design frame (previews only)
+    val screenHeight = 852.dp  // design frame (previews only)
+
+    // Icons (Lucide, 24 grid): Figma icon/sm, md, lg, xl
     val iconSm = 16.dp
-    val icon = 20.dp
-    val iconLg = 24.dp
+    val iconMd = 18.dp
+    val icon = 20.dp   // Figma icon/lg
+    val iconLg = 24.dp // Figma icon/xl
 
     // Layout
-    val navBar = 64.dp
+    val navBar = 66.dp      // customer bottom nav
+    val teamNavBar = 64.dp  // staff bottom nav
     val screenPadding = 20.dp
 
     // Strokes: not part of the 4 dp grid on purpose
@@ -216,6 +296,7 @@ Figma draws outlines at 1.2 px and focus/error borders at 1.5 px. Compose accept
 | `screenHorizontalPadding` (legacy) | 16 | 20 | Figma `screen-pad` |
 | `pagerIndicatorSize` | 8 | 6 | Figma pager dot 22 × 6 |
 | `pagerIndicatorSelectedWidth` | 24 | 22 | same |
+| `navBar` | 64 | 66 | Figma `size/nav-bar` (team app: `teamNavBar` 64) |
 
 The legacy aliases carry the **new** values. Old screens move to the Figma sizes immediately, even before you rename the calls.
 
@@ -228,15 +309,23 @@ The legacy aliases carry the **new** values. Old screens move to the Figma sizes
 | Label → field gap | `space8` |
 | Field → helper gap | `space8` (Figma shows 6–8) |
 | Section gap | `space24` / `space32` |
-| Button / field height | `controlLg` (field shape: `AppPillShape`) |
+| Primary button height | `buttonLg` (52) |
+| Danger / compact button | `buttonCompact` (48) |
+| Secondary button height | `buttonMd` (44) |
+| Small button | `buttonSm` (36) |
+| Coupon "Apply" | `buttonXs` (26) |
+| Field height | `input` (52), shape `AppPillShape` |
+| Search pill (map, header) | `inputSearch` (44) |
+| Icon button size | `iconButton` (44); sheet close `iconButtonSm` (36) |
+| Chip height | `chip` (34) |
+| Badge height | `badge` (20) |
+| Option / language row | `optionLg` / `optionMd` / `optionSm` (66 / 52 / 48) |
 | Card corners | `radiusCard` |
 | Product photo inside a card | `radiusLg` |
 | Bottom sheet top corners | `radiusSheet` |
-| Bottom nav height | `navBar` (64) |
-| Secondary button height | `controlMd` |
-| Small button / chip row height | `controlSm` |
+| Bottom nav height | `navBar` (66); team app `teamNavBar` (64) |
 | Icon in field / button | `icon` (20) |
-| Icon button size | `controlMd` (44) |
+| Icon in app bar / bottom nav | `iconLg` (24) |
 
 ## Check
 

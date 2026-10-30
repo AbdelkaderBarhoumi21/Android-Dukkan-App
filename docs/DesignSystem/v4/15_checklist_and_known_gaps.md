@@ -11,7 +11,7 @@
 | 04 Color scheme | `AppColors.toColorScheme(isDark)` compiles with named arguments; sheets/dialogs use `sheet`; no dynamic color |
 | 05 Gradients / shadows | `AppGradients` (with `bottomFade`), `AppAurora` (3 blobs), `cardHighlight` + `Modifier.cardHighlight()`, `AppShadows` (with `screen`), `Modifier.appShadow` (draws the dark outline) compile; `dropShadow` resolves |
 | 06 Typography | 5 Plus Jakarta Sans + 4 Cairo `.ttf` in `res/font`; `LatinTypography`, `ArabicTypography`, `LatinTextStyles`, `ArabicTextStyles` compile |
-| 07 Dimens / shapes | old `iconSm` renamed to `icon` first; one radius scale (10/14/16/20/28/full); `navBar` 64; `AppShapes` (10/14/16/20/28), `AppPillShape` moved and compile |
+| 07 Dimens / shapes | old `iconSm` renamed to `icon` first; one radius scale (10/14/16/20/28/full); `navBar` 66 (`teamNavBar` 64), Figma `01c` size tokens added (`buttonLg`…`screenHeight`, `chip` 34, `iconMd` 18); `AppShapes` (10/14/16/20/28), `AppPillShape` moved and compile |
 | 08 Theme | new `AppTheme(darkTheme, isArabic)` used in `MainActivity` and every preview; theme mode saved in DataStore; old theme files deleted |
 | 09 Icons / logo | 76 Lucide icons (incl. eye-off, user-plus, star-filled, wifi-off, search-x, mic), `AppIcons` compiles, logo, adaptive launcher icon (`05b`), splash updated, Iconsax removed |
 | 10 Buttons | primary gradient + glow; pressed = solid `brandPressed` with no glow; disabled = field + tertiary; loading = spinner replaces trailing icon |

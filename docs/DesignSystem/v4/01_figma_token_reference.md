@@ -190,9 +190,19 @@ All dark **surfaces** (card, float/sheet, screen) add a 1 dp night-700 border. B
 | `radiusCard`                            | radius/card                                           | 20 (card, product card)                    |
 | `radiusSheet`                           | radius/sheet                                          | 28 (bottom sheet, dialog)                  |
 | `radiusFull` / `AppPillShape`           | radius/full                                           | 999 (button, **input**, option, chip, nav) |
-| `controlLg` / `controlMd` / `controlSm` | Button L·input / Button M·icon button / Button S·chip | 52 / 44 / 36                               |
-| `icon`                                  | icon                                                  | 20                                         |
-| `navBar`                                | Nav bar                                               | 64                                         |
+| `controlLg` / `controlMd` / `controlSm` | Button L·input / Button M·icon button / Button S | 52 / 44 / 36 |
+| `buttonLg` / `buttonCompact` / `buttonMd` / `buttonSm` / `buttonXs` / `buttonSlide` | size/button-* | 52 / 48 / 44 / 36 / 26 / 58 |
+| `input` / `inputSearch` | size/input · input-search | 52 / 44 |
+| `iconButton` / `iconButtonSm` | size/icon-button · icon-button-sm | 44 / 36 |
+| `chip` / `badge` | size/chip · badge | **34** / 20 |
+| `optionLg` / `optionMd` / `optionSm` | size/option-* | 66 / 52 / 48 |
+| `stepper` / `addButton` / `wishlist` / `checkbox` | size/stepper · add-button · wishlist · checkbox | 32 / 32 / 28 / 20 |
+| `switchHeight` × `switchWidth` | size/switch-* | 28 × 46 |
+| `toast` | size/toast | 58 |
+| `screenWidth` × `screenHeight` | size/screen-* (design frame) | 393 × 852 |
+| `radiusScreen` | radius/screen (Figma only) | 44 |
+| `iconSm` / `iconMd` / `icon` / `iconLg` | icon/sm · md · lg · xl | 16 / **18** / 20 / 24 |
+| `navBar` / `teamNavBar` | size/nav-bar · team-nav-bar | **66** (customer) / 64 (staff) |
 | `screenPadding`                         | screen padding                                        | 20                                         |
 
 ## 7. Component specs summary (docs 10–12)
