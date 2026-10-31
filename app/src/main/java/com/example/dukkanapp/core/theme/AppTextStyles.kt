@@ -36,8 +36,8 @@ internal fun appTextStyles(arabic: Boolean): AppTextStyles = AppTextStyles(
     helper = scriptStyle(arabic, FontWeight.SemiBold, 11.5.sp, 14.sp, 16.sp),
 )
 
-internal val latinTextStyles: AppTextStyles = appTextStyles(arabic = false)
-internal val arabicTextStyles: AppTextStyles = appTextStyles(arabic = true)
+internal val LatinTextStyles: AppTextStyles = appTextStyles(arabic = false)
+internal val ArabicTextStyles: AppTextStyles = appTextStyles(arabic = true)
 internal val LocalAppTextStyles = staticCompositionLocalOf<AppTextStyles> {
     error("AppTextStyles not provided: wrap content in AppTheme")
 }

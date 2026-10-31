@@ -101,4 +101,4 @@ internal fun appTypography(arabic: Boolean): Typography {
 
 /** Built once, not on every recomposition. AppTheme picks one (doc 08). */
 internal val LatinTypography: Typography = appTypography(arabic = false)
-internal val arabicTypography: Typography = appTypography(arabic = true)
+internal val ArabicTypography: Typography = appTypography(arabic = true)

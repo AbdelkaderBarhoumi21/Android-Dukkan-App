@@ -61,7 +61,7 @@ internal val DarkAppShadows = AppShadows(
         outline = AppPalette.Night700,
     ),
 )
-internal val LocalAppShadow = staticCompositionLocalOf<AppShadows> {
+internal val LocalAppShadows = staticCompositionLocalOf<AppShadows> {
     error("AppShadows not provided: wrap content in AppTheme")
 }
 
