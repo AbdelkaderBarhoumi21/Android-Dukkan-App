@@ -80,5 +80,9 @@ class DefaultFailureMapper @Inject constructor(
         is AppException.Firestore.Internal,
         is AppException.Firestore.DataLoss,
         is AppException.Unexpected -> AppFailure.Unknown
+        // Local storage
+        is AppException.Storage.Io -> AppFailure.Storage.Unavailable
+        is AppException.Storage.Corrupted -> AppFailure.Unknown   // a bug: gets reported
+
     }
 }

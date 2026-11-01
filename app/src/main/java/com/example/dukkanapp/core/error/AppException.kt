@@ -116,5 +116,13 @@ sealed class AppException(cause: Throwable?) : Exception(cause) {
     /** Anything not in this catalog. Always reported. */
     class Unexpected(cause: Throwable? = null) : AppException(cause)
 
+    // ── Local storage (DataStore / files) ────────────────────────────────
+    sealed class Storage(cause: Throwable?) : AppException(cause) {
+        /** Disk full, I/O error, file locked. */
+        class Io(cause: Throwable? = null) : Storage(cause)
+
+        /** The stored file is unreadable (DataStore CorruptionException). */
+        class Corrupted(cause: Throwable? = null) : Storage(cause)
+    }
 
 }

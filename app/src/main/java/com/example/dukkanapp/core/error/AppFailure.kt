@@ -41,6 +41,11 @@ sealed interface AppFailure {
 
     /** Anything we did not anticipate. Already reported to crash reporting. */
     data object Unknown : AppFailure
+
+    sealed interface Storage : AppFailure {
+        /** Could not read or write data on this device (disk full, I/O error). */
+        data object Unavailable : Storage
+    }
 }
 
 val AppFailure.isRetryable: Boolean
