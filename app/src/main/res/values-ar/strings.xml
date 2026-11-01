@@ -91,4 +91,6 @@
     <string name="error_already_exists">هذا العنصر موجود مسبقاً.</string>
     <string name="error_conflict">تم تعديل هذا في مكان آخر. يرجى التحديث والمحاولة مرة أخرى.</string>
     <string name="error_unknown">حدث خطأ ما. يرجى المحاولة مرة أخرى.</string>
+    <!-- values-ar/strings.xml -->
+    <string name="error_storage_unavailable">تعذّر الحفظ على هذا الجهاز. تحقق من مساحة التخزين وحاول مرة أخرى.</string>
 </resources>

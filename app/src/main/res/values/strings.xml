@@ -91,4 +91,6 @@
     <string name="error_already_exists">This item already exists.</string>
     <string name="error_conflict">This was changed elsewhere. Please refresh and try again.</string>
     <string name="error_unknown">Something went wrong. Please try again.</string>
+    <!-- values/strings.xml -->
+    <string name="error_storage_unavailable">Couldn\'t save on this device. Check your free storage and try again.</string>
 </resources>
