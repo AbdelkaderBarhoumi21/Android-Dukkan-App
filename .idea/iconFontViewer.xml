@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="com.bullfrog.iconfontviewer.IconFontSettings">
+    <option name="fontInfos">
+      <list>
+        <FontInfo>
+          <option name="path" value="$PROJECT_DIR$/app/src/main/res/font/plus_jakarta_sans_medium.ttf" />
+        </FontInfo>
+        <FontInfo>
+          <option name="path" value="$PROJECT_DIR$/app/src/main/res/font/plus_jakarta_sans_extrabold.ttf" />
+        </FontInfo>
+        <FontInfo>
+          <option name="path" value="$PROJECT_DIR$/app/src/main/res/font/plus_jakarta_sans_bold.ttf" />
+        </FontInfo>
+        <FontInfo>
+          <option name="path" value="$PROJECT_DIR$/app/src/main/res/font/cairo_medium.ttf" />
+        </FontInfo>
+        <FontInfo>
+          <option name="path" value="$PROJECT_DIR$/app/src/main/res/font/cairo_regular.ttf" />
+        </FontInfo>
+        <FontInfo>
+          <option name="path" value="$PROJECT_DIR$/app/src/main/res/font/cairo_semibold.ttf" />
+        </FontInfo>
+        <FontInfo>
+          <option name="path" value="$PROJECT_DIR$/app/src/main/res/font/cairo_bold.ttf" />
+        </FontInfo>
+        <FontInfo>
+          <option name="path" value="$PROJECT_DIR$/app/src/main/res/font/plus_jakarta_sans_semibold.ttf" />
+        </FontInfo>
+        <FontInfo>
+          <option name="path" value="$PROJECT_DIR$/app/src/main/res/font/plus_jakarta_sans_regular.ttf" />
+        </FontInfo>
+      </list>
+    </option>
+  </component>
+</project>
