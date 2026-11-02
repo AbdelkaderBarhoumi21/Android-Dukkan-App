@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Theme.DukkanApp" parent="Theme.AppCompat.Light.NoActionBar" />
+
+    <style name="Theme.DukkanApp.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/dukkan_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dukkan_mark</item>
+        <item name="postSplashScreenTheme">@style/Theme.DukkanApp</item>
+    </style>
 </resources>
