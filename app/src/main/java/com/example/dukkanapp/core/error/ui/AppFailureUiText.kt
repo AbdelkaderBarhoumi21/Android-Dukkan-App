@@ -28,4 +28,5 @@ private val AppFailure.messageRes: Int
         AppFailure.Data.AlreadyExists -> R.string.error_already_exists
         AppFailure.Data.Conflict -> R.string.error_conflict
         is AppFailure.Feature, AppFailure.Unknown -> R.string.error_unknown
+        AppFailure.Storage.Unavailable -> R.string.error_storage_unavailable
     }
