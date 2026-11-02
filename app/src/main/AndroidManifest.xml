@@ -17,7 +17,7 @@
             android:configChanges="locale|layoutDirection|uiMode|screenSize|screenLayout|keyboardHidden"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.DukkanApp"
+            android:theme="@style/Theme.DukkanApp.Splash"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
