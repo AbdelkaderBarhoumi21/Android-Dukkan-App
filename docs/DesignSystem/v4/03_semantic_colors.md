@@ -1,6 +1,6 @@
 # 03 — AppColors (semantic colors, light + dark)
 
-**File (new):** `core/designsystem/theme/AppColors.kt`
+**File (new):** `core/theme/AppColors.kt`
 **Replaces:** `core/utils/constants/AppExtendedColors.kt` (delete it at the end of doc 08).
 
 ## Why
@@ -73,7 +73,7 @@ These fields exist in our code because components need them, but Figma has no se
 ## Code
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.theme
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf

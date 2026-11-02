@@ -79,7 +79,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 
 @Composable
@@ -126,7 +126,7 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 
 /**
  * Builds "<template with %1$s = Terms, %2$s = Privacy Policy>" where both
@@ -202,10 +202,10 @@ import com.example.dukkanapp.R
 import com.example.dukkanapp.core.designsystem.components.button.AppButton
 import com.example.dukkanapp.core.designsystem.components.button.AppSocialButton
 import com.example.dukkanapp.core.designsystem.components.layout.AppScaffold
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
 import com.example.dukkanapp.core.designsystem.components.layout.AppScreenBackground
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthFooterLink
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthHeader
 import com.example.dukkanapp.features.auth.presentation.components.common.AppOrDivider
@@ -396,10 +396,10 @@ import com.example.dukkanapp.core.designsystem.components.selection.AppCheckbox
 import com.example.dukkanapp.core.designsystem.components.textfield.AppFieldStatus
 import com.example.dukkanapp.core.designsystem.components.textfield.AppPasswordField
 import com.example.dukkanapp.core.designsystem.components.textfield.AppTextField
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
 import com.example.dukkanapp.core.designsystem.components.layout.AppScreenBackground
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthFooterLink
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthHeader
 import com.example.dukkanapp.features.auth.presentation.components.common.AppOrDivider
@@ -769,9 +769,9 @@ import com.example.dukkanapp.core.designsystem.components.textfield.AppFieldStat
 import com.example.dukkanapp.core.designsystem.components.textfield.AppPasswordField
 import com.example.dukkanapp.core.designsystem.components.textfield.AppPasswordStrength
 import com.example.dukkanapp.core.designsystem.components.textfield.AppTextField
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthFooterLink
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthHeader
 import com.example.dukkanapp.features.auth.presentation.components.common.AuthFormColumn
@@ -1099,9 +1099,9 @@ import com.example.dukkanapp.core.designsystem.components.feedback.AppMessageKin
 import com.example.dukkanapp.core.designsystem.components.layout.AppScaffold
 import com.example.dukkanapp.core.designsystem.components.layout.AppScreenBackground
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
-import com.example.dukkanapp.core.designsystem.theme.appShadow
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.theme.appShadow
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthHeader
 import com.example.dukkanapp.features.auth.presentation.components.common.AuthFormColumn
 import com.example.dukkanapp.features.auth.presentation.components.common.AuthHeaderLogo

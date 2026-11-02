@@ -38,10 +38,10 @@ Tokens only help if features use them. These greps must return **nothing** (run 
 
 ```bash
 # Raw colors outside the theme package
-grep -rn "Color(0x" app/src/main/java | grep -v "core/designsystem/theme/"
+grep -rn "Color(0x" app/src/main/java | grep -v "core/theme/"
 
 # Palette read outside the theme package
-grep -rn "AppPalette\." app/src/main/java | grep -v "core/designsystem/theme/"
+grep -rn "AppPalette\." app/src/main/java | grep -v "core/theme/"
 
 # Hard-coded dp / sp in features and components (previews excluded by hand)
 grep -rnE "[0-9]+(\.[0-9]+)?\.(dp|sp)\b" app/src/main/java/com/example/dukkanapp/features app/src/main/java/com/example/dukkanapp/core/common

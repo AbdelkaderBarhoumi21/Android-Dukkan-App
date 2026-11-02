@@ -1,6 +1,6 @@
 # 02 — AppPalette (primitive colors)
 
-**File (new):** `app/src/main/java/com/example/dukkanapp/core/designsystem/theme/AppPalette.kt`
+**File (new):** `app/src/main/java/com/example/dukkanapp/core/theme/AppPalette.kt`
 **Replaces:** the `private val Blue50 … Black` lines at the top of `core/utils/constants/AppColors.kt` (the rest of that file moves to doc 04).
 
 ## Why
@@ -44,7 +44,7 @@ Every value comes from `01 · Foundations → Primitive palette`. Since the late
 ## Code
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.theme
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -131,7 +131,7 @@ internal object AppPalette {
 
 ## Notes
 
-- `internal` keeps the palette inside the `app` module. To keep it out of feature packages too, the rule in doc 00 plus the grep in doc 15 catch any `AppPalette.` outside `core/designsystem/theme`.
+- `internal` keeps the palette inside the `app` module. To keep it out of feature packages too, the rule in doc 00 plus the grep in doc 15 catch any `AppPalette.` outside `core/theme`.
 - `0xFF…`: the first two hex digits are alpha (`FF` = opaque). Transparency is added later with `.copy(alpha = …)`, never by inventing a new hex.
 - A few steps (`Blue200`, `Blue300`, `Blue800`, `Red100`, `Slate800`) are in Figma but not used by any token yet. Keep them: they are part of the scale.
 

@@ -52,7 +52,7 @@ Both point to the same color. Prefer `AppTheme.colors` in our own components bec
 |---|-----|-------------------|
 | 00 | this file | nothing |
 | 01 | `01_figma_token_reference.md` | nothing (reference tables only) |
-| 02 | `02_palette.md` | `core/designsystem/theme/AppPalette.kt` |
+| 02 | `02_palette.md` | `core/theme/AppPalette.kt` |
 | 03 | `03_semantic_colors.md` | `AppColors.kt` (replaces `AppExtendedColors.kt`) |
 | 04 | `04_material_color_scheme.md` | `AppColorScheme.kt` (replaces `AppColors.kt` in `core/utils/constants`) |
 | 05 | `05_gradients_and_shadows.md` | `AppGradients.kt`, `AppShadows.kt` |
@@ -79,7 +79,7 @@ Docs 10–14 use exactly the names defined in docs 02–09.
 app/src/main/java/com/example/dukkanapp/
 └── core/
     ├── designsystem/
-    │   ├── theme/                       ← package com.example.dukkanapp.core.designsystem.theme
+    │   ├── theme/                       ← package com.example.dukkanapp.core.theme
     │   │   ├── AppPalette.kt            02  internal primitives
     │   │   ├── AppColors.kt             03  semantic colors + LocalAppColors
     │   │   ├── AppColorScheme.kt        04  Material ColorScheme built from AppColors
@@ -116,13 +116,13 @@ Files that **disappear** once you are done:
 
 | Old file | Replaced by |
 |---|---|
-| `core/config/theme/AppTheme.kt` | `core/designsystem/theme/AppTheme.kt` |
-| `core/config/theme/AppTypography.kt` | `core/designsystem/theme/AppTypography.kt` |
-| `core/config/theme/ThemePreview.kt` | `core/designsystem/theme/ThemeCatalogPreview.kt` |
+| `core/config/theme/AppTheme.kt` | `core/theme/AppTheme.kt` |
+| `core/config/theme/AppTypography.kt` | `core/theme/AppTypography.kt` |
+| `core/config/theme/ThemePreview.kt` | `core/theme/ThemeCatalogPreview.kt` |
 | `core/utils/constants/AppColors.kt` (palette + schemes) | `AppPalette.kt` + `AppColorScheme.kt` |
 | `core/utils/constants/AppExtendedColors.kt` | `AppColors.kt` |
-| `core/utils/constants/AppDimens.kt` | `core/designsystem/theme/AppDimens.kt` |
-| `core/utils/constants/AppShapes.kt` | `core/designsystem/theme/AppShapes.kt` |
+| `core/utils/constants/AppDimens.kt` | `core/theme/AppDimens.kt` |
+| `core/utils/constants/AppShapes.kt` | `core/theme/AppShapes.kt` |
 | `res/font/konnect_*.otf` (18 files) | `res/font/plus_jakarta_sans_*.ttf` (5) + `cairo_*.ttf` (4) |
 
 Tip: move files with Android Studio **Refactor → Move** (F6). It rewrites imports in every screen for you. Then rename/rewrite the contents following each doc.
@@ -131,7 +131,7 @@ Tip: move files with Android Studio **Refactor → Move** (F6). It rewrites impo
 
 ## 4. The rules
 
-1. **Only `AppPalette` holds hex.** `AppPalette` is `internal object`, and every other file reads it only inside `core/designsystem/theme`.
+1. **Only `AppPalette` holds hex.** `AppPalette` is `internal object`, and every other file reads it only inside `core/theme`.
 2. **Features never write `Color(0x…)`, `12.dp` or `14.sp`.** They use `AppTheme.colors`, `AppDimens`, `MaterialTheme.typography` / `AppTheme.textStyles`.
 3. **Widgets never branch on `isSystemInDarkTheme()`.** Light and dark are two instances of the same `AppColors` class. The theme picks one.
 4. **One name per meaning.** If Figma calls it `brand/soft`, Kotlin calls it `brandSoft`. No synonyms.

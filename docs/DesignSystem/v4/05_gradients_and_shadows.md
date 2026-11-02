@@ -2,8 +2,8 @@
 
 **Files (new):**
 
-- `core/designsystem/theme/AppGradients.kt`
-- `core/designsystem/theme/AppShadows.kt`
+- `core/theme/AppGradients.kt`
+- `core/theme/AppShadows.kt`
 
 ## Why
 
@@ -74,7 +74,7 @@ Figma's rule: **all dark surfaces (card, float/sheet, screen) add a 1 px night-7
 ## Code — `AppGradients.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.theme
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -205,7 +205,7 @@ fun Modifier.cardHighlight(color: Color, radius: Dp = 90.dp): Modifier = drawBeh
 Dark mode cards get a **1 dp night-700 border** next to the black shadow (Figma `01b`). We put that border **inside the shadow token** (`outline`), so every component that already calls `appShadow(AppTheme.shadows.card, shape)` gets the border in dark mode for free. In light mode `outline` is `Color.Unspecified` and nothing is drawn.
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.theme
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Immutable

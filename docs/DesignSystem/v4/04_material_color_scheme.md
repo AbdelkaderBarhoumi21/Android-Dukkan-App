@@ -1,6 +1,6 @@
 # 04 — Material ColorScheme built from AppColors
 
-**File (new):** `core/designsystem/theme/AppColorScheme.kt`
+**File (new):** `core/theme/AppColorScheme.kt`
 **Replaces:** `AppLightColorScheme` / `AppDarkColorScheme` in `core/utils/constants/AppColors.kt`.
 Keep the old file until doc 08 (the old `AppTheme` still imports it). Doc 08 deletes it.
 
@@ -52,7 +52,7 @@ We remove the parameter completely (doc 08), so nobody turns it on by accident.
 ## Code
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.theme
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme

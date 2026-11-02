@@ -79,8 +79,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.theme.AppAurora
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppAurora
+import com.example.dukkanapp.core.theme.AppTheme
 
 /** Band height and warm-blob position per aurora size (Figma 393 dp frames). */
 enum class AppScreenBackground(val bandHeight: Dp, val sunCenterY: Dp) {
@@ -189,9 +189,9 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.designsystem.components.button.AppIconButton
 import com.example.dukkanapp.core.designsystem.components.button.AppIconButtonVariant
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
 fun AppScaffold(
@@ -327,8 +327,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.example.dukkanapp.core.designsystem.components.logo.AppLogoMark
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppTheme
 
 sealed interface AuthHeaderLogo {
     /** The Dukkan awning mark, no background. */
@@ -403,7 +403,7 @@ import androidx.compose.ui.Modifier
 import com.example.dukkanapp.core.designsystem.components.button.AppButton
 import com.example.dukkanapp.core.designsystem.components.button.AppButtonSize
 import com.example.dukkanapp.core.designsystem.components.button.AppButtonVariant
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
 fun AppAuthFooterLink(
@@ -452,8 +452,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
 fun AppOrDivider(text: String, modifier: Modifier = Modifier, showLines: Boolean = false) {

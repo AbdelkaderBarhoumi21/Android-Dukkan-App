@@ -1,8 +1,8 @@
 # 07 — AppDimens and AppShapes
 
 **Files:**
-- `core/designsystem/theme/AppDimens.kt` (moved from `core/utils/constants/AppDimens.kt` and rewritten)
-- `core/designsystem/theme/AppShapes.kt` (moved from `core/utils/constants/AppShapes.kt` and rewritten)
+- `core/theme/AppDimens.kt` (moved from `core/utils/constants/AppDimens.kt` and rewritten)
+- `core/theme/AppShapes.kt` (moved from `core/utils/constants/AppShapes.kt` and rewritten)
 
 ## Why
 
@@ -131,7 +131,7 @@ In Android Studio, open the **old** `core/utils/constants/AppDimens.kt`, put the
 ## Code — `AppDimens.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.theme
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.ui.unit.dp
 
@@ -252,7 +252,7 @@ object AppDimens {
 ## Code — `AppShapes.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.theme
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
@@ -330,7 +330,7 @@ The legacy aliases carry the **new** values. Old screens move to the Figma sizes
 ## Check
 
 - [ ] I renamed old `iconSm` → `icon` **before** replacing the file.
-- [ ] I moved both files to `core/designsystem/theme` with Refactor → Move, and imports updated.
+- [ ] I moved both files to `core/theme` with Refactor → Move, and imports updated.
 - [ ] App compiles. Deprecation warnings are expected. Fix them screen by screen with Alt+Enter.
 - [ ] Old `core/utils/constants/AppShapes.kt` is gone (moved, not duplicated).
 - [ ] No `radiusField`, `radiusXl` or `radius2Xl` in new code (only the deprecated aliases).

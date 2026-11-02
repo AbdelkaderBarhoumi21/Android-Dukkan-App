@@ -66,7 +66,7 @@ package com.example.dukkanapp.core.designsystem.components.textfield
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 
 /** Validation look of a field. The ViewModel decides it; the field only draws it. */
 enum class AppFieldStatus { Default, Error, Success }
@@ -187,9 +187,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppPillShape
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppPillShape
+import com.example.dukkanapp.core.theme.AppTheme
 
 /** Figma: "fully rounded like buttons" (radius/full). */
 private val FieldShape = AppPillShape
@@ -357,9 +357,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.foundation.layout.size
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
 fun AppPasswordField(
@@ -432,9 +432,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppPillShape
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppPillShape
+import com.example.dukkanapp.core.theme.AppTheme
 
 enum class PasswordStrength(val segments: Int, @StringRes val labelRes: Int) {
     Weak(1, R.string.password_strength_weak),
@@ -527,10 +527,10 @@ import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.designsystem.components.button.AppIconButton
 import com.example.dukkanapp.core.designsystem.components.button.AppIconButtonVariant
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppPillShape
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
-import com.example.dukkanapp.core.designsystem.theme.appShadow
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppPillShape
+import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.theme.appShadow
 
 enum class AppSearchBarVariant { Elevated, Field }
 
@@ -626,8 +626,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
 fun AppOtpField(

@@ -3,8 +3,8 @@
 **Files:**
 - `res/font/plus_jakarta_sans_regular.ttf`, `_medium`, `_semibold`, `_bold`, `_extrabold` (new)
 - `res/font/cairo_regular.ttf`, `cairo_medium.ttf`, `cairo_semibold.ttf`, `cairo_bold.ttf` (new)
-- `core/designsystem/theme/AppTypography.kt` (rewrite of `core/config/theme/AppTypography.kt`)
-- `core/designsystem/theme/AppTextStyles.kt` (new)
+- `core/theme/AppTypography.kt` (rewrite of `core/config/theme/AppTypography.kt`)
+- `core/theme/AppTextStyles.kt` (new)
 
 **Removes:** the 18 `res/font/konnect_*.otf` files (after doc 08 builds).
 
@@ -122,7 +122,7 @@ Display sizes use ≈ 1.4× instead of 1.5×: at 28 sp and above, 1.5× leaves v
 ## Code — `AppTypography.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.theme
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -223,7 +223,7 @@ internal val ArabicTypography: Typography = appTypography(arabic = true)
 ## Code — `AppTextStyles.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.theme
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf

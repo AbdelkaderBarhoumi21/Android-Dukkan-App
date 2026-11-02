@@ -9,7 +9,7 @@
 
 **Replaces:** `core/common/components/buttons/AppPrimaryButton.kt`, `core/common/components/buttons/AppTextButton.kt`, `features/auth/presentation/components/authoptions/AuthButton.kt`. Delete them at the end of [14_auth_screens_refactor.md](14_auth_screens_refactor.md), once no screen uses them.
 
-**Needs first:** docs 00–09. You use `AppTheme.colors`, `AppTheme.gradients`, `AppTheme.shadows`, `Modifier.appShadow`, `AppDimens`, `AppPillShape` and `AppIcons` from `core.designsystem.theme`.
+**Needs first:** docs 00–09. You use `AppTheme.colors`, `AppTheme.gradients`, `AppTheme.shadows`, `Modifier.appShadow`, `AppDimens`, `AppPillShape` and `AppIcons` from `core.theme`.
 
 ---
 
@@ -103,9 +103,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppShadow
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppShadow
+import com.example.dukkanapp.core.theme.AppTheme
 
 enum class AppButtonVariant { Primary, Deal, Dark, Tonal, Outline, Ghost, Danger }
 
@@ -251,11 +251,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppPillShape
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
-import com.example.dukkanapp.core.designsystem.theme.appShadow
+import com.example.dukkanapp.core.theme.AppPillShape
+import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.theme.appShadow
 
 @Composable
 fun AppButton(
@@ -408,7 +408,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 
 /**
  * "Continue with Google / Facebook". Same pill as [AppButton] Outline,
@@ -476,10 +476,10 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppShadow
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
-import com.example.dukkanapp.core.designsystem.theme.appShadow
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppShadow
+import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.theme.appShadow
 
 enum class AppIconButtonVariant { White, Glass, Soft, Field, Brand, Dark }
 

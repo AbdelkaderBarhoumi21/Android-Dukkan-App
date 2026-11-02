@@ -319,8 +319,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.em
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppTheme
 
 /** The Dukkan mark alone. Use it at 48 dp and below (Figma rule). */
 @Composable

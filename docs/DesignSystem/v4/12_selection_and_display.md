@@ -66,9 +66,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 
 private val CheckboxShape = RoundedCornerShape(percent = 30)
 
@@ -155,8 +155,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppTheme
 
 /** Drawing only. Put `Modifier.selectable(selected, role = Role.RadioButton)` on the parent row. */
 @Composable
@@ -206,10 +206,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppPillShape
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
-import com.example.dukkanapp.core.designsystem.theme.appShadow
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppPillShape
+import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.theme.appShadow
 
 @Composable
 fun AppSwitch(
@@ -279,9 +279,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppPillShape
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppPillShape
+import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
 fun AppChip(
@@ -349,9 +349,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppPillShape
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppPillShape
+import com.example.dukkanapp.core.theme.AppTheme
 
 enum class AppBadgeVariant { Discount, Hot, New, Eta, Bestseller, LowStock, FreeDelivery, Rating }
 
@@ -407,8 +407,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.em
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppTheme
 import java.util.Locale
 
 enum class AppPriceSize { Large, Small }
@@ -487,10 +487,10 @@ import androidx.compose.ui.unit.sp
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.designsystem.components.button.AppIconButton
 import com.example.dukkanapp.core.designsystem.components.button.AppIconButtonVariant
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppPillShape
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppPillShape
+import com.example.dukkanapp.core.theme.AppTheme
 
 enum class AppStepperStyle { Compact, Large }
 
@@ -590,9 +590,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
 fun AppAvatar(
@@ -663,9 +663,9 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppPillShape
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppPillShape
+import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
 fun AppPagerIndicator(pageCount: Int, currentPage: Int, modifier: Modifier = Modifier) {
@@ -731,10 +731,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppPillShape
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppPillShape
+import com.example.dukkanapp.core.theme.AppTheme
 
 data class AppStep(val label: String, val icon: Int)
 
@@ -813,10 +813,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
-import com.example.dukkanapp.core.designsystem.theme.appShadow
+import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.theme.appShadow
 
 enum class AppToastVariant { Success, Error, Warning, Info }
 
@@ -930,9 +930,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 
 enum class AppMessageKind { Error, Success, Info }
 
@@ -1000,9 +1000,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
 fun AppListRow(
@@ -1089,8 +1089,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.designsystem.components.button.AppButton
 import com.example.dukkanapp.core.designsystem.components.button.AppButtonVariant
-import com.example.dukkanapp.core.designsystem.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppTheme
 
 /** The action under an empty state. Null = no button. */
 data class AppEmptyStateAction(
@@ -1195,7 +1195,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 
 private const val SHIMMER_DURATION_MS = 1_200
 

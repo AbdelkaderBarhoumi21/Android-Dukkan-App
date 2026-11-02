@@ -4,8 +4,9 @@
 
 | File | Action |
 |---|---|
-| `core/designsystem/theme/AppTheme.kt` | new (replaces `core/config/theme/AppTheme.kt`) |
-| `core/designsystem/theme/ThemeCatalogPreview.kt` | new (replaces `core/config/theme/ThemePreview.kt`) |
+| `core/theme/AppTheme.kt` | new (replaces `core/config/theme/AppTheme.kt`) |
+| `core/theme/ThemeCatalogPreview.kt` | new (replaces `core/config/theme/ThemePreview.kt`) |
+| `core/theme/AppPreviews.kt` | new (shared multi-preview annotation) |
 | `features/settings/domain/model/ThemeMode.kt` | new |
 | `features/settings/domain/repository/ThemeRepository.kt` | new |
 | `features/settings/domain/usecase/ObserveThemeModeUseCase.kt` | new |
@@ -38,7 +39,7 @@ Figma screen **11.3 App settings** has an **Appearance: Light / Dark / System** 
 ### Code — `AppTheme.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.theme
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -311,7 +312,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.dukkanapp.core.designsystem.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.core.navigation.AppNavHost
 import com.example.dukkanapp.core.navigation.startup.AppStartViewModel
 import com.example.dukkanapp.features.settings.domain.model.ThemeMode
@@ -376,7 +377,7 @@ The settings screen (Figma 11.3) is a normal MVI feature. Its ViewModel calls `S
 ### Code — `ThemeCatalogPreview.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.theme
+package com.example.dukkanapp.core.theme
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -590,9 +591,55 @@ private fun ThemeCatalogArabicPreview() {
 
 `widthDp = 393` is the Figma frame width (393 × 852), so previews line up with the design.
 
+### Where previews live
+
+No new top-level package for previews. Keep the `core/` and `features/` structure and put each preview **in the same file as the composable it shows**, as `private` functions at the bottom of the file (see `OnboardingScreenContent.kt` and `LanguageSelectionScreenContent.kt`).
+
+| What you preview | Where |
+|---|---|
+| A screen (`XxxScreenContent`) | Same file, at the bottom, `private fun XxxPreview()` |
+| A design-system component (button, field, card) | Same file as the component, under `core/common/components/...` |
+| The token catalog (colors, type, shadows) | `core/theme/ThemeCatalogPreview.kt` |
+| Large fake data shared by previews | `features/<feature>/presentation/preview/XxxPreviewData.kt` |
+
+Why not a separate `previews/` package:
+
+- A preview can only call `private` helpers and sub-composables from the same file.
+- When you rename or change a composable, its preview is right there to update. A separate package goes stale.
+- Previews don't affect the release app. Only the Compose tooling reads them, and R8 strips them from release builds.
+
+### Code — `AppPreviews.kt`
+
+Most previews repeat the same Light, Dark and Arabic setup. Declare it once:
+
+```kotlin
+package com.example.dukkanapp.core.theme
+
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+
+/** Light, Dark and Arabic (RTL) at the Figma frame width (393dp). */
+@Preview(name = "Light", showBackground = true, widthDp = 393)
+@Preview(name = "Dark", showBackground = true, widthDp = 393, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Arabic", showBackground = true, widthDp = 393, locale = "ar")
+annotation class AppPreviews
+```
+
+Use it on every screen and component preview:
+
+```kotlin
+@AppPreviews
+@Composable
+private fun OnboardingScreenPreview() {
+    AppTheme { OnboardingScreenContent(state = /* ... */) }
+}
+```
+
+`AppTheme`'s default `darkTheme = isSystemInDarkTheme()` follows the preview's `uiMode`, and `isArabic` follows `locale`, so the previews pass neither explicitly.
+
 ## Part D — Clean up
 
-1. Search the project for `core.config.theme.AppTheme` and replace it with `core.designsystem.theme.AppTheme` (Ctrl+Shift+R). Previews in every screen import it.
+1. Search the project for `core.config.theme.AppTheme` and replace it with `core.theme.AppTheme` (Ctrl+Shift+R). Previews in every screen import it.
 2. Search for `AppTheme.extendedColors` and replace each use (`success` → `AppTheme.colors.success`, `successContainer` → `successSoft`, `favorite` → `error`…). See the table in doc 03.
 3. Delete the old files listed at the top of this doc.
 4. Delete the 18 `konnect_*.otf` files.
@@ -608,4 +655,5 @@ private fun ThemeCatalogArabicPreview() {
 - [ ] Status bar icons are dark on light theme and light on dark theme.
 - [ ] `ThemeCatalog` previews render in light, dark and Arabic. Dark matches Figma `01b · Dark mode` (background `#0B1220`, brand `#6090FA`).
 - [ ] Switching the app to Arabic shows Cairo everywhere, with taller lines.
+- [ ] A screen preview annotated with `@AppPreviews` shows Light, Dark and Arabic variants side by side.
 - [ ] `core/config/theme/` is empty and deleted.
