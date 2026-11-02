@@ -93,5 +93,6 @@
     <string name="error_unknown">Une erreur s\'est produite. Veuillez réessayer.</string>
     <!-- values-fr/strings.xml -->
     <string name="error_storage_unavailable">Impossible d\'enregistrer sur cet appareil. Vérifiez l\'espace de stockage et réessayez.</string>
+    <string name="logo_wordmark">dukkan</string>
 
 </resources>

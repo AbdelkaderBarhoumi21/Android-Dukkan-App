@@ -93,4 +93,5 @@
     <string name="error_unknown">حدث خطأ ما. يرجى المحاولة مرة أخرى.</string>
     <!-- values-ar/strings.xml -->
     <string name="error_storage_unavailable">تعذّر الحفظ على هذا الجهاز. تحقق من مساحة التخزين وحاول مرة أخرى.</string>
+    <string name="logo_wordmark">دكّان</string>
 </resources>
