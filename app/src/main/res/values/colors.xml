@@ -7,4 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Mirrors AppPalette for XML-only places (splash, launcher). Keep in sync. -->
+    <color name="dukkan_background">#FFF7F9FB</color>
+    <color name="dukkan_brand">#FF2563EB</color>
+    <color name="dukkan_background_dark">#FF0B1220</color> <!-- night-950 -->
 </resources>
