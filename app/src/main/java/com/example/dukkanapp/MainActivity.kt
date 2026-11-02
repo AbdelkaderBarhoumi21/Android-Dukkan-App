@@ -13,7 +13,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.dukkanapp.core.config.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.core.navigation.AppNavHost
 import com.example.dukkanapp.core.navigation.startup.AppStartViewModel
 import com.example.dukkanapp.features.settings.domain.model.ThemeMode
