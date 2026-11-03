@@ -20,7 +20,7 @@ Today every button is styled at the place it is used:
 - `AppPrimaryButton` uses a flat `colorScheme.primary`.
 - `AuthButton` takes 5 color parameters, and `AuthOptionsSection` passes `Color.Transparent` and `outline` by hand.
 
-Figma has one pill button with **7 variants** and **3 sizes**. So we build one composable and pass it a *variant*. The variant decides the colors. The screen never chooses a color.
+Figma has one pill button with **7 variants** and **5 sizes** (plus a separate slide-to-confirm button, see below). So we build one composable and pass it a *variant*. The variant decides the colors. The screen never chooses a color.
 
 - **Open/closed:** a new look (for example "Gold") is one new enum value and one line in `appButtonStyle`. No screen changes.
 - **Single responsibility:** `appButtonStyle()` only maps a variant to colors. `AppButtonContainer` only draws a pill and handles clicks. `AppButton` only lays out the label, icons and spinner.
@@ -51,11 +51,19 @@ All variants use the pill shape (`AppPillShape`), a label in `labelLarge` (Bold)
 | `Ghost` | transparent | none | `brand` | none | Text link: Forgot password?, See all |
 | `Danger` | `errorSoft` | `errorBorder` 1.2 dp | `error` | none | Cancel order, Delete address |
 
-| Size | Height | Horizontal padding | Label size |
-|---|---|---|---|
-| `Large` | `controlLg` 52 | `space24` | 15 sp (`labelLarge`) |
-| `Medium` | `controlMd` 44 | `space20` | 14 sp |
-| `Small` | `controlSm` 36 | `space16` | 12.5 sp |
+| Size | Figma token | Height | Horizontal padding | Label size | Used for |
+|---|---|---|---|---|---|
+| `Large` | `size/button-lg` → `buttonLg` | 52 | `space24` | 15 sp (`labelLarge`) | primary & outline buttons |
+| `Compact` | `size/button-compact` → `buttonCompact` | 48 | `space24` | 14.5 sp | danger / compact buttons |
+| `Medium` | `size/button-md` → `buttonMd` | 44 | `space20` | 14 sp | secondary buttons |
+| `Small` | `size/button-sm` → `buttonSm` | 36 | `space16` | 12.5 sp | small buttons |
+| `ExtraSmall` | `size/button-xs` → `buttonXs` | 26 | `space12` | 12 sp | inline "Apply" on coupons |
+
+`Compact` and `ExtraSmall` label sizes and `ExtraSmall` padding are not listed in the Figma size tokens (it only gives the heights). They are our choice, between the neighbouring sizes. Check them against the Figma frames and adjust.
+
+**`size/button-slide` (58 dp, "slide to order / accept")** is **not** an `AppButtonSize`. It is a swipe-to-confirm control with a draggable thumb, so it gets its own composable (`AppSlideButton`, using `AppDimens.buttonSlide` and `gradients.button`) when the checkout screen needs it. It isn't built yet.
+
+Use the Figma name in new code (`buttonLg`), not the older `controlLg`. They have the same value.
 
 **States (Figma `03b · Atom states`).** "Default · Pressed · Disabled · Loading for the 3 main variants":
 
@@ -73,7 +81,7 @@ Rules that apply to every variant:
 
 **Social button (`Social/Google`, `Social/Facebook`):** `card` fill, `border` 1.2 dp, height 52, label 14.5 sp Bold `textPrimary`, untinted brand logo at 20 dp.
 
-**Icon button (`Icon button/*`):** a 44 dp circle (`controlMd`) with a 20 dp icon.
+**Icon button (`Icon button/*`):** a 44 dp circle (`iconButton`, Figma `size/icon-button`) with a 20 dp icon.
 
 | Variant | Fill | Icon | Shadow |
 |---|---|---|---|
@@ -110,9 +118,11 @@ import com.example.dukkanapp.core.theme.AppTheme
 enum class AppButtonVariant { Primary, Deal, Dark, Tonal, Outline, Ghost, Danger }
 
 enum class AppButtonSize(val height: Dp, val horizontalPadding: Dp) {
-    Large(AppDimens.controlLg, AppDimens.space24),
-    Medium(AppDimens.controlMd, AppDimens.space20),
-    Small(AppDimens.controlSm, AppDimens.space16),
+    Large(AppDimens.buttonLg, AppDimens.space24),
+    Compact(AppDimens.buttonCompact, AppDimens.space24),
+    Medium(AppDimens.buttonMd, AppDimens.space20),
+    Small(AppDimens.buttonSm, AppDimens.space16),
+    ExtraSmall(AppDimens.buttonXs, AppDimens.space12),
 }
 
 /** Everything a pill needs to draw itself. Built by [appButtonStyle], never by screens. */
@@ -200,14 +210,16 @@ internal fun appButtonStyle(
     }
 }
 
-/** Label style per size. Large uses the token as is; M and S shrink it like Figma. */
+/** Label style per size. Large uses the token as is; the smaller sizes shrink it like Figma. */
 @Composable
 internal fun appButtonTextStyle(size: AppButtonSize): TextStyle {
     val base = MaterialTheme.typography.labelLarge
     return when (size) {
         AppButtonSize.Large -> base
+        AppButtonSize.Compact -> base.copy(fontSize = 14.5.sp)
         AppButtonSize.Medium -> base.copy(fontSize = 14.sp)
         AppButtonSize.Small -> base.copy(fontSize = 12.5.sp, lineHeight = 16.sp)
+        AppButtonSize.ExtraSmall -> base.copy(fontSize = 12.sp, lineHeight = 16.sp)
     }
 }
 ```
@@ -372,8 +384,10 @@ private fun AppButtonPreview() {
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
+            AppButton(text = "Compact", onClick = {}, size = AppButtonSize.Compact)
             AppButton(text = "Medium", onClick = {}, size = AppButtonSize.Medium)
             AppButton(text = "Small", onClick = {}, size = AppButtonSize.Small)
+            AppButton(text = "Apply", onClick = {}, size = AppButtonSize.ExtraSmall)
             AppButton(text = "Disabled", onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth())
             AppButton(
                 text = "Continue",
@@ -431,7 +445,7 @@ fun AppSocialButton(
         onClick = onClick,
         style = style,
         interactionSource = interactionSource,
-        height = AppDimens.controlLg,
+        height = AppDimens.buttonLg,
         horizontalPadding = AppDimens.space16,
         enabled = enabled,
         isLoading = isLoading,
@@ -490,7 +504,7 @@ fun AppIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     variant: AppIconButtonVariant = AppIconButtonVariant.White,
-    size: Dp = AppDimens.controlMd,
+    size: Dp = AppDimens.iconButton,
     enabled: Boolean = true,
 ) {
     val colors = AppTheme.colors
@@ -545,7 +559,8 @@ fun AppIconButton(
 - **The order of modifiers matters:** shadow, then clip, then background, then border, then clickable, then padding.
   - Clipping before the shadow cuts the shadow off.
   - Padding before `clickable` makes the edges dead to touch.
-- **Touch target.** `Large` (52) and `Medium` (44) are fine. `Small` (36) is below 48 dp. Use it only inside dense rows that already have space around them (product card, coupon "Apply"), or add `Modifier.minimumInteractiveComponentSize()` at the call site.
+- **Touch target.** `Large` (52) and `Compact` (48) are fine. `Medium` (44) is slightly under 48 dp but is Figma's secondary button size. `Small` (36) and `ExtraSmall` (26) are well below 48 dp. Use them only inside dense rows that already have space around them (product card, coupon "Apply"), or add `Modifier.minimumInteractiveComponentSize()` at the call site. For `ExtraSmall` always add it: 26 dp is too small to tap reliably.
+- **Which size where:** primary and outline buttons use `Large`, danger and compact buttons use `Compact`, secondary buttons use `Medium`, small buttons use `Small`, and the inline coupon "Apply" uses `ExtraSmall`. Icons inside an `ExtraSmall` button don't fit a 20 dp icon well, so keep it text only.
 - **Icons are `Painter`s.** Pass `painterResource(AppIcons.X)`, so Lucide drawables and brand logos use the same API.
 - **No `onBrand` on Deal?** The deal gradient is orange to pink, and white text on it passes 3:1 for 15 sp Bold (large-text rule). Use Deal only for short labels.
 - **Ripple:** `ripple()` is the Material 3 API (`androidx.compose.material3.ripple`). Don't use `rememberRipple()`, which is deprecated.
@@ -565,6 +580,7 @@ fun AppIconButton(
 ## Check
 
 - [ ] `AppButtonPreview` shows 7 pills. Primary and Deal have a colored glow under them, and Outline has a thin grey border.
+- [ ] The size previews measure 52 (Large), 48 (Compact), 44 (Medium), 36 (Small) and 26 (ExtraSmall) dp high, like Figma `size/button-*`.
 - [ ] Press and hold Primary: the gradient becomes solid `#1D4ED8` and the glow disappears (no lift). Tonal turns `#DBE7FE`, Outline turns `#F1F5F9`.
 - [ ] Disabled: grey `field` fill (`#F1F5F9` light, `#1A2540` dark), grey label, no glow.
 - [ ] Loading: the label stays, the spinner takes the trailing arrow's place. Tapping it does nothing.
