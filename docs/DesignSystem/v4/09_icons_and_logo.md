@@ -499,7 +499,7 @@ When `grep -rn "Iconsax" app/src` returns nothing:
 2. Delete `iconsax = "1.0.1"` and the `iconsax-compose` line from `gradle/libs.versions.toml`.
 3. Keep `material-icons-core` only if something still uses `Icons.*`. The goal is zero.
 
-| Old                                   | New                                  |
+| Old                                   | New      |
 | ------------------------------------- | ------------------------------------ |
 | `Iconsax.Linear.Sms`                  | `AppIcons.Mail`                      |
 | `Iconsax.Linear.PasswordCheck`        | `AppIcons.Lock`                      |
