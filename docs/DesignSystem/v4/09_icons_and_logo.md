@@ -2,18 +2,18 @@
 
 **Files:**
 
-| File | Action |
-|---|---|
-| `res/drawable/ic_lucide_*.xml` (76 files) | new (Vector Asset import) |
-| `res/drawable/ic_facebook.xml` | new (Figma shows Google + Facebook, not Apple) |
-| `res/drawable/ic_dukkan_mark.xml` | new (replaces `ic_app_logo.xml`) |
-| `core/designsystem/icon/AppIcons.kt` | new |
-| `core/designsystem/components/logo/AppLogo.kt` | new |
-| `res/drawable/ic_launcher_foreground.xml`, `ic_launcher_background.xml`, `ic_launcher_monochrome.xml` | rewrite (Figma `05b · Android app icon`) |
-| `res/mipmap-anydpi-v26/ic_launcher.xml`, `ic_launcher_round.xml` | rewrite |
-| `res/mipmap-*/ic_launcher.png` (legacy) | regenerate |
-| `res/values/colors.xml`, `res/values/themes.xml` | edit: splash colors, remove purple/teal |
-| `app/build.gradle.kts`, `gradle/libs.versions.toml` | remove `iconsax-compose` (last step) |
+| File                                                                                                  | Action                                         |
+| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| `res/drawable/ic_lucide_*.xml` (76 files)                                                             | new (Vector Asset import)                      |
+| `res/drawable/ic_facebook.xml`                                                                        | new (Figma shows Google + Facebook, not Apple) |
+| `res/drawable/ic_dukkan_mark.xml`                                                                     | new (replaces `ic_app_logo.xml`)               |
+| `core/designsystem/icon/AppIcons.kt`                                                                  | new                                            |
+| `core/designsystem/components/logo/AppLogo.kt`                                                        | new                                            |
+| `res/drawable/ic_launcher_foreground.xml`, `ic_launcher_background.xml`, `ic_launcher_monochrome.xml` | rewrite (Figma `05b · Android app icon`)       |
+| `res/mipmap-anydpi-v26/ic_launcher.xml`, `ic_launcher_round.xml`                                      | rewrite                                        |
+| `res/mipmap-*/ic_launcher.png` (legacy)                                                               | regenerate                                     |
+| `res/values/colors.xml`, `res/values/themes.xml`                                                      | edit: splash colors, remove purple/teal        |
+| `app/build.gradle.kts`, `gradle/libs.versions.toml`                                                   | remove `iconsax-compose` (last step)           |
 
 ## Why
 
@@ -30,94 +30,94 @@ Importing the exact Lucide SVGs as vector drawables means:
 
 ## Figma spec
 
-| Property | Value |
-|---|---|
-| Set | Lucide (lucide.dev), ISC license |
-| Grid | 24 × 24 |
-| Stroke | 2 px, round caps, round joins |
+| Property     | Value                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Set          | Lucide (lucide.dev), ISC license                                                                                                     |
+| Grid         | 24 × 24                                                                                                                              |
+| Stroke       | 2 px, round caps, round joins                                                                                                        |
 | Display size | `AppDimens.icon` (20) in fields, buttons, rows; `AppDimens.iconLg` (24) in app bar and bottom nav; `AppDimens.iconSm` (16) in badges |
-| Color | always tinted by the caller: `colors.textTertiary` idle, `colors.brand` focused/active, `colors.error` error |
+| Color        | always tinted by the caller: `colors.textTertiary` idle, `colors.brand` focused/active, `colors.error` error                         |
 
 ### The 76 icons
 
-| Lucide name | Drawable | `AppIcons` |
-|---|---|---|
-| house | `ic_lucide_house` | `House` |
-| layout-grid | `ic_lucide_layout_grid` | `LayoutGrid` |
-| shopping-bag | `ic_lucide_shopping_bag` | `ShoppingBag` |
-| percent | `ic_lucide_percent` | `Percent` |
-| user-round | `ic_lucide_user_round` | `UserRound` |
-| user-plus (**new**) | `ic_lucide_user_plus` | `UserPlus` |
-| search | `ic_lucide_search` | `Search` |
-| scan-line | `ic_lucide_scan_line` | `ScanLine` |
-| sliders-horizontal | `ic_lucide_sliders_horizontal` | `SlidersHorizontal` |
-| bell | `ic_lucide_bell` | `Bell` |
-| heart | `ic_lucide_heart` | `Heart` |
-| map-pin | `ic_lucide_map_pin` | `MapPin` |
-| locate-fixed | `ic_lucide_locate_fixed` | `LocateFixed` |
-| truck | `ic_lucide_truck` | `Truck` |
-| package | `ic_lucide_package` | `Package` |
-| package-check | `ic_lucide_package_check` | `PackageCheck` |
-| receipt | `ic_lucide_receipt` | `Receipt` |
-| credit-card | `ic_lucide_credit_card` | `CreditCard` |
-| banknote | `ic_lucide_banknote` | `Banknote` |
-| wallet | `ic_lucide_wallet` | `Wallet` |
-| ticket-percent | `ic_lucide_ticket_percent` | `TicketPercent` |
-| tag | `ic_lucide_tag` | `Tag` |
-| gift | `ic_lucide_gift` | `Gift` |
-| sparkles | `ic_lucide_sparkles` | `Sparkles` |
-| zap | `ic_lucide_zap` | `Zap` |
-| star | `ic_lucide_star` | `Star` |
-| star-filled (**new**) | `ic_lucide_star_filled` | `StarFilled` |
-| clock | `ic_lucide_clock` | `Clock` |
-| calendar | `ic_lucide_calendar` | `Calendar` |
-| navigation | `ic_lucide_navigation` | `Navigation` |
-| route | `ic_lucide_route` | `Route` |
-| store | `ic_lucide_store` | `Store` |
-| bike | `ic_lucide_bike` | `Bike` |
-| phone | `ic_lucide_phone` | `Phone` |
-| message-circle | `ic_lucide_message_circle` | `MessageCircle` |
-| mail | `ic_lucide_mail` | `Mail` |
-| lock | `ic_lucide_lock` | `Lock` |
-| eye | `ic_lucide_eye` | `Eye` |
-| eye-off (**new**) | `ic_lucide_eye_off` | `EyeOff` |
-| globe | `ic_lucide_globe` | `Globe` |
-| languages | `ic_lucide_languages` | `Languages` |
-| sun | `ic_lucide_sun` | `Sun` |
-| moon | `ic_lucide_moon` | `Moon` |
-| settings | `ic_lucide_settings` | `Settings` |
-| log-out | `ic_lucide_log_out` | `LogOut` |
-| circle-help | `ic_lucide_circle_help` | `CircleHelp` |
-| info | `ic_lucide_info` | `Info` |
-| circle-alert | `ic_lucide_circle_alert` | `CircleAlert` |
-| circle-check | `ic_lucide_circle_check` | `CircleCheck` |
-| check | `ic_lucide_check` | `Check` |
-| x | `ic_lucide_x` | `X` |
-| plus | `ic_lucide_plus` | `Plus` |
-| minus | `ic_lucide_minus` | `Minus` |
-| trash-2 | `ic_lucide_trash_2` | `Trash2` |
-| pencil | `ic_lucide_pencil` | `Pencil` |
-| camera | `ic_lucide_camera` | `Camera` |
-| share-2 | `ic_lucide_share_2` | `Share2` |
-| arrow-left | `ic_lucide_arrow_left` | `ArrowLeft` |
-| arrow-right | `ic_lucide_arrow_right` | `ArrowRight` |
-| chevron-right | `ic_lucide_chevron_right` | `ChevronRight` |
-| chevron-down | `ic_lucide_chevron_down` | `ChevronDown` |
-| refresh-cw | `ic_lucide_refresh_cw` | `RefreshCw` |
-| award | `ic_lucide_award` | `Award` |
-| flame | `ic_lucide_flame` | `Flame` |
-| shirt | `ic_lucide_shirt` | `Shirt` |
-| headphones | `ic_lucide_headphones` | `Headphones` |
-| watch | `ic_lucide_watch` | `Watch` |
-| smartphone | `ic_lucide_smartphone` | `Smartphone` |
-| laptop | `ic_lucide_laptop` | `Laptop` |
-| sofa | `ic_lucide_sofa` | `Sofa` |
-| footprints | `ic_lucide_footprints` | `Footprints` |
-| backpack | `ic_lucide_backpack` | `Backpack` |
-| glasses | `ic_lucide_glasses` | `Glasses` |
-| wifi-off (**new**) | `ic_lucide_wifi_off` | `WifiOff` |
-| search-x (**new**) | `ic_lucide_search_x` | `SearchX` |
-| mic (**new**) | `ic_lucide_mic` | `Mic` |
+| Lucide name           | Drawable                       | `AppIcons`          |
+| --------------------- | ------------------------------ | ------------------- |
+| house                 | `ic_lucide_house`              | `House`             |
+| layout-grid           | `ic_lucide_layout_grid`        | `LayoutGrid`        |
+| shopping-bag          | `ic_lucide_shopping_bag`       | `ShoppingBag`       |
+| percent               | `ic_lucide_percent`            | `Percent`           |
+| user-round            | `ic_lucide_user_round`         | `UserRound`         |
+| user-plus (**new**)   | `ic_lucide_user_plus`          | `UserPlus`          |
+| search                | `ic_lucide_search`             | `Search`            |
+| scan-line             | `ic_lucide_scan_line`          | `ScanLine`          |
+| sliders-horizontal    | `ic_lucide_sliders_horizontal` | `SlidersHorizontal` |
+| bell                  | `ic_lucide_bell`               | `Bell`              |
+| heart                 | `ic_lucide_heart`              | `Heart`             |
+| map-pin               | `ic_lucide_map_pin`            | `MapPin`            |
+| locate-fixed          | `ic_lucide_locate_fixed`       | `LocateFixed`       |
+| truck                 | `ic_lucide_truck`              | `Truck`             |
+| package               | `ic_lucide_package`            | `Package`           |
+| package-check         | `ic_lucide_package_check`      | `PackageCheck`      |
+| receipt               | `ic_lucide_receipt`            | `Receipt`           |
+| credit-card           | `ic_lucide_credit_card`        | `CreditCard`        |
+| banknote              | `ic_lucide_banknote`           | `Banknote`          |
+| wallet                | `ic_lucide_wallet`             | `Wallet`            |
+| ticket-percent        | `ic_lucide_ticket_percent`     | `TicketPercent`     |
+| tag                   | `ic_lucide_tag`                | `Tag`               |
+| gift                  | `ic_lucide_gift`               | `Gift`              |
+| sparkles              | `ic_lucide_sparkles`           | `Sparkles`          |
+| zap                   | `ic_lucide_zap`                | `Zap`               |
+| star                  | `ic_lucide_star`               | `Star`              |
+| star-filled (**new**) | `ic_lucide_star_filled`        | `StarFilled`        |
+| clock                 | `ic_lucide_clock`              | `Clock`             |
+| calendar              | `ic_lucide_calendar`           | `Calendar`          |
+| navigation            | `ic_lucide_navigation`         | `Navigation`        |
+| route                 | `ic_lucide_route`              | `Route`             |
+| store                 | `ic_lucide_store`              | `Store`             |
+| bike                  | `ic_lucide_bike`               | `Bike`              |
+| phone                 | `ic_lucide_phone`              | `Phone`             |
+| message-circle        | `ic_lucide_message_circle`     | `MessageCircle`     |
+| mail                  | `ic_lucide_mail`               | `Mail`              |
+| lock                  | `ic_lucide_lock`               | `Lock`              |
+| eye                   | `ic_lucide_eye`                | `Eye`               |
+| eye-off (**new**)     | `ic_lucide_eye_off`            | `EyeOff`            |
+| globe                 | `ic_lucide_globe`              | `Globe`             |
+| languages             | `ic_lucide_languages`          | `Languages`         |
+| sun                   | `ic_lucide_sun`                | `Sun`               |
+| moon                  | `ic_lucide_moon`               | `Moon`              |
+| settings              | `ic_lucide_settings`           | `Settings`          |
+| log-out               | `ic_lucide_log_out`            | `LogOut`            |
+| circle-help           | `ic_lucide_circle_help`        | `CircleHelp`        |
+| info                  | `ic_lucide_info`               | `Info`              |
+| circle-alert          | `ic_lucide_circle_alert`       | `CircleAlert`       |
+| circle-check          | `ic_lucide_circle_check`       | `CircleCheck`       |
+| check                 | `ic_lucide_check`              | `Check`             |
+| x                     | `ic_lucide_x`                  | `X`                 |
+| plus                  | `ic_lucide_plus`               | `Plus`              |
+| minus                 | `ic_lucide_minus`              | `Minus`             |
+| trash-2               | `ic_lucide_trash_2`            | `Trash2`            |
+| pencil                | `ic_lucide_pencil`             | `Pencil`            |
+| camera                | `ic_lucide_camera`             | `Camera`            |
+| share-2               | `ic_lucide_share_2`            | `Share2`            |
+| arrow-left            | `ic_lucide_arrow_left`         | `ArrowLeft`         |
+| arrow-right           | `ic_lucide_arrow_right`        | `ArrowRight`        |
+| chevron-right         | `ic_lucide_chevron_right`      | `ChevronRight`      |
+| chevron-down          | `ic_lucide_chevron_down`       | `ChevronDown`       |
+| refresh-cw            | `ic_lucide_refresh_cw`         | `RefreshCw`         |
+| award                 | `ic_lucide_award`              | `Award`             |
+| flame                 | `ic_lucide_flame`              | `Flame`             |
+| shirt                 | `ic_lucide_shirt`              | `Shirt`             |
+| headphones            | `ic_lucide_headphones`         | `Headphones`        |
+| watch                 | `ic_lucide_watch`              | `Watch`             |
+| smartphone            | `ic_lucide_smartphone`         | `Smartphone`        |
+| laptop                | `ic_lucide_laptop`             | `Laptop`            |
+| sofa                  | `ic_lucide_sofa`               | `Sofa`              |
+| footprints            | `ic_lucide_footprints`         | `Footprints`        |
+| backpack              | `ic_lucide_backpack`           | `Backpack`          |
+| glasses               | `ic_lucide_glasses`            | `Glasses`           |
+| wifi-off (**new**)    | `ic_lucide_wifi_off`           | `WifiOff`           |
+| search-x (**new**)    | `ic_lucide_search_x`           | `SearchX`           |
+| mic (**new**)         | `ic_lucide_mic`                | `Mic`               |
 
 Where the new ones are used: `EyeOff` in the password field when the password is visible (Figma `03b`), `StarFilled` (tinted `colors.gold`) on every rating, `WifiOff` on the offline screens, `SearchX` on "No results" (05b.4), `Mic` in the search bar and the address voice note, `UserPlus` on the Sign up header tile.
 
@@ -282,13 +282,13 @@ Never mirror icons that aren't directional (search, heart, clock).
 
 Figma `05 · Logo`: **"A shop awning with a smile — 'dukkan' means 'shop'. 4.4 px stroke on a 48 grid, Brand gradient. No background. Use the mark alone at 48 px and below."**
 
-| Asset | Spec |
-|---|---|
-| Mark | awning + smile, 48 × 48 grid, 4.4 stroke, `brand` gradient (Azure400 → Blue700, 135°) |
-| Horizontal lockup | mark + "dukkan" wordmark, ExtraBold, −3.5 % tracking |
-| Arabic lockup | mark + "دكّان" |
-| On colour / mono | white mark on brand or dark backgrounds |
-| App icon | launcher only: full spec in `05b · Android app icon` (Step 4) |
+| Asset             | Spec                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------- |
+| Mark              | awning + smile, 48 × 48 grid, 4.4 stroke, `brand` gradient (Azure400 → Blue700, 135°) |
+| Horizontal lockup | mark + "dukkan" wordmark, ExtraBold, −3.5 % tracking                                  |
+| Arabic lockup     | mark + "دكّان"                                                                        |
+| On colour / mono  | white mark on brand or dark backgrounds                                               |
+| App icon          | launcher only: full spec in `05b · Android app icon` (Step 4)                         |
 
 ### Export the mark
 
@@ -363,17 +363,17 @@ Add `logo_wordmark` to the strings files: `dukkan` in `values/` and `values-fr/`
 
 ### Figma spec
 
-| Item | Value |
-|---|---|
-| Canvas | **108 × 108 dp** per layer |
-| Visible area | inner **72 dp** (the launcher masks the rest) |
-| Safe zone | inner **66 dp**: the mark must stay inside it |
-| Foreground | `ic_launcher_foreground`: **white** mark, ≈ 40 dp wide, centered |
-| Background | `ic_launcher_background`: gradient **azure-400 `#4F8BFF` → blue-700 `#1D4ED8`** (135°, the `brand` gradient) |
-| Monochrome | `ic_launcher_monochrome`: one color, same geometry as the foreground (Android 13 themed icons) |
-| Masks | circle, squircle, rounded square, square (legacy): same layers, the OEM picks the shape |
-| Legacy PNG | mdpi 48 · hdpi 72 · xhdpi 96 · xxhdpi 144 · xxxhdpi 192 px (Android < 8) |
-| Play Store | 512 × 512 px PNG |
+| Item         | Value                                                                                                        |
+| ------------ | ------------------------------------------------------------------------------------------------------------ |
+| Canvas       | **108 × 108 dp** per layer                                                                                   |
+| Visible area | inner **72 dp** (the launcher masks the rest)                                                                |
+| Safe zone    | inner **66 dp**: the mark must stay inside it                                                                |
+| Foreground   | `ic_launcher_foreground`: **white** mark, ≈ 40 dp wide, centered                                             |
+| Background   | `ic_launcher_background`: gradient **azure-400 `#4F8BFF` → blue-700 `#1D4ED8`** (135°, the `brand` gradient) |
+| Monochrome   | `ic_launcher_monochrome`: one color, same geometry as the foreground (Android 13 themed icons)               |
+| Masks        | circle, squircle, rounded square, square (legacy): same layers, the OEM picks the shape                      |
+| Legacy PNG   | mdpi 48 · hdpi 72 · xhdpi 96 · xxhdpi 144 · xxxhdpi 192 px (Android < 8)                                     |
+| Play Store   | 512 × 512 px PNG                                                                                             |
 
 "Export as vector drawables" (Figma): all three layers are XML vectors, so they stay sharp at every density.
 
@@ -499,15 +499,129 @@ When `grep -rn "Iconsax" app/src` returns nothing:
 2. Delete `iconsax = "1.0.1"` and the `iconsax-compose` line from `gradle/libs.versions.toml`.
 3. Keep `material-icons-core` only if something still uses `Icons.*`. The goal is zero.
 
-| Old | New |
-|---|---|
-| `Iconsax.Linear.Sms` | `AppIcons.Mail` |
-| `Iconsax.Linear.PasswordCheck` | `AppIcons.Lock` |
-| `Iconsax.Linear.Eye` / `EyeSlash` | `AppIcons.Eye` / `AppIcons.EyeOff` |
+| Old                                   | New                                  |
+| ------------------------------------- | ------------------------------------ |
+| `Iconsax.Linear.Sms`                  | `AppIcons.Mail`                      |
+| `Iconsax.Linear.PasswordCheck`        | `AppIcons.Lock`                      |
+| `Iconsax.Linear.Eye` / `EyeSlash`     | `AppIcons.Eye` / `AppIcons.EyeOff`   |
 | `Icons.AutoMirrored.Filled.ArrowBack` | `AppIcons.ArrowLeft` (auto-mirrored) |
-| `R.drawable.ic_email` | `AppIcons.Mail` |
-| `R.drawable.ic_back_button` | `AppIcons.ArrowLeft` |
-| `R.drawable.ic_app_logo` | `AppLogoMark()` |
+| `R.drawable.ic_email`                 | `AppIcons.Mail`                      |
+| `R.drawable.ic_back_button`           | `AppIcons.ArrowLeft`                 |
+| `R.drawable.ic_app_logo`              | `AppLogoMark()`                      |
+
+## Step 5 sets up the **splash screen**: what the user sees from the moment they tap the app icon until your first screen is ready.
+
+1. Why `colors.xml` exists
+
+--------------------------
+
+Your app colors live in Kotlin (`AppTheme.colors.background`). But the splash appears **before** Compose has loaded, so it can't read them. It can only read old-style XML resources. So the doc says:
+
+* Copy the few colors the splash needs into `colors.xml`.
+
+* That's the second and last place hex colors are allowed, after `AppPalette`.
+
+* Name them after the tokens, and keep them in sync by hand.
+    <color name="dukkan_background">#FFF7F9FB</color>       <!-- light background -->
+    <color name="dukkan_brand">#FF2563EB</color>            <!-- brand blue -->
+    <color name="dukkan_background_dark">#FF0B1220</color>  <!-- dark background -->
+
+2. `themes.xml`: the splash theme
+---------------------------------
+
+A theme is a set of settings for a screen. This one tells Android what to draw during the splash:
+    <style name="Theme.DukkanApp.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/dukkan_background</item>   <!-- background color -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dukkan_mark</item> <!-- the logo in the middle -->
+        <item name="postSplashScreenTheme">@style/Theme.DukkanApp</item>            <!-- theme to use after -->
+    </style>
+
+| Line                             | Meaning                                              |
+| -------------------------------- | ---------------------------------------------------- |
+| `windowSplashScreenBackground`   | The color behind the logo                            |
+| `windowSplashScreenAnimatedIcon` | The icon shown in the center (your blue mark)        |
+| `postSplashScreenTheme`          | When the splash ends, switch to the normal app theme |
+
+`Theme.DukkanApp` stays as the normal theme.
+3. `values-night/themes.xml`: dark mode
+---------------------------------------
+
+Android picks the file in `values-night/` automatically when the phone is in dark mode. It's the same splash theme, but with `@color/dukkan_background_dark`. Without it, a dark-mode user would see a white flash. Doc 08 also keeps the splash up until the saved theme is loaded, for the same reason.
+4. `AndroidManifest.xml`
+------------------------
+
+You tell the main activity to start with the splash theme:
+    <activity android:name=".MainActivity"
+        android:theme="@style/Theme.DukkanApp.Splash">
+
+After the splash, `postSplashScreenTheme` switches it to the normal theme.
+What the user sees
+------------------
+
+    tap icon → [light or dark background + blue mark] → your first screen
+                  (system splash, no Compose yet)
+
+The tagline
+-----------
+
+Figma's splash also shows "Shop smart. Delivered fast." and "Made in Tunisia · v1.0". The system splash can only show **one icon**, not text. If you want those lines, you'd put them on your first Compose screen.
+Your project
+------------
+
+Your `MainActivity` already calls `installSplashScreen()`, so the splash library is already set up. This step only changes how it looks. Do you want me to look at your current `colors.xml`, `themes.xml` and manifest and apply it?
+
+What is `Theme.DukkanApp` for?
+------------------------------
+
+Your screens are drawn by Compose with `AppTheme { }`, but Android still creates a **window** (the empty frame that holds your app) before any Compose code runs. That window needs an old-style XML theme to know basic things:
+
+* the window background color,
+* whether there's an action bar,
+* the default status bar and navigation bar behavior.
+
+`Theme.DukkanApp` is that theme. It's also required: your `MainActivity` extends `AppCompatActivity`, which **crashes at startup** unless the activity uses an AppCompat theme. That's why its parent is `Theme.AppCompat.Light.NoActionBar` (`NoActionBar` because Compose draws its own top bar).
+
+So there are two separate "themes" in your app:
+
+|                   | Where            | What it controls                                       |
+| ----------------- | ---------------- | ------------------------------------------------------ |
+| `AppTheme { }`    | Kotlin / Compose | Colors, fonts, shapes of your screens                  |
+| `Theme.DukkanApp` | XML              | The Android window around your screens, and the splash |
+
+They don't talk to each other, and both are needed.
+Why do we write it in XML and then in the manifest?
+---------------------------------------------------
+
+Two different jobs:
+
+1. **XML file (`themes.xml`):** it defines the theme, which is a list of settings. It's like writing a recipe.
+
+2. **Manifest (`AndroidManifest.xml`):** it says **which activity uses which theme**. It's like choosing the recipe for a dish.
+    <activity
+   
+        android:name=".MainActivity"
+        android:theme="@style/Theme.DukkanApp.Splash" />   <!-- "use this recipe" -->
+
+Defining a theme alone does nothing. Android doesn't scan `themes.xml` for the right one. And the choice has to be in the manifest because Android reads it **before your code starts**. The splash has to show immediately, before `MainActivity.onCreate` runs, so a Kotlin line couldn't set it.
+How the two themes work together
+--------------------------------
+
+    App starts
+       │
+       ▼
+    Theme.DukkanApp.Splash   ← manifest picks this, so Android shows the splash instantly
+       │   (background color + blue mark)
+       ▼
+    postSplashScreenTheme
+       │
+       ▼
+    Theme.DukkanApp          ← normal window theme, then Compose draws AppTheme { } on top
+
+`Theme.DukkanApp.Splash` is the "starting" theme, and `Theme.DukkanApp` is the "normal" one. The name with the dot (`.Splash`) means it inherits from `Theme.DukkanApp`.
+In your project
+---------------
+
+`installSplashScreen()` in `MainActivity` works together with the splash theme: the theme in the manifest draws the splash, and `installSplashScreen()` lets you keep it on screen while the start destination and theme load. You need both for the splash to work.
 
 ## Check
 
