@@ -1,4 +1,4 @@
-package com.example.dukkanapp.core.common.components.buttons
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.MaterialTheme
@@ -9,9 +9,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
-import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.theme.AppShadow
-import com.example.dukkanapp.core.theme.AppTheme
 
 enum class AppButtonVariant { Primary, Deal, Dark, Tonal, Outline, Ghost, Danger }
 enum class AppButtonSize(
