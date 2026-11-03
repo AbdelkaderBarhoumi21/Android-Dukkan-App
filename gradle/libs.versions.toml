@@ -32,7 +32,6 @@ coreSplashScreen = "1.0.1"
 coroutines = "1.9.0"
 
 # Iconsax
-iconsax = "1.0.1"
 
 # Firebase
 firebaseBoom = "34.19.0"
@@ -55,7 +54,6 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-compose-material-iconsCore = { group = "androidx.compose.material", name = "material-icons-core" }
 # Localization
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
@@ -80,7 +78,6 @@ kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 # Iconsax
-iconsax-compose = { module = "io.github.yohannestz:iconsax-compose", version.ref = "iconsax" }
 
 # Firebase
 firebase-boom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBoom" }
