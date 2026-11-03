@@ -1,6 +1,7 @@
 package com.example.dukkanapp.core.theme
 
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /** Dukkan spacing, radius and size tokens. Figma: "Dukkan / 4". */
 object AppDimens {
@@ -67,6 +68,13 @@ object AppDimens {
     val navBar = 66.dp      // customer bottom nav
     val teamNavBar = 64.dp  // staff bottom nav
     val screenPadding = 20.dp
+
+    // Button label sizes (sp): smaller than the labelLarge token, per button size
+    val buttonTextCompact = 14.5.sp
+    val buttonTextMd = 14.sp
+    val buttonTextSm = 12.5.sp
+    val buttonTextXs = 12.sp
+    val buttonTextLineHeightSm = 16.sp
 
     // Strokes: not part of the 4 dp grid on purpose
     val strokeThin = 1.2.dp

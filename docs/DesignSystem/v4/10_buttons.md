@@ -41,23 +41,23 @@ So we draw the pill ourselves: `appShadow`, then `clip`, then `background(brush)
 
 All variants use the pill shape (`AppPillShape`), a label in `labelLarge` (Bold) and icons at `AppDimens.icon` (20 dp).
 
-| Variant | Fill | Border | Label / icon | Shadow | Used for |
-|---|---|---|---|---|---|
-| `Primary` | `gradients.button` | none | `onBrand` | `shadows.button` | Main action: Log in, Continue, Checkout |
-| `Deal` | `gradients.deal` | none | `onBrand` | `shadows.deal` | Flash-deal CTA ("Grab deals") |
-| `Dark` | `inverse` | none | `onInverse` | none | Cart bar "Cart", strong neutral CTA |
-| `Tonal` | `brandSoft` | none | `brandSoftText` | none | Secondary action: Apply, Add photo |
-| `Outline` | `card` | `border` 1.2 dp | `textPrimary` | none | Cancel, Choose another address |
-| `Ghost` | transparent | none | `brand` | none | Text link: Forgot password?, See all |
-| `Danger` | `errorSoft` | `errorBorder` 1.2 dp | `error` | none | Cancel order, Delete address |
+| Variant   | Fill               | Border               | Label / icon    | Shadow           | Used for                                |
+| --------- | ------------------ | -------------------- | --------------- | ---------------- | --------------------------------------- |
+| `Primary` | `gradients.button` | none                 | `onBrand`       | `shadows.button` | Main action: Log in, Continue, Checkout |
+| `Deal`    | `gradients.deal`   | none                 | `onBrand`       | `shadows.deal`   | Flash-deal CTA ("Grab deals")           |
+| `Dark`    | `inverse`          | none                 | `onInverse`     | none             | Cart bar "Cart", strong neutral CTA     |
+| `Tonal`   | `brandSoft`        | none                 | `brandSoftText` | none             | Secondary action: Apply, Add photo      |
+| `Outline` | `card`             | `border` 1.2 dp      | `textPrimary`   | none             | Cancel, Choose another address          |
+| `Ghost`   | transparent        | none                 | `brand`         | none             | Text link: Forgot password?, See all    |
+| `Danger`  | `errorSoft`        | `errorBorder` 1.2 dp | `error`         | none             | Cancel order, Delete address            |
 
-| Size | Figma token | Height | Horizontal padding | Label size | Used for |
-|---|---|---|---|---|---|
-| `Large` | `size/button-lg` → `buttonLg` | 52 | `space24` | 15 sp (`labelLarge`) | primary & outline buttons |
-| `Compact` | `size/button-compact` → `buttonCompact` | 48 | `space24` | 14.5 sp | danger / compact buttons |
-| `Medium` | `size/button-md` → `buttonMd` | 44 | `space20` | 14 sp | secondary buttons |
-| `Small` | `size/button-sm` → `buttonSm` | 36 | `space16` | 12.5 sp | small buttons |
-| `ExtraSmall` | `size/button-xs` → `buttonXs` | 26 | `space12` | 12 sp | inline "Apply" on coupons |
+| Size         | Figma token                             | Height | Horizontal padding | Label size           | Used for                  |
+| ------------ | --------------------------------------- | ------ | ------------------ | -------------------- | ------------------------- |
+| `Large`      | `size/button-lg` → `buttonLg`           | 52     | `space24`          | 15 sp (`labelLarge`) | primary & outline buttons |
+| `Compact`    | `size/button-compact` → `buttonCompact` | 48     | `space24`          | 14.5 sp              | danger / compact buttons  |
+| `Medium`     | `size/button-md` → `buttonMd`           | 44     | `space20`          | 14 sp                | secondary buttons         |
+| `Small`      | `size/button-sm` → `buttonSm`           | 36     | `space16`          | 12.5 sp              | small buttons             |
+| `ExtraSmall` | `size/button-xs` → `buttonXs`           | 26     | `space12`          | 12 sp                | inline "Apply" on coupons |
 
 `Compact` and `ExtraSmall` label sizes and `ExtraSmall` padding are not listed in the Figma size tokens (it only gives the heights). They are our choice, between the neighbouring sizes. Check them against the Figma frames and adjust.
 
@@ -67,12 +67,12 @@ Use the Figma name in new code (`buttonLg`), not the older `controlLg`. They hav
 
 **States (Figma `03b · Atom states`).** "Default · Pressed · Disabled · Loading for the 3 main variants":
 
-| State | Primary | Tonal | Outline | Other variants (our rule, same idea) |
-|---|---|---|---|---|
-| Default | `gradients.button` + `shadows.button` | `brandSoft` | `card` + `border` | as the table above |
-| **Pressed** | **solid `brandPressed` fill, no shadow** ("no lift") | `brandRing` fill | `field` fill, `border` stays | Deal: gradient, no shadow. Dark / Ghost / Danger: ripple only |
-| **Disabled** | `field` fill, `textTertiary` label, no border, no shadow | same | same | same (Ghost keeps a transparent fill) |
-| **Loading** | fill stays; **the spinner replaces the trailing icon, the label stays** | same | same | same |
+| State        | Primary                                                                 | Tonal            | Outline                      | Other variants (our rule, same idea)                          |
+| ------------ | ----------------------------------------------------------------------- | ---------------- | ---------------------------- | ------------------------------------------------------------- |
+| Default      | `gradients.button` + `shadows.button`                                   | `brandSoft`      | `card` + `border`            | as the table above                                            |
+| **Pressed**  | **solid `brandPressed` fill, no shadow** ("no lift")                    | `brandRing` fill | `field` fill, `border` stays | Deal: gradient, no shadow. Dark / Ghost / Danger: ripple only |
+| **Disabled** | `field` fill, `textTertiary` label, no border, no shadow                | same             | same                         | same (Ghost keeps a transparent fill)                         |
+| **Loading**  | fill stays; **the spinner replaces the trailing icon, the label stays** | same             | same                         | same                                                          |
 
 Rules that apply to every variant:
 
@@ -83,14 +83,14 @@ Rules that apply to every variant:
 
 **Icon button (`Icon button/*`):** a 44 dp circle (`iconButton`, Figma `size/icon-button`) with a 20 dp icon.
 
-| Variant | Fill | Icon | Shadow |
-|---|---|---|---|
-| `White` | `card` | `textPrimary` | `shadows.card` |
+| Variant | Fill                               | Icon          | Shadow         |
+| ------- | ---------------------------------- | ------------- | -------------- |
+| `White` | `card`                             | `textPrimary` | `shadows.card` |
 | `Glass` | `card` at 72 % alpha (over photos) | `textPrimary` | `shadows.card` |
-| `Soft` | `brandSoft` | `brand` | none |
-| `Field` | `field` | `textPrimary` | none |
-| `Brand` | `gradients.brand` | `onBrand` | `shadows.card` |
-| `Dark` | `inverse` | `onInverse` | `shadows.card` |
+| `Soft`  | `brandSoft`                        | `brand`       | none           |
+| `Field` | `field`                            | `textPrimary` | none           |
+| `Brand` | `gradients.brand`                  | `onBrand`     | `shadows.card` |
+| `Dark`  | `inverse`                          | `onInverse`   | `shadows.card` |
 
 ---
 
@@ -547,8 +547,8 @@ fun AppIconButton(
 
 ### New string (all three languages)
 
-| Key | EN | AR | FR |
-|---|---|---|---|
+| Key          | EN      | AR           | FR         |
+| ------------ | ------- | ------------ | ---------- |
 | `cd_loading` | Loading | جارٍ التحميل | Chargement |
 
 ---
@@ -567,15 +567,107 @@ fun AppIconButton(
 
 ### Old to new
 
-| Old call | New call |
-|---|---|
-| `AppPrimaryButton(text, onClick, isLoading = x)` | `AppButton(text, onClick, Modifier.fillMaxWidth(), isLoading = x)` |
-| `AppTextButton(onClick, text)` | `AppButton(text, onClick, variant = AppButtonVariant.Ghost, size = AppButtonSize.Small)` |
-| `AuthButton(text, icon = google, containerColor = Transparent, borderColor = outline)` | `AppSocialButton(text, logo = painterResource(AppIcons.Google), onClick)` |
-| `AuthButton(email, containerColor = primary, ...)` | `AppButton(text, onClick, leadingIcon = painterResource(AppIcons.Mail))` |
-| `AppScaffold` back `Box` | `AppIconButton(painterResource(AppIcons.ArrowLeft), cd, onClick)` (doc 13) |
+| Old call                                                                               | New call                                                                                 |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `AppPrimaryButton(text, onClick, isLoading = x)`                                       | `AppButton(text, onClick, Modifier.fillMaxWidth(), isLoading = x)`                       |
+| `AppTextButton(onClick, text)`                                                         | `AppButton(text, onClick, variant = AppButtonVariant.Ghost, size = AppButtonSize.Small)` |
+| `AuthButton(text, icon = google, containerColor = Transparent, borderColor = outline)` | `AppSocialButton(text, logo = painterResource(AppIcons.Google), onClick)`                |
+| `AuthButton(email, containerColor = primary, ...)`                                     | `AppButton(text, onClick, leadingIcon = painterResource(AppIcons.Mail))`                 |
+| `AppScaffold` back `Box`                                                               | `AppIconButton(painterResource(AppIcons.ArrowLeft), cd, onClick)` (doc 13)               |
 
 ---
+
+## 
+
+1. The flow of `AppButtonStyle`
+
+-------------------------------
+
+`AppButtonStyle` is a small bag of 4 values that says how to **paint** the button. The button composable never picks colors itself. It asks a function.
+    Screen: AppButton(variant = Primary, enabled = true, isLoading = false)
+                │
+                ├─ watches touch → isPressed (true while the finger is down)
+                ▼
+       appButtonStyle(variant, enabled, pressed)      ← the "decider"
+                │   returns
+                ▼
+       AppButtonStyle(background, content, border, shadow)   ← the answer
+                ▼
+       AppButtonContainer draws the pill using that answer
+       Text and Icon use style.content for their color
+
+**The 4 fields (the answer):**
+
+| Field        | Type            | What it is                                                                                        | Example (Primary) |
+| ------------ | --------------- | ------------------------------------------------------------------------------------------------- | ----------------- |
+| `background` | `Brush`         | Fill of the pill. `Brush` because it can be a gradient or one color (`SolidColor` wraps a color). | the blue gradient |
+| `content`    | `Color`         | Color of the text, icons, spinner and ripple                                                      | white (`onBrand`) |
+| `border`     | `BorderStroke?` | Outline, or `null` for none                                                                       | `null`            |
+| `shadow`     | `AppShadow?`    | Colored glow, or `null` for none                                                                  | blue glow         |
+
+**The 3 inputs of `appButtonStyle`:**
+
+| Param     | Meaning                                                                                                                                                                |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variant` | Which look: Primary, Deal, Dark, Tonal, Outline, Ghost, Danger                                                                                                         |
+| `enabled` | If false, every variant becomes grey (`field` fill, `textTertiary` label, no border, no shadow). This check is first because disabled looks the same for all variants. |
+| `pressed` | Finger is down. Primary turns solid `brandPressed` and the glow disappears ("no lift").                                                                                |
+
+Two small details: `@Immutable` tells Compose the style won't change by itself, so it can skip extra work. `internal` means only the design-system module can build styles, and screens can't.
+
+2. Compose also has Elevated, Filled, Tonal, Outlined and Text buttons
+
+----------------------------------------------------------------------
+
+Yes. They're the same family as Flutter:
+
+| Flutter              | Compose (Material 3) |
+| -------------------- | -------------------- |
+| `ElevatedButton`     | `ElevatedButton`     |
+| `FilledButton`       | `Button`             |
+| `FilledButton.tonal` | `FilledTonalButton`  |
+| `OutlinedButton`     | `OutlinedButton`     |
+| `TextButton`         | `TextButton`         |
+
+They map closely to our variants: Primary ≈ `Button`, Tonal ≈ `FilledTonalButton`, Outline ≈ `OutlinedButton`, Ghost ≈ `TextButton`.
+
+3. Why we don't use them
+
+------------------------
+
+Because of what Figma asks for on the Primary button:
+
+* **Gradient fill:** the `colors` parameter of these buttons takes a `Color`, not a `Brush`, so you can't pass a gradient.
+* **Colored shadow:** Material's elevation draws a grey shadow, and you can't tint it on older Android versions (below API 28). Figma's glow is blue at 30%.
+* **Two systems:** you could hack a gradient on top with `Modifier.background(...)`, but then you fight Material's built-in defaults (its colors, minimum size, shadow, pressed behavior) on every button. Seven variants made this messy.
+
+So the doc builds the pill itself.
+
+4. Why a `Box`
+
+--------------
+
+A `Box` is just an empty rectangle you can stack things in. We add what a button needs, step by step:
+    Box(
+        Modifier
+            .height(height)
+            .appShadow(...)        // 1. glow behind
+            .clip(AppPillShape)    // 2. round the corners
+            .background(brush)     // 3. fill (gradient or color)
+            .border(...)           // 4. outline
+            .clickable(role = Role.Button, ripple...)  // 5. tap, ripple, TalkBack "button"
+            .padding(horizontal = ...)
+    )
+
+`Modifier.clickable` gives the ripple, the disabled state and the "Button" role for TalkBack, so we lose nothing important. Material's own `Button` is also built from a rectangle plus a row inside, so we're doing the same job with full control.
+
+The order matters. If `clip` came before the shadow, the glow would be cut off. The doc's notes section explains this.
+In short
+--------
+
+* **`AppButtonStyle`** = the answer to "what colors does this button use right now?", computed from the variant, `enabled` and `pressed`.
+* **Not `ElevatedButton`, `Button` and so on**, because they can't do the gradient and the colored glow from Figma.
+* **A `Box`** gives us full control, and `clickable` still provides ripple, disabled state and accessibility.
 
 ## Check
 
