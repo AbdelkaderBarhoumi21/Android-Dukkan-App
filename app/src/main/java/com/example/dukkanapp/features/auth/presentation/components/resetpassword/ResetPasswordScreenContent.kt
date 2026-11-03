@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.footer.AppAccountRecoveryFooter
@@ -22,10 +23,10 @@ import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.text.asString
 import com.example.dukkanapp.core.utils.constants.AppDimens
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.auth.presentation.logic.resetpassword.ResetPasswordIntent
 import com.example.dukkanapp.features.auth.presentation.logic.resetpassword.ResetPasswordUiState
-import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
 fun ResetPasswordScreenContent(
@@ -63,7 +64,7 @@ fun ResetPasswordScreenContent(
                 isSuccess = state.isValidNewPassword,
                 leadingIcon = {
                     Icon(
-                        imageVector = Iconsax.Linear.PasswordCheck,
+                        painter = painterResource(AppIcons.Lock),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(AppDimens.iconSm)
@@ -82,7 +83,7 @@ fun ResetPasswordScreenContent(
                 isSuccess = state.isValidConfirmPassword,
                 leadingIcon = {
                     Icon(
-                        imageVector = Iconsax.Linear.PasswordCheck,
+                        painter = painterResource(AppIcons.Lock),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(AppDimens.iconSm)

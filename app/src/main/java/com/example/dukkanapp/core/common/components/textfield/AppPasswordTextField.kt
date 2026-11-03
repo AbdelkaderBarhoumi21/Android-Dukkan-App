@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -18,7 +19,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.utils.constants.AppDimens
-import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
+import com.example.dukkanapp.core.utils.constants.AppIcons
 
 @Composable
 fun AppPasswordTextField(
@@ -57,7 +58,7 @@ fun AppPasswordTextField(
                 }
             ) {
                 Icon(
-                    imageVector = if (isVisible) Iconsax.Linear.Eye else Iconsax.Linear.EyeSlash,
+                    painter = painterResource(if (isVisible) AppIcons.EyeOff else AppIcons.Eye),
                     contentDescription = stringResource(
                         if (isVisible) R.string.cd_hide_password
                         else R.string.cd_show_password

@@ -7,13 +7,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.utils.constants.AppDimens
-import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
+import com.example.dukkanapp.core.utils.constants.AppIcons
 
 @Composable
 fun LanguageSearchField(
@@ -29,7 +30,7 @@ fun LanguageSearchField(
         placeHolder = stringResource(R.string.language_selection_search_hint),
         leadingIcon = {
             Icon(
-                imageVector = Iconsax.Linear.SearchNormal,
+                painter = painterResource(AppIcons.Search),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(AppDimens.iconSm),

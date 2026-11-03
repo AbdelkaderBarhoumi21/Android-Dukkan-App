@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
@@ -26,10 +27,10 @@ import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextFie
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.common.text.asString
 import com.example.dukkanapp.core.utils.constants.AppDimens
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpIntent
 import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpUiState
-import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
 fun SignUpScreenContent(
@@ -62,7 +63,7 @@ fun SignUpScreenContent(
                 onValueChange = { onIntent(SignUpIntent.EmailChanged(it)) },
                 leadingIcon = {
                     Icon(
-                        imageVector = Iconsax.Linear.Sms,
+                        painter = painterResource(AppIcons.Mail),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(AppDimens.iconSm)
@@ -86,7 +87,7 @@ fun SignUpScreenContent(
                 isSuccess = state.isValidPassword,
                 leadingIcon = {
                     Icon(
-                        imageVector = Iconsax.Linear.PasswordCheck,
+                        painter = painterResource(AppIcons.Lock),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(AppDimens.iconSm)
@@ -106,7 +107,7 @@ fun SignUpScreenContent(
                 isSuccess = state.isValidConfirmPassword,
                 leadingIcon = {
                     Icon(
-                        imageVector = Iconsax.Linear.PasswordCheck,
+                        painter = painterResource(AppIcons.Lock),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(AppDimens.iconSm)

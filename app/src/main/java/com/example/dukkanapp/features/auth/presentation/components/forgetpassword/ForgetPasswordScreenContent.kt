@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
@@ -22,10 +23,10 @@ import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
 import com.example.dukkanapp.core.common.text.asString
 import com.example.dukkanapp.core.utils.constants.AppDimens
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.auth.presentation.logic.forgetpassword.ForgetPasswordIntent
 import com.example.dukkanapp.features.auth.presentation.logic.forgetpassword.ForgetPasswordUiState
-import com.github.yohannestz.iconsax_compose.iconsax.Iconsax
 
 @Composable
 fun ForgetPasswordScreenContent(
@@ -60,7 +61,7 @@ fun ForgetPasswordScreenContent(
                 onValueChange = { onIntent(ForgetPasswordIntent.EmailChanged(it)) },
                 leadingIcon = {
                     Icon(
-                        imageVector = Iconsax.Linear.Sms,
+                        painter = painterResource(AppIcons.Mail),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(AppDimens.iconSm)

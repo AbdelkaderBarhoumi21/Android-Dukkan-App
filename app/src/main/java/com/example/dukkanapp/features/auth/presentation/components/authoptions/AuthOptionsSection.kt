@@ -11,6 +11,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.utils.constants.AppDimens
+import com.example.dukkanapp.core.utils.constants.AppIcons
 
 @Composable
 fun AuthOptionsSection(
@@ -40,7 +41,7 @@ fun AuthOptionsSection(
         )
         AuthButton(
             text = stringResource(R.string.auth_options_email),
-            icon = painterResource(R.drawable.ic_email),
+            icon = painterResource(AppIcons.Mail),
             iconColor = MaterialTheme.colorScheme.surface,
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.surface,
