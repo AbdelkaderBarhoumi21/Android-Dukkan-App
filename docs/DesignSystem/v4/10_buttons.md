@@ -224,7 +224,58 @@ internal fun appButtonTextStyle(size: AppButtonSize): TextStyle {
 }
 ```
 
-### `AppButton.kt`
+### ``MutableInteractionSource`
+
+C'est un **canal de messages** entre le doigt de l'utilisateur et ton bouton. Quand l'utilisateur touche, relâche ou annule, Compose y envoie un événement (`PressInteraction.Press`, `Release`, `Cancel`). Toi, tu peux écouter ce canal.
+    val interactionSource = remember { MutableInteractionSource() }
+
+* `MutableInteractionSource()` crée le canal.
+* `remember { ... }` le garde entre les recompositions. Sans `remember`, un nouveau canal serait créé à chaque redessin et l'état serait perdu.
+
+On le branche ensuite sur le bouton :
+    Modifier.clickable(interactionSource = interactionSource, ...)
+
+`clickable` envoie alors ses événements dans ce canal, et on les lit avec `collectIsPressedAsState()`.
+`collectIsPressedAsState()`
+---------------------------
+
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+Cette fonction écoute le canal et le transforme en un `State<Boolean>` :
+
+* `true` pendant que le doigt est posé sur le bouton
+* `false` quand il est relâché ou annulé
+
+Quand la valeur change, Compose redessine le bouton. C'est ce qui permet à `appButtonStyle(variant, enabled, pressed = isPressed)` de changer les couleurs au moment de l'appui.
+Pourquoi `by` ?
+---------------
+
+Sans `by`, tu écrirais `.value` à chaque lecture :
+    val isPressed = interactionSource.collectIsPressedAsState()
+    if (isPressed.value) ...      // il faut .value
+
+Avec `by`, Kotlin ajoute `.value` à ta place :
+    val isPressed by interactionSource.collectIsPressedAsState()
+    if (isPressed) ...            // un simple Boolean
+
+Il faut importer `androidx.compose.runtime.getValue`. C'est ce qu'on appelle un **délégué de propriété**.
+Le flux complet
+---------------
+
+    Doigt appuie
+       → clickable envoie Press dans interactionSource
+       → collectIsPressedAsState() met isPressed = true
+       → Compose redessine AppButton
+       → appButtonStyle(pressed = true) donne la couleur "pressed" et pas d'ombre
+    Doigt relâche
+       → Release → isPressed = false → retour à la couleur normale
+
+Équivalent Flutter
+------------------
+
+C'est proche de `InkWell` avec `onHighlightChanged`, ou de `WidgetState.pressed` dans `ButtonStyle`. Ici tu le fais à la main parce que ton bouton est un `Box` personnalisé. Les boutons Material gèrent déjà cela en interne.
+
+### AppButton.kt`
 
 ```kotlin
 package com.example.dukkanapp.core.designsystem.components.button
@@ -663,6 +714,7 @@ A `Box` is just an empty rectangle you can stack things in. We add what a button
 
 The order matters. If `clip` came before the shadow, the glow would be cut off. The doc's notes section explains this.
 In short
+
 --------
 
 * **`AppButtonStyle`** = the answer to "what colors does this button use right now?", computed from the variant, `enabled` and `pressed`.
