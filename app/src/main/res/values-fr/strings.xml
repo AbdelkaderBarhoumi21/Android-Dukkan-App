@@ -12,6 +12,7 @@
     <string name="cd_back">Retour</string>
     <string name="cd_pager_indicator">Page %1$d sur %2$d</string>
     <string name="cd_show_password">Afficher le mot de passe</string>
+    <string name="cd_loading">Chargement</string>
     <string name="cd_hide_password">Masquer le mot de passe</string>
 
     <!-- Language selection -->
