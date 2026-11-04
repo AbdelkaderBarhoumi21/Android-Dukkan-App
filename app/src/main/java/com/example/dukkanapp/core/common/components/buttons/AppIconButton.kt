@@ -26,7 +26,7 @@ import com.example.dukkanapp.core.theme.appShadow
 enum class AppIconButtonVariant { White, Glass, Soft, Field, Brand, Dark }
 
 @Composable
-fun AppIcon(
+fun AppIconButton(
     icon: Painter,
     contentDescription: String?,
     onClick: () -> Unit,
