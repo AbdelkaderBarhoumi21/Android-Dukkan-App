@@ -51,9 +51,9 @@ private fun diagonal(start: Color, end: Color): Brush =
         end = Offset.Infinite,
     )
 
-/** Transparent → opaque [color], top to bottom. */
-private fun fadeTo(color: Color): Brush =
-    Brush.verticalGradient(listOf(color.copy(alpha = 0f), color))
+/** Transparent → opaque [color], top to bottom, opaque from [solidFrom] on. */
+private fun fadeTo(color: Color, solidFrom: Float = 1f): Brush =
+    Brush.verticalGradient(0f to color.copy(alpha = 0f), solidFrom to color)
 
 private val SharedBrand = diagonal(AppPalette.Azure400, AppPalette.Blue700)
 private val SharedButton = Brush.horizontalGradient(listOf(AppPalette.Azure500, AppPalette.Blue700))
@@ -69,7 +69,7 @@ internal val LightAppGradients = AppGradients(
     brand = SharedBrand,
     button = SharedButton,
     screenTint = Brush.verticalGradient(listOf(AppPalette.Azure100, AppPalette.Slate50)),
-    bottomFade = fadeTo(AppPalette.Slate50),
+    bottomFade = fadeTo(AppPalette.Slate50, solidFrom = 0.5f), // Figma `Fade/Background`
     deal = SharedDeal,
     gold = SharedGold,
     navy = SharedNavy,

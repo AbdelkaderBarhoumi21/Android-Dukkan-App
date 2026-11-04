@@ -34,6 +34,24 @@ data class AppShadows(
     val button: AppShadow,
     val deal: AppShadow,
     val screen: AppShadow,
+    val toast: AppToastTokens,
+)
+
+/**
+ * Figma `Elevation/Toast` and the toast's status tints (`4.4 · Toast`).
+ * [topHighlight] is drawn inside the shape: dark mode only.
+ * [onStatus] is the colour of the glyph and action label on a status fill.
+ * [haloAlpha] and [ringAlpha] are the status colour's alpha in the 44 and 34 icon circles.
+ */
+@Immutable
+data class AppToastTokens(
+    val layers: List<AppShadow>,
+    val topHighlight: AppShadow?,
+    val washAlpha: Float,
+    val borderAlpha: Float,
+    val haloAlpha: Float,
+    val ringAlpha: Float,
+    val onStatus: Color,
 )
 
 internal val LightAppShadows = AppShadows(
@@ -42,9 +60,22 @@ internal val LightAppShadows = AppShadows(
     button = AppShadow(AppPalette.Blue600.copy(alpha = 0.30f), offsetY = 8.dp, blur = 20.dp),
     deal = AppShadow(AppPalette.Orange500.copy(alpha = 0.30f), offsetY = 8.dp, blur = 20.dp),
     screen = AppShadow(AppPalette.Slate900.copy(alpha = 0.10f), offsetY = 18.dp, blur = 44.dp),
+    toast = AppToastTokens(
+        layers = listOf(
+            AppShadow(AppPalette.Slate900.copy(alpha = 0.05f), offsetY = 1.dp, blur = 2.dp),
+            AppShadow(AppPalette.Slate900.copy(alpha = 0.10f), offsetY = 8.dp, blur = 20.dp, spread = (-4).dp),
+            AppShadow(AppPalette.Slate900.copy(alpha = 0.10f), offsetY = 20.dp, blur = 40.dp, spread = (-12).dp),
+        ),
+        topHighlight = null,
+        washAlpha = 0.09f,
+        borderAlpha = 0.18f,
+        haloAlpha = 0.10f,
+        ringAlpha = 0.16f,
+        onStatus = AppPalette.White,
+    ),
 )
 
-/** Figma 01b: surfaces go black + 1 dp night-700 border; button and deal keep a coloured glow. */
+/** Figma 1.2: surfaces go black + 1 dp night-700 border; button and deal keep a coloured glow. */
 internal val DarkAppShadows = AppShadows(
     card = AppShadow(
         AppPalette.Black.copy(alpha = 0.45f), offsetY = 4.dp, blur = 14.dp,
@@ -59,6 +90,18 @@ internal val DarkAppShadows = AppShadows(
     screen = AppShadow(
         AppPalette.Black.copy(alpha = 0.60f), offsetY = 18.dp, blur = 44.dp,
         outline = AppPalette.Night700,
+    ),
+    toast = AppToastTokens(
+        layers = listOf(
+            AppShadow(AppPalette.Black.copy(alpha = 0.40f), offsetY = 1.dp, blur = 2.dp),
+            AppShadow(AppPalette.Black.copy(alpha = 0.55f), offsetY = 12.dp, blur = 32.dp, spread = (-8).dp),
+        ),
+        topHighlight = AppShadow(AppPalette.White.copy(alpha = 0.06f), offsetY = 1.dp, blur = 0.dp),
+        washAlpha = 0.16f,
+        borderAlpha = 0.24f,
+        haloAlpha = 0.14f,
+        ringAlpha = 0.22f,
+        onStatus = AppPalette.Night900,
     ),
 )
 internal val LocalAppShadows = staticCompositionLocalOf<AppShadows> {
@@ -92,3 +135,7 @@ fun Modifier.appShadow(shadow: AppShadow, shape: Shape): Modifier {
         withShadow
     }
 }
+
+/** A multi-layer Figma effect style, such as `Elevation/Toast`. Same modifier-order rule as [appShadow]. */
+fun Modifier.appShadowLayers(layers: List<AppShadow>, shape: Shape): Modifier =
+    layers.fold(this) { modifier, layer -> modifier.appShadow(layer, shape) }

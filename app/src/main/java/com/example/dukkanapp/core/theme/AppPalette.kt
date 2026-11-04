@@ -27,10 +27,13 @@ internal object AppPalette {
     // Neutrals (light surfaces, dark-mode text)
     val Slate50 = Color(0xFFF7F9FB)
     val Slate100 = Color(0xFFF1F5F9)
+    val Slate150 = Color(0xFFEEF2F6)
     val Slate200 = Color(0xFFE2E8F0)
+    val Slate250 = Color(0xFFD5DCE6)
     val Slate300 = Color(0xFFCBD5E1)
     val Slate400 = Color(0xFF94A3B8)
     val Slate500 = Color(0xFF64748B)
+    val Slate600 = Color(0xFF475569)
     val Slate700 = Color(0xFF334155)
     val Slate800 = Color(0xFF1E293B)
     val Slate900 = Color(0xFF0F172A)
@@ -56,6 +59,7 @@ internal object AppPalette {
     val Amber500 = Color(0xFFF59E0B)
     val Amber600 = Color(0xFFD97706)
     val Amber700 = Color(0xFFB45309)
+    val Amber800 = Color(0xFF92400E)
     val Amber950 = Color(0xFF33260A)
 
     // Error
@@ -63,6 +67,7 @@ internal object AppPalette {
     val Red100 = Color(0xFFFEE2E2)
     val Red200 = Color(0xFFFECACA)
     val Red400 = Color(0xFFF87171)
+    val Red500 = Color(0xFFEF4444)
     val Red600 = Color(0xFFDC2626)
     val Red950 = Color(0xFF3A1418)
 
@@ -70,8 +75,19 @@ internal object AppPalette {
     val Orange100 = Color(0xFFFFEDD5)
     val Orange400 = Color(0xFFFB923C)
     val Orange500 = Color(0xFFF97316)
+    val Orange600 = Color(0xFFEA580C)
     val Orange950 = Color(0xFF3A1E0B)
     val Rose500 = Color(0xFFF43F5E)
+
+    // Skeleton: Figma `skeleton/base` and the middle stop of `Skeleton/Shimmer`
+    val SkeletonBase = Color(0xFFE9EEF4)
+    val SkeletonHighlight = Color(0xFFF6F8FB)
+
+    // Other brands' colours. Never recolour them in dark mode.
+    val FacebookBlue = Color(0xFF1877F2)
+    val WhatsAppGreen = Color(0xFF25D366)
+    val WhatsAppSoft = Color(0xFFE7F8EE)
+    val WhatsAppText = Color(0xFF128C4B)
 
     val White = Color(0xFFFFFFFF)
     val Black = Color(0xFF000000)

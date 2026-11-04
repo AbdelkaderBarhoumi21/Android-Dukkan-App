@@ -96,9 +96,9 @@ fun AppButton(
             // trailing icon replace loading
             when {
                 isLoading -> CircularProgressIndicator(
-                    modifier = Modifier.size(AppDimens.icon),
+                    modifier = Modifier.size(AppDimens.iconSm),
                     color = style.content,
-                    strokeWidth = AppDimens.strokeFocus,
+                    strokeWidth = AppDimens.strokeSpinner,
                 )
 
                 trailingIcon != null -> Icon(

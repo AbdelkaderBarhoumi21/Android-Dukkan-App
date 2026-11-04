@@ -32,7 +32,7 @@ internal class AppButtonStyle(
 )
 
 /**
- * Maps a variant + state to colors (Figma `03 · Atoms` + `03b · Atom states`).
+ * Maps a variant + state to colors (Figma `4.1 · Atoms` + `4.2 · Atom states`).
  * [pressed]: finger down. Pressed buttons have no shadow ("no lift").
  */
 @Composable
@@ -84,7 +84,7 @@ internal fun appButtonStyle(
         )
 
         AppButtonVariant.Outline -> AppButtonStyle(
-            background = SolidColor(if (pressed) colors.field else colors.card),
+            background = SolidColor(if (pressed) colors.border else colors.card),
             content = colors.textPrimary,
             border = BorderStroke(AppDimens.strokeThin, colors.border),
             shadow = null,
@@ -106,22 +106,10 @@ internal fun appButtonStyle(
     }
 }
 
-/** Label style per size. Large uses the token as is; the smaller sizes shrink it like Figma. */
+/** Label style per size: real Figma text styles, read from the atoms. */
 @Composable
-internal fun appButtonTextStyle(size: AppButtonSize): TextStyle {
-    val base = MaterialTheme.typography.labelLarge
-    return when (size) {
-        AppButtonSize.Large -> base
-        AppButtonSize.Compact -> base.copy(fontSize = AppDimens.buttonTextCompact)
-        AppButtonSize.Medium -> base.copy(fontSize = AppDimens.buttonTextMd)
-        AppButtonSize.Small -> base.copy(
-            fontSize = AppDimens.buttonTextSm,
-            lineHeight = AppDimens.buttonTextLineHeightSm
-        )
-
-        AppButtonSize.ExtraSmall -> base.copy(
-            fontSize = AppDimens.buttonTextXs,
-            lineHeight = AppDimens.buttonTextLineHeightSm
-        )
-    }
+internal fun appButtonTextStyle(size: AppButtonSize): TextStyle = when (size) {
+    AppButtonSize.Large -> MaterialTheme.typography.labelLarge
+    AppButtonSize.Compact, AppButtonSize.Medium -> AppTheme.textStyles.bodyStrong
+    AppButtonSize.Small, AppButtonSize.ExtraSmall -> MaterialTheme.typography.labelMedium
 }

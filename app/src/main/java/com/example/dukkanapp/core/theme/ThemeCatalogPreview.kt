@@ -64,6 +64,9 @@ private fun AppColors.asNamedList(): List<Pair<String, Color>> = listOf(
     "error" to error, "errorSoft" to errorSoft, "errorBorder" to errorBorder,
     "deal" to deal, "dealSoft" to dealSoft, "gold" to gold,
     "inverse" to inverse, "onInverse" to onInverse, "scrim" to scrim, "shadow" to shadow,
+    "iconWishlist" to iconWishlist, "iconSilver" to iconSilver, "borderSubtle" to borderSubtle,
+    "handle" to handle, "skeleton" to skeleton, "skeletonHighlight" to skeletonHighlight,
+    "textPoints" to textPoints, "textFlash" to textFlash,
 )
 
 @Composable
@@ -148,14 +151,15 @@ private fun typeSamples(): List<Pair<String, TextStyle>> {
         "displayLarge 40/48" to t.displayLarge, "displayMedium 32/40" to t.displayMedium,
         "displaySmall 28/36" to t.displaySmall, "headlineLarge 24/32" to t.headlineLarge,
         "headlineMedium 22/28" to t.headlineMedium, "headlineSmall 20/26" to t.headlineSmall,
-        "titleLarge 18/24" to t.titleLarge, "titleMedium 16/22" to t.titleMedium,
+        "titleLarge 17/24" to t.titleLarge, "titleMedium 16/22" to t.titleMedium,
         "titleSmall 14/20" to t.titleSmall, "bodyLarge 15/22" to t.bodyLarge,
         "bodyMedium 14/20" to t.bodyMedium, "bodySmall 13/18" to t.bodySmall,
         "labelLarge 15/20" to t.labelLarge, "labelMedium 12.5/16" to t.labelMedium,
-        "labelSmall 12/16" to t.labelSmall, "caption 11/14" to x.caption,
-        "OVERLINE 10.5/12" to x.overline, "priceLarge 279.000 TND" to x.priceLarge,
-        "priceSmall 39.900 TND" to x.priceSmall, "fieldText 14.5/20" to x.fieldText,
-        "helper 11.5/14" to x.helper,
+        "labelSmall 10.5/14" to t.labelSmall, "caption 11/14" to x.caption,
+        "OVERLINE 10.5/12" to x.overline, "fieldText 14.5/20" to x.fieldText,
+        "helper 11.5/14" to x.helper, "titleCompact 15/20" to x.titleCompact,
+        "labelStrong 12.5/16" to x.labelStrong, "bodyStrong 13.5/18" to x.bodyStrong,
+        "supporting 11.5/16" to x.supporting, "micro 10.5/14" to x.micro,
     )
 }
 

@@ -4,7 +4,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
 
 /**
- * Material shapes, same as Figma "06 · Compose tokens → Shape.kt" (one scale).
+ * Material shapes, same as Figma's radius variables (one scale).
  * Material widgets read these (cards → medium/large, sheets → extraLarge, menus → extraSmall).
  */
 internal val AppShapes = Shapes(

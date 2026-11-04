@@ -56,6 +56,16 @@ data class AppColors(
     val onInverse: Color,
     val scrim: Color,
     val shadow: Color,
+
+    // Newer tokens
+    val iconWishlist: Color,
+    val iconSilver: Color,
+    val borderSubtle: Color,
+    val handle: Color,
+    val skeleton: Color,
+    val skeletonHighlight: Color,
+    val textPoints: Color,
+    val textFlash: Color,
 )
 
 internal val LightAppColors = AppColors(
@@ -97,9 +107,18 @@ internal val LightAppColors = AppColors(
     onInverse = AppPalette.White,
     scrim = AppPalette.Slate900,
     shadow = AppPalette.Slate900,
+
+    iconWishlist = AppPalette.Red500,
+    iconSilver = AppPalette.Slate600,
+    borderSubtle = AppPalette.Slate150,
+    handle = AppPalette.Slate250,
+    skeleton = AppPalette.SkeletonBase,
+    skeletonHighlight = AppPalette.SkeletonHighlight,
+    textPoints = AppPalette.Amber800,
+    textFlash = AppPalette.Orange600,
 )
 
-/** Official Figma `01b · Dark mode` values. Fields marked "derived" are ours (see the table above). */
+/** Official Figma `1.2 · Dark mode` values. Fields marked "derived" are ours (see doc 03). */
 internal val DarkAppColors = AppColors(
     background = AppPalette.Night950,
     card = AppPalette.Night900,
@@ -139,6 +158,15 @@ internal val DarkAppColors = AppColors(
     onInverse = AppPalette.Slate900, // derived
     scrim = AppPalette.Black,
     shadow = AppPalette.Black,
+
+    iconWishlist = AppPalette.Red400,
+    iconSilver = AppPalette.Slate400,
+    borderSubtle = AppPalette.Night800,
+    handle = AppPalette.Night700,
+    skeleton = AppPalette.Night800,
+    skeletonHighlight = AppPalette.Night700,
+    textPoints = AppPalette.Amber300,
+    textFlash = AppPalette.Orange400,
 )
 
 internal val LocalAppColors = staticCompositionLocalOf<AppColors> {

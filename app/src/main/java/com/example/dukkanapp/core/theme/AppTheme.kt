@@ -11,7 +11,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 /**
  * Accessor for Dukkan tokens inside composables:
  * `AppTheme.colors.brand`, `AppTheme.gradients.button`, `AppTheme.shadows.card`,
- * `AppTheme.textStyles.priceSmall`.
+ * `AppTheme.textStyles.bodyStrong`.
  */
 object AppTheme {
     val colors: AppColors
@@ -38,7 +38,7 @@ object AppTheme {
 /**
  * Dukkan theme. Wrap every screen and every preview in it.
  *
- * @param darkTheme light or dark tokens (Figma 01 / 01b).
+ * @param darkTheme light or dark tokens (Figma 1.1 / 1.2).
  * @param isArabic Cairo type scale instead of Plus Jakarta Sans (Figma "Typography · Cairo").
  *   Defaults to the current app language.
  */
