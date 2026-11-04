@@ -2,10 +2,10 @@
 
 **Files (new):**
 
-- `core/designsystem/components/button/AppButtonStyle.kt`
-- `core/designsystem/components/button/AppButton.kt`
-- `core/designsystem/components/button/AppSocialButton.kt`
-- `core/designsystem/components/button/AppIconButton.kt`
+- `core/theme/AppButtonsStyle.kt`
+- `core/common/components/buttons/AppButton.kt`
+- `core/common/components/buttons/AppSocialButton.kt`
+- `core/common/components/buttons/AppIconButton.kt`
 
 **Replaces:** `core/common/components/buttons/AppPrimaryButton.kt`, `core/common/components/buttons/AppTextButton.kt`, `features/auth/presentation/components/authoptions/AuthButton.kt`. Delete them at the end of [14_auth_screens_refactor.md](14_auth_screens_refactor.md), once no screen uses them.
 
@@ -77,7 +77,7 @@ Use the Figma name in new code (`buttonLg`), not the older `controlLg`. They hav
 Rules that apply to every variant:
 
 - **Pressed = no lift.** The shadow disappears while the finger is down, and there is no scale animation. The ripple still shows.
-- **Loading** ignores clicks and TalkBack reads "Loading". If the button has no trailing icon, the spinner takes the trailing icon's place (20 dp, after the label), so the label shifts a little. That's Figma's "spinner replaces the trailing icon, label stays".
+- **Loading** ignores clicks and TalkBack reads "Loading". If the button has no trailing icon, the spinner takes the trailing icon's place (16 dp, stroke 2.4, after the label), so the label shifts a little. That's Figma's "spinner replaces the trailing icon, label stays".
 
 **Social button (`Social/Google`, `Social/Facebook`):** `card` fill, `border` 1.2 dp, height 52, label `labelLarge` 15 Bold `textPrimary`, untinted brand logo at 20 dp.
 
@@ -96,10 +96,10 @@ Rules that apply to every variant:
 
 ## Code
 
-### `AppButtonStyle.kt`
+### `core/theme/AppButtonsStyle.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.button
+package com.example.dukkanapp.core.theme
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.MaterialTheme
@@ -110,14 +110,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.sp
-import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.theme.AppShadow
-import com.example.dukkanapp.core.theme.AppTheme
 
 enum class AppButtonVariant { Primary, Deal, Dark, Tonal, Outline, Ghost, Danger }
-
-enum class AppButtonSize(val height: Dp, val horizontalPadding: Dp) {
+enum class AppButtonSize(
+    val height: Dp,
+    val horizontalPadding: Dp
+) {
     Large(AppDimens.buttonLg, AppDimens.space24),
     Compact(AppDimens.buttonCompact, AppDimens.space24),
     Medium(AppDimens.buttonMd, AppDimens.space20),
@@ -127,7 +125,7 @@ enum class AppButtonSize(val height: Dp, val horizontalPadding: Dp) {
 
 /** Everything a pill needs to draw itself. Built by [appButtonStyle], never by screens. */
 @Immutable
-internal data class AppButtonStyle(
+internal class AppButtonStyle(
     val background: Brush,
     val content: Color,
     val border: BorderStroke?,
@@ -140,9 +138,7 @@ internal data class AppButtonStyle(
  */
 @Composable
 internal fun appButtonStyle(
-    variant: AppButtonVariant,
-    enabled: Boolean,
-    pressed: Boolean = false,
+    variant: AppButtonVariant, enabled: Boolean, pressed: Boolean = false
 ): AppButtonStyle {
     val colors = AppTheme.colors
     val gradients = AppTheme.gradients
@@ -157,6 +153,7 @@ internal fun appButtonStyle(
             shadow = null,
         )
     }
+
 
     return when (variant) {
         AppButtonVariant.Primary -> AppButtonStyle(
@@ -270,10 +267,10 @@ Le flux complet
 
 C'est proche de `InkWell` avec `onHighlightChanged`, ou de `WidgetState.pressed` dans `ButtonStyle`. Ici tu le fais à la main parce que ton bouton est un `Box` personnalisé. Les boutons Material gèrent déjà cela en interne.
 
-### AppButton.kt`
+### `AppButton.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.button
+package com.example.dukkanapp.core.common.components.buttons
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -309,11 +306,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.example.dukkanapp.R
+import com.example.dukkanapp.core.theme.AppButtonSize
+import com.example.dukkanapp.core.theme.AppButtonStyle
+import com.example.dukkanapp.core.theme.AppButtonVariant
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.theme.appButtonStyle
+import com.example.dukkanapp.core.theme.appButtonTextStyle
 import com.example.dukkanapp.core.theme.appShadow
+import com.example.dukkanapp.core.utils.constants.AppIcons
 
 @Composable
 fun AppButton(
@@ -325,17 +327,17 @@ fun AppButton(
     leadingIcon: Painter? = null,
     trailingIcon: Painter? = null,
     isLoading: Boolean = false,
-    enabled: Boolean = true,
+    enabled: Boolean = true
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
+    val interaction = remember { MutableInteractionSource() }
+    val isPressed by interaction.collectIsPressedAsState()
     val style = appButtonStyle(variant, enabled, pressed = isPressed && !isLoading)
     val loadingDescription = stringResource(R.string.cd_loading)
 
     AppButtonContainer(
         onClick = onClick,
         style = style,
-        interactionSource = interactionSource,
+        interactionSource = interaction,
         height = size.height,
         horizontalPadding = size.horizontalPadding,
         enabled = enabled,
@@ -346,41 +348,44 @@ fun AppButton(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(AppDimens.space8),
+            horizontalArrangement = Arrangement.spacedBy(AppDimens.space8)
         ) {
             leadingIcon?.let {
-                Icon(painter = it, contentDescription = null, tint = style.content, modifier = Modifier.size(AppDimens.icon))
+                Icon(
+                    painter = it,
+                    contentDescription = null,
+                    tint = style.content,
+                    modifier = Modifier.size(AppDimens.icon)
+                )
             }
             Text(
                 text = text,
                 style = appButtonTextStyle(size),
                 color = style.content,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                overflow = TextOverflow.Ellipsis
             )
-            // Figma 4.2: "spinner replaces the trailing icon, label stays".
+            // trailing icon replace loading
             when {
                 isLoading -> CircularProgressIndicator(
-                    modifier = Modifier.size(AppDimens.icon),
+                    modifier = Modifier.size(AppDimens.iconSm),
                     color = style.content,
-                    strokeWidth = AppDimens.strokeFocus,
+                    strokeWidth = AppDimens.strokeSpinner,
                 )
+
                 trailingIcon != null -> Icon(
                     painter = trailingIcon,
                     contentDescription = null,
                     tint = style.content,
-                    modifier = Modifier.size(AppDimens.icon),
+                    modifier = Modifier.size(AppDimens.icon)
                 )
             }
         }
     }
+
+
 }
 
-/**
- * Draws the pill (shadow, fill, border), handles ripple and clicks.
- * Shared by [AppButton] and [AppSocialButton] so both behave the same.
- * The caller owns [interactionSource], because the pressed state changes the style.
- */
 @Composable
 internal fun AppButtonContainer(
     onClick: () -> Unit,
@@ -396,20 +401,27 @@ internal fun AppButtonContainer(
     Box(
         modifier = modifier
             .height(height)
-            .then(if (style.shadow != null) Modifier.appShadow(style.shadow, AppPillShape) else Modifier)
+            .then(
+                if (style.shadow != null) Modifier.appShadow(
+                    style.shadow,
+                    AppPillShape
+                ) else Modifier
+            )
             .clip(AppPillShape)
             .background(style.background)
-            .then(if (style.border != null) Modifier.border(style.border, AppPillShape) else Modifier)
+            .then(
+                if (style.border != null) Modifier.border(style.border, AppPillShape) else Modifier
+            )
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(color = style.content),
                 enabled = enabled && !isLoading,
                 role = Role.Button,
-                onClick = onClick,
+                onClick = onClick
             )
             .padding(horizontal = horizontalPadding),
         contentAlignment = Alignment.Center,
-        content = content,
+        content = content
     )
 }
 
@@ -434,7 +446,12 @@ private fun AppButtonPreview() {
             AppButton(text = "Medium", onClick = {}, size = AppButtonSize.Medium)
             AppButton(text = "Small", onClick = {}, size = AppButtonSize.Small)
             AppButton(text = "Apply", onClick = {}, size = AppButtonSize.ExtraSmall)
-            AppButton(text = "Disabled", onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth())
+            AppButton(
+                text = "Disabled",
+                onClick = {},
+                enabled = false,
+                modifier = Modifier.fillMaxWidth()
+            )
             AppButton(
                 text = "Continue",
                 onClick = {},
@@ -450,7 +467,7 @@ private fun AppButtonPreview() {
 ### `AppSocialButton.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.button
+package com.example.dukkanapp.core.common.components.buttons
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -467,8 +484,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
+import com.example.dukkanapp.core.theme.AppButtonVariant
 import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.appButtonStyle
 
 /**
  * "Continue with Google / Facebook". Same pill as [AppButton] Outline,
@@ -483,31 +501,35 @@ fun AppSocialButton(
     enabled: Boolean = true,
     isLoading: Boolean = false,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
+    val interaction = remember { MutableInteractionSource() }
+    val isPressed by interaction.collectIsPressedAsState()
     val style = appButtonStyle(AppButtonVariant.Outline, enabled, pressed = isPressed && !isLoading)
 
     AppButtonContainer(
         onClick = onClick,
         style = style,
-        interactionSource = interactionSource,
+        interactionSource = interaction,
         height = AppDimens.buttonLg,
         horizontalPadding = AppDimens.space16,
         enabled = enabled,
         isLoading = isLoading,
-        modifier = modifier,
+        modifier = modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(AppDimens.space8),
         ) {
-            Image(painter = logo, contentDescription = null, modifier = Modifier.size(AppDimens.icon))
+            Image(
+                painter = logo,
+                contentDescription = null,
+                modifier = Modifier.size(AppDimens.icon)
+            )
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelLarge,
                 color = style.content,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -517,7 +539,7 @@ fun AppSocialButton(
 ### `AppIconButton.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.button
+package com.example.dukkanapp.core.common.components.buttons
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -537,6 +559,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppShadow
 import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.core.theme.appShadow
@@ -556,36 +579,50 @@ fun AppIconButton(
     val colors = AppTheme.colors
     val gradients = AppTheme.gradients
     val cardShadow = AppTheme.shadows.card
-
     val (fill: Brush, tint: Color, shadow: AppShadow?) = when (variant) {
-        AppIconButtonVariant.White -> Triple(SolidColor(colors.card), colors.textPrimary, cardShadow)
-        AppIconButtonVariant.Glass -> Triple(SolidColor(colors.card.copy(alpha = 0.72f)), colors.textPrimary, cardShadow)
+        AppIconButtonVariant.White -> Triple(
+            SolidColor(colors.card),
+            colors.textPrimary,
+            cardShadow
+        )
+
+        AppIconButtonVariant.Glass -> Triple(
+            SolidColor(colors.card.copy(alpha = 0.72f)),
+            colors.textPrimary,
+            cardShadow
+        )
+
         AppIconButtonVariant.Soft -> Triple(SolidColor(colors.brandSoft), colors.brand, null)
         AppIconButtonVariant.Field -> Triple(SolidColor(colors.field), colors.textPrimary, null)
         AppIconButtonVariant.Brand -> Triple(gradients.brand, colors.onBrand, cardShadow)
-        AppIconButtonVariant.Dark -> Triple(SolidColor(colors.inverse), colors.onInverse, cardShadow)
+        AppIconButtonVariant.Dark -> Triple(
+            SolidColor(colors.inverse),
+            colors.onInverse,
+            cardShadow
+        )
     }
-
     Box(
         modifier = modifier
             .size(size)
-            .then(if (shadow != null) Modifier.appShadow(shadow, CircleShape) else Modifier)
-            .clip(CircleShape)
+            .then(if (shadow != null) Modifier.appShadow(shadow, AppPillShape) else Modifier)
+            .clip(
+                CircleShape
+            )
             .background(fill)
             .clickable(
                 enabled = enabled,
                 role = Role.Button,
                 indication = ripple(color = tint),
                 interactionSource = null,
-                onClick = onClick,
+                onClick = onClick
             ),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.Center
     ) {
         Icon(
             painter = icon,
             contentDescription = contentDescription,
             tint = if (enabled) tint else colors.textTertiary,
-            modifier = Modifier.size(AppDimens.icon),
+            modifier = Modifier.size(AppDimens.icon)
         )
     }
 }
@@ -725,4 +762,4 @@ In short
 - [ ] Loading: the label stays, the spinner takes the trailing arrow's place. Tapping it does nothing.
 - [ ] TalkBack on a loading button says "Log in, Loading, button".
 - [ ] Arabic (RTL): the trailing arrow icon sits on the left. Use a mirrored icon (`autoMirror` in the vector XML) for arrows.
-- [ ] `grep -rn "ButtonDefaults.buttonColors" app/src/main/java` returns nothing outside `designsystem/`.
+- [ ] `grep -rn "ButtonDefaults.buttonColors" app/src/main/java` returns nothing outside `core/common/components/buttons/`.

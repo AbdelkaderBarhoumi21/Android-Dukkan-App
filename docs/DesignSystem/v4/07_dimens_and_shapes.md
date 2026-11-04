@@ -1,8 +1,8 @@
 # 07 — AppDimens and AppShapes
 
 **Files:**
-- `core/theme/AppDimens.kt` (moved from `core/utils/constants/AppDimens.kt` and rewritten)
-- `core/theme/AppShapes.kt` (moved from `core/utils/constants/AppShapes.kt` and rewritten)
+- `core/theme/AppDimens.kt` (new; the old `core/utils/constants/AppDimens.kt` stays until the screens move)
+- `core/theme/AppShapes.kt` (new; the old `core/utils/constants/AppShapes.kt` stays until the screens move)
 
 ## Why
 
@@ -68,6 +68,7 @@ v4 names spacing **by value**, exactly like Figma: `space/16` → `space16`. Rad
 | | `screenPadding` | screen padding | 20 |
 | Strokes | `strokeThin` | outline / chip / social border | 1.2 |
 | | `strokeFocus` | focused / error / success input border | 1.5 |
+| | `strokeSpinner` | spinner inside a loading button (Figma `4.2`) | 2.4 |
 | | `focusRing` | focus ring around a field | 3 |
 | A11y | `touchTargetMin` | Material minimum | 48 |
 
@@ -204,6 +205,7 @@ object AppDimens {
     // Strokes: not part of the 4 dp grid on purpose
     val strokeThin = 1.2.dp
     val strokeFocus = 1.5.dp
+    val strokeSpinner = 2.4.dp
     val focusRing = 3.dp
 
     // Accessibility
@@ -332,5 +334,5 @@ The legacy aliases carry the **new** values. Old screens move to the Figma sizes
 - [ ] I renamed old `iconSm` → `icon` **before** replacing the file.
 - [ ] I moved both files to `core/theme` with Refactor → Move, and imports updated.
 - [ ] App compiles. Deprecation warnings are expected. Fix them screen by screen with Alt+Enter.
-- [ ] Old `core/utils/constants/AppShapes.kt` is gone (moved, not duplicated).
+- [ ] Old `core/utils/constants/AppDimens.kt` and `AppShapes.kt` are deleted once no screen imports them (doc 14).
 - [ ] No `radiusField`, `radiusXl` or `radius2Xl` in new code (only the deprecated aliases).

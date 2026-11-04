@@ -2,16 +2,16 @@
 
 **Files (new):**
 
-- `core/designsystem/components/textfield/AppFieldStatus.kt`
-- `core/designsystem/components/textfield/AppTextField.kt`
-- `core/designsystem/components/textfield/AppPasswordField.kt`
-- `core/designsystem/components/textfield/AppPasswordStrength.kt`
-- `core/designsystem/components/textfield/AppSearchBar.kt`
-- `core/designsystem/components/textfield/AppOtpField.kt`
+- `core/common/components/textfield/AppFieldStatus.kt`
+- `core/common/components/textfield/AppTextField.kt`
+- `core/common/components/textfield/AppPasswordField.kt`
+- `core/common/components/textfield/AppPasswordStrength.kt`
+- `core/common/components/textfield/AppSearchBar.kt`
+- `core/common/components/textfield/AppOtpField.kt`
 
 **Replaces:** `core/common/components/TextField/AppTextField.kt` (`AppTextFiled`, typo, plus `AppTextFieldDefault`) and `core/common/components/TextField/AppPasswordTextField.kt`.
 
-> **Fix while you are here.** The old folder is `TextField` (capital T), but its files declare `package ...components.textfield`. The folder and the package don't match, which is the same bug we fixed for `Login/login`. The new files live in `designsystem/components/textfield/` (all lowercase). Delete the old `TextField` folder once [14](14_auth_screens_refactor.md) is done. The function name typo `AppTextFiled` disappears with it.
+> **Fix while you are here.** The old folder is `TextField` (capital T), but its files declare `package ...components.textfield`. The folder and the package don't match, which is the same bug we fixed for `Login/login`. The new files live in `core/common/components/textfield/` (all lowercase). Delete the old `TextField` folder once [14](14_auth_screens_refactor.md) is done. The function name typo `AppTextFiled` disappears with it.
 
 ---
 
@@ -61,7 +61,7 @@ Priority when several apply: **Disabled > Error > Success > Focused > Default.**
 ### `AppFieldStatus.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.textfield
+package com.example.dukkanapp.core.common.components.textfield
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -147,7 +147,7 @@ internal fun appFieldColors(
 ### `AppTextField.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.textfield
+package com.example.dukkanapp.core.common.components.textfield
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -186,7 +186,7 @@ import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
@@ -337,7 +337,7 @@ private fun AppFieldHelper(text: String, status: AppFieldStatus, color: Color) {
 ### `AppPasswordField.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.textfield
+package com.example.dukkanapp.core.common.components.textfield
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -358,7 +358,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.foundation.layout.size
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
@@ -413,7 +413,7 @@ fun AppPasswordField(
 In sign-up (Figma 02.3) the password field is followed by **4 segments** and a helper line: "Strong · 8+ characters, a number and a symbol".
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.textfield
+package com.example.dukkanapp.core.common.components.textfield
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateColorAsState
@@ -500,7 +500,7 @@ The 4 dp segment height is drawn once, here, so it stays local. Strings to add: 
 Figma has two variants: `Search/elevated` (on the home aurora, 52 dp, `card`, `shadows.float`) and `Search/field` (inside pages, 48 dp, `field`, no shadow). Both use a leading `search` icon in `textTertiary`, text at 14 Medium, and an optional brand filter button on the end (home header). Like every input, the search bar is a **pill** (radius/full).
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.textfield
+package com.example.dukkanapp.core.common.components.textfield
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -524,9 +524,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.components.button.AppIconButton
-import com.example.dukkanapp.core.designsystem.components.button.AppIconButtonVariant
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.common.components.buttons.AppIconButton
+import com.example.dukkanapp.core.common.components.buttons.AppIconButtonVariant
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
@@ -604,7 +604,7 @@ The field-variant height (48) is the only size not in `AppDimens`. It equals `to
 This is the 4-digit delivery code (team app C02.4 "Enter delivery code", and later phone OTP). Each box is 52 × 58, radius **`radiusLg` (16)** (Figma radius table: "OTP box → lg"), `card` fill, `border` 1.5 dp, and the digit is 22 sp ExtraBold. The focused box gets a `brand` border, and on error every box gets `error`.
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.textfield
+package com.example.dukkanapp.core.common.components.textfield
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

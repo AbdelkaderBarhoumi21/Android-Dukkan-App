@@ -7,8 +7,8 @@
 | `res/drawable/ic_lucide_*.xml` (76 files)                                                             | new (Vector Asset import)                      |
 | `res/drawable/ic_facebook.xml`                                                                        | new (Figma shows Google + Facebook, not Apple) |
 | `res/drawable/ic_dukkan_mark.xml`                                                                     | new (replaces `ic_app_logo.xml`)               |
-| `core/designsystem/icon/AppIcons.kt`                                                                  | new                                            |
-| `core/designsystem/components/logo/AppLogo.kt`                                                        | new                                            |
+| `core/utils/constants/AppIcons.kt`                                                                  | new                                            |
+| `core/common/components/AppLogoMark.kt`                                                        | new                                            |
 | `res/drawable/ic_launcher_foreground.xml`, `ic_launcher_background.xml`, `ic_launcher_monochrome.xml` | rewrite (Figma `3.2 · Android app icon`)       |
 | `res/mipmap-anydpi-v26/ic_launcher.xml`, `ic_launcher_round.xml`                                      | rewrite                                        |
 | `res/mipmap-*/ic_launcher.png` (legacy)                                                               | regenerate                                     |
@@ -144,7 +144,7 @@ Show them with `tint = Color.Unspecified`, so they're never recolored.
 ## Step 2 — `AppIcons.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.icon
+package com.example.dukkanapp.core.utils.constants
 
 import androidx.annotation.DrawableRes
 import com.example.dukkanapp.R
@@ -297,12 +297,12 @@ Figma `3.1 · Logo`: **"A shop awning with a smile — 'dukkan' means 'shop'. 4.
 3. Also export a **white** version as `ic_dukkan_mark_white` (for the launcher foreground and dark backgrounds).
 4. Delete `ic_app_logo.xml` once nothing references it.
 
-### Code — `AppLogo.kt`
+### Code — `AppLogoMark.kt`
 
 The wordmark is live text, not an image, so it stays sharp and follows the font.
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.logo
+package com.example.dukkanapp.core.common.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

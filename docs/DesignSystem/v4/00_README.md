@@ -91,31 +91,34 @@ The old `06 · Compose tokens` chapter is gone. The Kotlin in these docs is writ
 ```
 app/src/main/java/com/example/dukkanapp/
 └── core/
-    ├── designsystem/
-    │   ├── theme/                       ← package com.example.dukkanapp.core.theme
-    │   │   ├── AppPalette.kt            02  internal primitives
-    │   │   ├── AppColors.kt             03  semantic colors + LocalAppColors
-    │   │   ├── AppColorScheme.kt        04  Material ColorScheme built from AppColors
-    │   │   ├── AppGradients.kt          05  brushes + LocalAppGradients
-    │   │   ├── AppShadows.kt            05  shadows + Modifier.appShadow + LocalAppShadows
-    │   │   ├── AppTypography.kt         06  AppFontFamily + Material Typography
-    │   │   ├── AppTextStyles.kt         06  caption, overline, price… + LocalAppTextStyles
-    │   │   ├── AppDimens.kt             07  spacing, radius, sizes
-    │   │   ├── AppShapes.kt             07  Material Shapes + AppPillShape
-    │   │   ├── AppTheme.kt              08  composition root + accessor object
-    │   │   └── ThemeCatalogPreview.kt   08  previews of every token
-    │   ├── icon/
-    │   │   └── AppIcons.kt              09  Lucide icon ids
-    │   └── components/                  ← reusable UI built only from tokens
-    │       ├── logo/                    09  AppLogo, AppLogoMark
-    │       ├── button/                  10  AppButton, AppSocialButton, AppIconButton
-    │       ├── textfield/               11  AppTextField, AppPasswordField, AppSearchBar, AppOtpField…
-    │       ├── selection/               12  checkbox, radio, switch, chip
-    │       ├── display/                 12  badge, price, stepper, avatar, rating, pager…
-    │       ├── feedback/                12  toast, AppMessageBanner, AppEmptyState, AppSkeleton
-    │       └── layout/                  13  AppScreenBackground, AppScaffold
-    ├── common/components/               old components: delete each one once doc 14 replaces it
-    └── …
+    ├── theme/                           ← package com.example.dukkanapp.core.theme
+    │   ├── AppPalette.kt                02  internal primitives
+    │   ├── AppColors.kt                 03  semantic colors + LocalAppColors
+    │   ├── AppColorScheme.kt            04  Material ColorScheme built from AppColors
+    │   ├── AppGradients.kt              05  brushes + LocalAppGradients
+    │   ├── AppShadows.kt                05  shadows + Modifier.appShadow + LocalAppShadows
+    │   ├── AppTypography.kt             06  AppFontFamily + Material Typography
+    │   ├── AppTextStyles.kt             06  caption, overline, bodyStrong… + LocalAppTextStyles
+    │   ├── AppDimens.kt                 07  spacing, radius, sizes
+    │   ├── AppShapes.kt                 07  Material Shapes + AppPillShape
+    │   ├── AppTheme.kt                  08  composition root + accessor object
+    │   ├── AppPreviews.kt               08  shared multi-preview annotation
+    │   ├── ThemeCatalogPreview.kt       08  previews of every token
+    │   └── AppButtonsStyle.kt           10  button variants, sizes and state colors
+    ├── utils/constants/
+    │   ├── AppIcons.kt                  09  Lucide icon ids
+    │   ├── AppDimens.kt                 old: delete when no screen imports it (doc 14)
+    │   └── AppShapes.kt                 old: delete when no screen imports it (doc 14)
+    └── common/components/               ← reusable UI built only from tokens
+        ├── AppLogoMark.kt               09  AppLogo, AppLogoMark
+        ├── buttons/                     10  AppButton, AppSocialButton, AppIconButton
+        ├── textfield/                   11  AppTextField, AppPasswordField, AppSearchBar, AppOtpField…
+        ├── selection/                   12  checkbox, radio, switch, chip
+        ├── display/                     12  badge, price, stepper, avatar, rating, pager…
+        ├── feedback/                    12  toast, AppEmptyState, AppSkeleton
+        ├── banner/                      12  AppMessageBanner
+        ├── list/                        12  AppListRow
+        └── scaffold/                    13  AppScreenBackground, AppScaffold
 features/auth/presentation/components/common/   13  AppAuthHeader, AppAuthFooterLink, AppOrDivider
 features/settings/                       08  theme mode (ThemeMode, ThemeRepository, use cases, DataStore)
 app/src/main/res/
@@ -134,8 +137,8 @@ Files that **disappear** once you are done:
 | `core/config/theme/ThemePreview.kt` | `core/theme/ThemeCatalogPreview.kt` |
 | `core/utils/constants/AppColors.kt` (palette + schemes) | `AppPalette.kt` + `AppColorScheme.kt` |
 | `core/utils/constants/AppExtendedColors.kt` | `AppColors.kt` |
-| `core/utils/constants/AppDimens.kt` | `core/theme/AppDimens.kt` |
-| `core/utils/constants/AppShapes.kt` | `core/theme/AppShapes.kt` |
+| `core/utils/constants/AppDimens.kt` (after the screens move, doc 14) | `core/theme/AppDimens.kt` |
+| `core/utils/constants/AppShapes.kt` (after the screens move, doc 14) | `core/theme/AppShapes.kt` |
 | `res/font/konnect_*.otf` (18 files) | `res/font/plus_jakarta_sans_*.ttf` (5) + `cairo_*.ttf` (4) |
 
 Tip: move files with Android Studio **Refactor → Move** (F6). It rewrites imports in every screen for you. Then rename/rewrite the contents following each doc.

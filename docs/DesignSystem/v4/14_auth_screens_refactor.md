@@ -30,7 +30,7 @@ The code below follows the recommendations. If you choose otherwise, only the pa
    - `mail`, `lock`, `eye`, `eye-off`, `arrow-left`, `arrow-right`, `check`, `circle-check`, `circle-alert`, `info`, `x`, `user-round`, `user-plus`
    - `clock`, `banknote`, `refresh-cw`, `gift`, `map-pin`, `search`, `sliders-horizontal`, `plus`, `minus`, `star`, `chevron-right`
 
-   Register them in `AppIcons` (`core.designsystem.icon`, doc 08), which already exposes `EyeOff`, `Google` and `Facebook` as `@DrawableRes Int` ids. The Dukkan mark comes from `AppLogoMark` (doc 09).
+   Register them in `AppIcons` (`core.utils.constants`, doc 08), which already exposes `EyeOff`, `Google` and `Facebook` as `@DrawableRes Int` ids. The Dukkan mark comes from `AppLogoMark` (doc 09).
 2. **Components:** type doc 10 → 11 → 12 (12.1, 12.9, 12.12) → 13.
 3. **Shared auth bits (§2):** `AuthFormColumn`, `legalText`, `AppLinks`.
 4. **Screens, one per commit, building after each:**
@@ -199,12 +199,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.designsystem.components.button.AppButton
-import com.example.dukkanapp.core.designsystem.components.button.AppSocialButton
-import com.example.dukkanapp.core.designsystem.components.layout.AppScaffold
+import com.example.dukkanapp.core.common.components.buttons.AppButton
+import com.example.dukkanapp.core.common.components.buttons.AppSocialButton
+import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.components.layout.AppScreenBackground
+import com.example.dukkanapp.core.utils.constants.AppIcons
+import com.example.dukkanapp.core.common.components.scaffold.AppScreenBackground
 import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthFooterLink
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthHeader
@@ -386,19 +386,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.text.asString
-import com.example.dukkanapp.core.designsystem.components.button.AppButton
-import com.example.dukkanapp.core.designsystem.components.button.AppButtonSize
-import com.example.dukkanapp.core.designsystem.components.button.AppButtonVariant
-import com.example.dukkanapp.core.designsystem.components.button.AppSocialButton
-import com.example.dukkanapp.core.designsystem.components.feedback.AppMessageBanner
-import com.example.dukkanapp.core.designsystem.components.layout.AppScaffold
-import com.example.dukkanapp.core.designsystem.components.selection.AppCheckbox
-import com.example.dukkanapp.core.designsystem.components.textfield.AppFieldStatus
-import com.example.dukkanapp.core.designsystem.components.textfield.AppPasswordField
-import com.example.dukkanapp.core.designsystem.components.textfield.AppTextField
+import com.example.dukkanapp.core.common.components.buttons.AppButton
+import com.example.dukkanapp.core.theme.AppButtonSize
+import com.example.dukkanapp.core.theme.AppButtonVariant
+import com.example.dukkanapp.core.common.components.buttons.AppSocialButton
+import com.example.dukkanapp.core.common.components.banner.AppMessageBanner
+import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
+import com.example.dukkanapp.core.common.components.selection.AppCheckbox
+import com.example.dukkanapp.core.common.components.textfield.AppFieldStatus
+import com.example.dukkanapp.core.common.components.textfield.AppPasswordField
+import com.example.dukkanapp.core.common.components.textfield.AppTextField
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
-import com.example.dukkanapp.core.designsystem.components.layout.AppScreenBackground
+import com.example.dukkanapp.core.utils.constants.AppIcons
+import com.example.dukkanapp.core.common.components.scaffold.AppScreenBackground
 import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthFooterLink
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthHeader
@@ -760,17 +760,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.text.asString
-import com.example.dukkanapp.core.designsystem.components.button.AppButton
-import com.example.dukkanapp.core.designsystem.components.display.AppProgressBar
-import com.example.dukkanapp.core.designsystem.components.feedback.AppMessageBanner
-import com.example.dukkanapp.core.designsystem.components.layout.AppScaffold
-import com.example.dukkanapp.core.designsystem.components.selection.AppCheckbox
-import com.example.dukkanapp.core.designsystem.components.textfield.AppFieldStatus
-import com.example.dukkanapp.core.designsystem.components.textfield.AppPasswordField
-import com.example.dukkanapp.core.designsystem.components.textfield.AppPasswordStrength
-import com.example.dukkanapp.core.designsystem.components.textfield.AppTextField
+import com.example.dukkanapp.core.common.components.buttons.AppButton
+import com.example.dukkanapp.core.common.components.display.AppProgressBar
+import com.example.dukkanapp.core.common.components.banner.AppMessageBanner
+import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
+import com.example.dukkanapp.core.common.components.selection.AppCheckbox
+import com.example.dukkanapp.core.common.components.textfield.AppFieldStatus
+import com.example.dukkanapp.core.common.components.textfield.AppPasswordField
+import com.example.dukkanapp.core.common.components.textfield.AppPasswordStrength
+import com.example.dukkanapp.core.common.components.textfield.AppTextField
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthFooterLink
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthHeader
@@ -1090,15 +1090,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.text.asString
-import com.example.dukkanapp.core.designsystem.components.button.AppButton
-import com.example.dukkanapp.core.designsystem.components.button.AppButtonSize
-import com.example.dukkanapp.core.designsystem.components.button.AppButtonVariant
-import com.example.dukkanapp.core.designsystem.components.display.AppProgressBar
-import com.example.dukkanapp.core.designsystem.components.feedback.AppMessageBanner
-import com.example.dukkanapp.core.designsystem.components.feedback.AppMessageKind
-import com.example.dukkanapp.core.designsystem.components.layout.AppScaffold
-import com.example.dukkanapp.core.designsystem.components.layout.AppScreenBackground
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.common.components.buttons.AppButton
+import com.example.dukkanapp.core.theme.AppButtonSize
+import com.example.dukkanapp.core.theme.AppButtonVariant
+import com.example.dukkanapp.core.common.components.display.AppProgressBar
+import com.example.dukkanapp.core.common.components.banner.AppMessageBanner
+import com.example.dukkanapp.core.common.components.banner.AppMessageKind
+import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
+import com.example.dukkanapp.core.common.components.scaffold.AppScreenBackground
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.core.theme.appShadow
@@ -1357,7 +1357,7 @@ private fun NotVerifiedPreview() {
 }
 ```
 
-> **Sizes read off Figma** (36 dp icon tile, 28 dp step circles, 13 / 13.5 sp titles) are used only in this file, so they stay local. If another screen needs the numbered-steps card, move `StepsCard` to `core/designsystem/components/display/`.
+> **Sizes read off Figma** (36 dp icon tile, 28 dp step circles, 13 / 13.5 sp titles) are used only in this file, so they stay local. If another screen needs the numbered-steps card, move `StepsCard` to `core/common/components/display/`.
 
 > **The guide's "Use another account" button** isn't in Figma 02.6/02.7. The back arrow (`BackClicked`) now does the same thing: sign out and return to Welcome.
 

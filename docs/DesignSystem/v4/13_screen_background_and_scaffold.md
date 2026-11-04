@@ -4,8 +4,8 @@
 
 | File | Status |
 |---|---|
-| `core/designsystem/components/layout/AppScreenBackground.kt` | new |
-| `core/designsystem/components/layout/AppScaffold.kt` | new, replaces `core/common/components/scaffold/AppScaffold.kt` |
+| `core/common/components/scaffold/AppScreenBackground.kt` | new |
+| `core/common/components/scaffold/AppScaffold.kt` | new, replaces `core/common/components/scaffold/AppScaffold.kt` |
 | `features/auth/presentation/components/common/AppAuthHeader.kt` | moved and rewritten from `core/common/components/header/AppAuthHeader.kt` |
 | `features/auth/presentation/components/common/AppAuthFooterLink.kt` | moved and rewritten from `core/common/components/footer/AppAuthFooterLink.kt` |
 | `features/auth/presentation/components/common/AppOrDivider.kt` | new, replaces `core/common/components/dividers/AppDivider.kt` on auth screens |
@@ -59,7 +59,7 @@ The Figma "white · 35 %" is **not** a header blob: it is the **card highlight**
 ### `AppScreenBackground.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.layout
+package com.example.dukkanapp.core.common.components.scaffold
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -162,7 +162,7 @@ What changes from today's `AppScaffold`:
 | default insets | `contentWindowInsets = WindowInsets.safeDrawing`, so content stays clear of the status bar, navigation bar **and** keyboard |
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.layout
+package com.example.dukkanapp.core.common.components.scaffold
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -187,13 +187,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.designsystem.components.button.AppIconButton
-import com.example.dukkanapp.core.designsystem.components.button.AppIconButtonVariant
-import com.example.dukkanapp.core.designsystem.components.feedback.AppToastHost
-import com.example.dukkanapp.core.designsystem.components.feedback.AppToastPlacement
-import com.example.dukkanapp.core.designsystem.components.feedback.AppToastState
+import com.example.dukkanapp.core.common.components.buttons.AppIconButton
+import com.example.dukkanapp.core.common.components.buttons.AppIconButtonVariant
+import com.example.dukkanapp.core.common.components.feedback.AppToastHost
+import com.example.dukkanapp.core.common.components.feedback.AppToastPlacement
+import com.example.dukkanapp.core.common.components.feedback.AppToastState
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
@@ -331,7 +331,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import com.example.dukkanapp.core.designsystem.components.logo.AppLogoMark
+import com.example.dukkanapp.core.common.components.AppLogoMark
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 
@@ -388,7 +388,7 @@ fun AppAuthHeader(
 }
 ```
 
-**Logo:** `AppLogoMark(modifier, size)` comes from `core/designsystem/components/logo/AppLogo.kt` (doc 09). Don't create a second logo drawable here. Pass the size with `size = logo.size`. For the Log in screen use `AuthHeaderLogo.Mark(AppDimens.logoMark)` (48 dp).
+**Logo:** `AppLogoMark(modifier, size)` comes from `core/common/components/AppLogoMark.kt` (doc 09). Don't create a second logo drawable here. Pass the size with `size = logo.size`. For the Log in screen use `AuthHeaderLogo.Mark(AppDimens.logoMark)` (48 dp).
 
 ### `AppAuthFooterLink.kt`
 
@@ -405,9 +405,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.dukkanapp.core.designsystem.components.button.AppButton
-import com.example.dukkanapp.core.designsystem.components.button.AppButtonSize
-import com.example.dukkanapp.core.designsystem.components.button.AppButtonVariant
+import com.example.dukkanapp.core.common.components.buttons.AppButton
+import com.example.dukkanapp.core.theme.AppButtonSize
+import com.example.dukkanapp.core.theme.AppButtonVariant
 import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable

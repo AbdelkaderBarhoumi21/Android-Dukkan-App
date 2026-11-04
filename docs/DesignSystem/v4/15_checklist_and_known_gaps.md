@@ -53,7 +53,7 @@ grep -rnE "core\.config\.theme|core\.utils\.constants\.(AppDimens|AppShapes|AppE
 grep -rnE "radiusField|radiusXl|radius2Xl" app/src/main/java | grep -v "AppDimens.kt"
 
 # Disabled inputs/buttons drawn with alpha instead of tokens (selection controls may still use alpha)
-grep -rn "alpha(if (enabled)" app/src/main/java/com/example/dukkanapp/core/designsystem/components/textfield app/src/main/java/com/example/dukkanapp/core/designsystem/components/button
+grep -rn "alpha(if (enabled)" app/src/main/java/com/example/dukkanapp/core/common/components/textfield app/src/main/java/com/example/dukkanapp/core/common/components/buttons
 
 # Old icon libraries
 grep -rnE "Iconsax|Icons\.(Filled|Outlined|AutoMirrored)" app/src/main/java

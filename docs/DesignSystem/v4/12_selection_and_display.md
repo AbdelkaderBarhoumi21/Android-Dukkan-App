@@ -5,19 +5,19 @@ This doc covers the small atoms and molecules from Figma pages **4.1 · Atoms**,
 **Folders (new):**
 
 ```
-core/designsystem/components/
+core/common/components/
 ├── selection/   AppCheckbox.kt · AppRadio.kt · AppSwitch.kt · AppChip.kt
-├── display/     AppBadge.kt · AppPriceText.kt · AppQuantity.kt · AppAvatar.kt · AppRating.kt
+├── display/     AppBadge.kt · AppPriceText.kt · AppQuantity.kt · AppAvatar.kt ·
 │                AppPagerIndicator.kt · AppProgressBar.kt · AppStatusSteps.kt
-├── feedback/    AppToast.kt · AppToastHost.kt · AppMessageBanner.kt · AppEmptyState.kt · AppSkeleton.kt
-└── layout/      AppListRow.kt
+├── feedback/    AppToast.kt · AppToastHost.kt · AppEmptyState.kt · AppSkeleton.kt
+├── banner/      AppMessageBanner.kt (already there: rewrite it)
+└── list/        AppListRow.kt
 ```
 
 **Replaces:**
 
 - `core/common/components/checkbox/AppCheckBox.kt`
 - `core/common/components/pager/AppPagerIndicator.kt`
-- `core/common/components/banner/AppMessageBanner.kt`
 - `core/common/components/dividers/AppDivider.kt` (use `HorizontalDivider(color = AppTheme.colors.border)` or `AppOrDivider` from doc 13)
 
 ---
@@ -41,7 +41,7 @@ core/designsystem/components/
 The label is 12.5 sp SemiBold in `textLabel`, with a gap of `space8`. The row is at least 48 dp tall.
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.selection
+package com.example.dukkanapp.core.common.components.selection
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -67,7 +67,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
 
 private val CheckboxShape = RoundedCornerShape(percent = 30)
@@ -144,7 +144,7 @@ fun AppCheckbox(
 | On | 22 dp, `brand` fill | 8 dp `onBrand` |
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.selection
+package com.example.dukkanapp.core.common.components.selection
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -189,7 +189,7 @@ fun AppRadio(selected: Boolean, modifier: Modifier = Modifier) {
 46 × 28, pill shaped. On = `brand` track, off = `border` track. The thumb is 22 dp `card` with `shadows.card`, and it slides with an animation.
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.selection
+package com.example.dukkanapp.core.common.components.selection
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -259,7 +259,7 @@ Height 34, pill shaped, padding `space12`, label `labelMedium` (12.5 Bold).
 | Selected | `brandSoft` | `brand` 1.2 dp | `brandSoftText` |
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.selection
+package com.example.dukkanapp.core.common.components.selection
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -329,7 +329,7 @@ Height 20, pill shaped, horizontal padding `space8`, text 10.5 sp Bold.
 | `Rating` | `warningSoft` | `warningText` | ★ 4.8 |
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.display
+package com.example.dukkanapp.core.common.components.display
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -401,7 +401,7 @@ Figma `Price`: one line with **two text styles**, the amount and a smaller curre
  Prices in Firestore are **integer millimes** (1 TND = 1000 millimes), so `279.000 TND` is stored as `279000`. Never store a `Double` for money.
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.display
+package com.example.dukkanapp.core.common.components.display
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -476,7 +476,7 @@ fun AppPriceText(
 The rule from Figma is: the **Add (+) button turns into the stepper when the item is in the cart.**
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.display
+package com.example.dukkanapp.core.common.components.display
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -498,10 +498,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.designsystem.components.button.AppIconButton
-import com.example.dukkanapp.core.designsystem.components.button.AppIconButtonVariant
+import com.example.dukkanapp.core.common.components.buttons.AppIconButton
+import com.example.dukkanapp.core.common.components.buttons.AppIconButtonVariant
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
 
@@ -579,7 +579,7 @@ fun AppCountBubble(count: Int, modifier: Modifier = Modifier) {
 | Rating | `star` icon in `gold` (filled), then "4.8 (1.2k)" in `caption`, `textLabel` |
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.display
+package com.example.dukkanapp.core.common.components.display
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -601,7 +601,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
@@ -654,7 +654,7 @@ fun AppRating(value: String, count: String?, modifier: Modifier = Modifier) {
 | Progress bar (sign-up "1/2") | 4 dp track, `border`, with a `brand` fill and animated progress |
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.display
+package com.example.dukkanapp.core.common.components.display
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -723,7 +723,7 @@ Figma "Status steps" are the order timeline: **Placed, Packing, On the way, At d
 The values map 1:1 to `orders/{id}.status` (see the Firebase docs).
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.display
+package com.example.dukkanapp.core.common.components.display
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -742,7 +742,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
 
@@ -857,7 +857,7 @@ Status colours follow the theme automatically:
 ### Code: `AppToast.kt`
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.feedback
+package com.example.dukkanapp.core.common.components.feedback
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -901,7 +901,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppShadow
@@ -1151,7 +1151,7 @@ Note the shape of `ToastCore`: `appShadow` first, then `background`, the same mo
 Material's `SnackbarHost` is **not** used. It queues messages (Figma says a new toast replaces the current one), sits at the bottom (Figma says top), and has fixed durations. A small state holder and host are simpler than fighting it.
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.feedback
+package com.example.dukkanapp.core.common.components.feedback
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
@@ -1439,7 +1439,7 @@ The banner stays the same idea: one message that isn't tied to a field (doc: aut
 | `Info` | `brandSoft` | none | `brandSoftText` · `info` |
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.feedback
+package com.example.dukkanapp.core.common.components.banner
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -1460,7 +1460,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
 
 enum class AppMessageKind { Error, Success, Info }
@@ -1507,7 +1507,7 @@ fun AppMessageBanner(
 The row is 56 dp minimum with horizontal padding `space16`. It has a leading 36 dp `field` circle with an icon in `textPrimary`, then the title (`titleSmall`) and optional subtitle (`bodySmall`, `textSecondary`). At the end there is a value (`labelMedium`, `brand`) and a `chevron-right` (`textTertiary`), or an `AppSwitch`.
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.layout
+package com.example.dukkanapp.core.common.components.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -1530,7 +1530,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
@@ -1595,7 +1595,7 @@ Figma board **14 · Empty & loading states**: empty lists for orders (14.1), not
 The tile size (72) and icon size (32) are read off the Figma frames; they belong to this component only.
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.feedback
+package com.example.dukkanapp.core.common.components.feedback
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -1616,8 +1616,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.designsystem.components.button.AppButton
-import com.example.dukkanapp.core.designsystem.components.button.AppButtonVariant
+import com.example.dukkanapp.core.common.components.buttons.AppButton
+import com.example.dukkanapp.core.theme.AppButtonVariant
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 
@@ -1699,7 +1699,7 @@ Figma 14.4 (Home loading) and 14.5 (Product grid loading): grey placeholder bloc
 | Reduced motion | no movement: blocks stay plain `field` |
 
 ```kotlin
-package com.example.dukkanapp.core.designsystem.components.feedback
+package com.example.dukkanapp.core.common.components.feedback
 
 import android.provider.Settings
 import androidx.compose.animation.core.LinearEasing

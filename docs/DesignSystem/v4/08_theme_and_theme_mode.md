@@ -11,7 +11,7 @@
 | `features/settings/domain/repository/ThemeRepository.kt` | new |
 | `features/settings/domain/usecase/ObserveThemeModeUseCase.kt` | new |
 | `features/settings/domain/usecase/SetThemeModeUseCase.kt` | new |
-| `features/settings/data/datasource/ThemePreferenceLocalDataSource.kt` | new |
+| `features/settings/data/datasources/local/ThemePreferenceLocalDataSource.kt` | new |
 | `features/settings/data/repository/ThemeRepositoryImpl.kt` | new |
 | `features/settings/di/SettingsModule.kt` | new |
 | `core/utils/constants/AppPreferencesKeys.kt` | edit: add `THEME_MODE` |
@@ -154,7 +154,7 @@ Import `androidx.datastore.preferences.core.stringPreferencesKey` if the file do
 ### Code — `ThemePreferenceLocalDataSource.kt`
 
 ```kotlin
-package com.example.dukkanapp.features.settings.data.datasource
+package com.example.dukkanapp.features.settings.data.datasources.local
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -197,7 +197,7 @@ interface ThemeRepository {
 ```kotlin
 package com.example.dukkanapp.features.settings.data.repository
 
-import com.example.dukkanapp.features.settings.data.datasource.ThemePreferenceLocalDataSource
+import com.example.dukkanapp.features.settings.data.datasources.local.ThemePreferenceLocalDataSource
 import com.example.dukkanapp.features.settings.domain.model.ThemeMode
 import com.example.dukkanapp.features.settings.domain.repository.ThemeRepository
 import kotlinx.coroutines.flow.Flow
@@ -444,6 +444,9 @@ private fun AppColors.asNamedList(): List<Pair<String, Color>> = listOf(
     "error" to error, "errorSoft" to errorSoft, "errorBorder" to errorBorder,
     "deal" to deal, "dealSoft" to dealSoft, "gold" to gold,
     "inverse" to inverse, "onInverse" to onInverse, "scrim" to scrim, "shadow" to shadow,
+    "iconWishlist" to iconWishlist, "iconSilver" to iconSilver, "borderSubtle" to borderSubtle,
+    "handle" to handle, "skeleton" to skeleton, "skeletonHighlight" to skeletonHighlight,
+    "textPoints" to textPoints, "textFlash" to textFlash,
 )
 
 @Composable
