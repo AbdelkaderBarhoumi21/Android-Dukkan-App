@@ -56,7 +56,7 @@ v4 names spacing **by value**, exactly like Figma: `space/16` → `space16`. Rad
 | | `checkbox` | size/checkbox | 20 |
 | | `switchHeight` | size/switch-height (switch track) | 28 |
 | | `switchWidth` | size/switch-width (switch track) | 46 |
-| | `toast` | size/toast | 58 |
+| | `toast` | size/toast | 64 |
 | | `screenWidth` | size/screen-width (design frame, previews only) | 393 |
 | | `screenHeight` | size/screen-height (design frame, previews only) | 852 |
 | Icons | `iconSm` | icon/sm: small icons in badges / steppers | 16 |
@@ -71,7 +71,7 @@ v4 names spacing **by value**, exactly like Figma: `space/16` → `space16`. Rad
 | | `focusRing` | focus ring around a field | 3 |
 | A11y | `touchTargetMin` | Material minimum | 48 |
 
-### Figma `01c · Size tokens`
+### Figma `1.4 · Sizes & spacing`
 
 Figma now has a **Size tokens** chapter: every radius, component size, spacing and icon size, stored as local variables (collection "Sizes"). Select a layer in Figma and its W / H / corner-radius field shows a token chip, for example `size/button-lg`.
 In code, every token stays in the one `AppDimens` object. The name is the Figma name in camelCase: `size/button-lg` → `AppDimens.buttonLg`, `size/option-md` → `AppDimens.optionMd`, `radius/screen` → `AppDimens.radiusScreen`.
@@ -97,7 +97,7 @@ Two old names don't follow that rule, because renaming them would silently chang
 
 ### One radius scale (Figma: "Radius · one scale")
 
-Figma now has **one** scale, **10 / 14 / 16 / 20 / 28 / full**, with the same values in Foundations and in the Compose chapter. The old conflict (Foundations 14/18/22 vs components 16/20) is gone.
+Figma now has **one** scale, **10 / 14 / 16 / 20 / 28 / full**, in chapter `1.4` and in the `Sizes` variables. The old conflict (Foundations 14/18/22 vs components 16/20) is gone.
 
 **Component → radius token** (Figma table):
 
@@ -164,7 +164,7 @@ object AppDimens {
     val controlMd = 44.dp
     val controlSm = 36.dp
 
-    // Component sizes: Figma size/* (01c · Size tokens)
+    // Component sizes: Figma size/* (1.4 · Sizes & spacing)
     val buttonLg = 52.dp       // primary & outline buttons
     val buttonCompact = 48.dp  // danger / compact buttons
     val buttonMd = 44.dp       // secondary buttons
@@ -186,7 +186,7 @@ object AppDimens {
     val checkbox = 20.dp       // checkbox
     val switchHeight = 28.dp   // switch track
     val switchWidth = 46.dp    // switch track
-    val toast = 58.dp          // toast
+    val toast = 64.dp          // toast
     val screenWidth = 393.dp   // design frame (previews only)
     val screenHeight = 852.dp  // design frame (previews only)
 
@@ -239,7 +239,7 @@ object AppDimens {
     @Deprecated("Use iconSm (16) or icon (20)") val icon2Xs = 12.dp
     @Deprecated("Use controlLg", ReplaceWith("AppDimens.controlLg")) val buttonHeight = 52.dp
     @Deprecated("Use strokeThin", ReplaceWith("AppDimens.strokeThin")) val borderWidth = 1.dp
-    @Deprecated("Use strokeThin", ReplaceWith("AppDimens.strokeThin")) val dividerHeight = 1.dp
+    @Deprecated("Use strokeThin", ReplaceWith("AppDimens.strokeThin")) val borderSubtleHeight = 1.dp
     @Deprecated("Use screenPadding", ReplaceWith("AppDimens.screenPadding")) val screenHorizontalPadding = 20.dp
     @Deprecated("Checkbox radius; use radiusSm") val radiusXs = 6.dp
     @Deprecated("Not in the Figma scale; use radiusSm") val radius3Xs = 2.dp
@@ -258,7 +258,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
 
 /**
- * Material shapes, same as Figma "06 · Compose tokens → Shape.kt" (one scale).
+ * Material shapes, same as Figma's radius variables (one scale).
  * Material widgets read these (cards → medium/large, sheets → extraLarge, menus → extraSmall).
  */
 internal val AppShapes = Shapes(

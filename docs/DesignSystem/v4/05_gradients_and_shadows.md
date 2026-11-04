@@ -17,7 +17,7 @@ Both have a light and a dark instance, so a component never checks the mode.
 
 ## Figma spec
 
-### Gradients (`01 · Foundations → Gradients`, "every stop is a primitive")
+### Gradients (`1.1 · Colour & effects → Gradients`, "every stop is a primitive")
 
 | Field        | Stops                                     | Direction  | Compose brush                                                                      |
 | ------------ | ----------------------------------------- | ---------- | ---------------------------------------------------------------------------------- |
@@ -42,7 +42,7 @@ Doc 13 (`AppScreenBackground`) places the blobs. This doc only defines the color
 
 **Card highlight** (`cardHighlight`): white · 35 %, a radial glow centered on the **top-right corner** with radius 90, drawn **only inside gradient cards** (promo banners, wallet card, earnings card). Same in light and dark. It is *not* part of the aurora: an earlier version of these docs put a "white blob" in the header, which was wrong. Use `Modifier.cardHighlight()` (code below).
 
-### Shadows (`01 · Foundations → Elevation`: x 0 · y · blur · color)
+### Shadows (`1.1 · Colour & effects → Elevation`: x 0 · y · blur · color)
 
 | Field              | Color             | Offset Y | Blur | Used by                                                                   |
 | ------------------ | ----------------- | -------- | ---- | ------------------------------------------------------------------------- |
@@ -52,7 +52,7 @@ Doc 13 (`AppScreenBackground`) places the blobs. This doc only defines the color
 | `deal`             | orange-500 @ 30 % | 8        | 20   | deal button                                                               |
 | `screen` (**new**) | slate-900 @ 10 %  | 18       | 44   | the phone frame / full-screen surfaces (e.g. a raised sheet over the map) |
 
-### Dark mode (`01b · Dark mode → Gradients & elevation · dark`)
+### Dark mode (`1.2 · Dark mode → Gradients & elevation · dark`)
 
 Figma: "Brand, button, deal and gold gradients stay the same. Tint and fades go to night. Shadows go black; cards add a 1 px night-700 border."
 
@@ -127,9 +127,9 @@ private fun diagonal(start: Color, end: Color): Brush =
         end = Offset.Infinite,
     )
 
-/** Transparent → opaque [color], top to bottom. */
-private fun fadeTo(color: Color): Brush =
-    Brush.verticalGradient(listOf(color.copy(alpha = 0f), color))
+/** Transparent → opaque [color], top to bottom, opaque from [solidFrom] on. */
+private fun fadeTo(color: Color, solidFrom: Float = 1f): Brush =
+    Brush.verticalGradient(0f to color.copy(alpha = 0f), solidFrom to color)
 
 private val SharedBrand = diagonal(AppPalette.Azure400, AppPalette.Blue700)
 private val SharedButton = Brush.horizontalGradient(listOf(AppPalette.Azure500, AppPalette.Blue700))
@@ -145,7 +145,7 @@ internal val LightAppGradients = AppGradients(
     brand = SharedBrand,
     button = SharedButton,
     screenTint = Brush.verticalGradient(listOf(AppPalette.Azure100, AppPalette.Slate50)),
-    bottomFade = fadeTo(AppPalette.Slate50),
+    bottomFade = fadeTo(AppPalette.Slate50, solidFrom = 0.5f), // Figma `Fade/Background`
     deal = SharedDeal,
     gold = SharedGold,
     navy = SharedNavy,
@@ -202,7 +202,19 @@ fun Modifier.cardHighlight(color: Color, radius: Dp = 90.dp): Modifier = drawBeh
 
 ## Code — `AppShadows.kt`
 
-Dark mode cards get a **1 dp night-700 border** next to the black shadow (Figma `01b`). We put that border **inside the shadow token** (`outline`), so every component that already calls `appShadow(AppTheme.shadows.card, shape)` gets the border in dark mode for free. In light mode `outline` is `Color.Unspecified` and nothing is drawn.
+Dark mode cards get a **1 dp night-700 border** next to the black shadow (Figma `1.2`). We put that border **inside the shadow token** (`outline`), so every component that already calls `appShadow(AppTheme.shadows.card, shape)` gets the border in dark mode for free. In light mode `outline` is `Color.Unspecified` and nothing is drawn.
+
+### `Elevation/Toast` (new, 3 layers)
+
+The toast has its own effect style with several layers, so it isn't a single `AppShadow`. Its component is in doc 12.11.
+
+| Layer | Light `Elevation/Toast` | Dark `Dark/Elevation/Toast` |
+|---|---|---|
+| 1 | 0 1 2, 0 spread, `#0F172A` 5 % | 0 1 2, 0 spread, black 40 % |
+| 2 | 0 8 20, −4 spread, `#0F172A` 10 % | 0 12 32, −8 spread, black 55 % |
+| 3 | 0 20 40, −12 spread, `#0F172A` 10 % | 0 1 0, 0 spread, white 6 % |
+
+The dark layer 3 is an **inner shadow** (`INNER_SHADOW` in the Figma effect style): a hairline highlight along the top edge. That's `topHighlight` in the code.
 
 ```kotlin
 package com.example.dukkanapp.core.theme
@@ -241,6 +253,24 @@ data class AppShadows(
     val button: AppShadow,
     val deal: AppShadow,
     val screen: AppShadow,
+    val toast: AppToastTokens,
+)
+
+/**
+ * Figma `Elevation/Toast` and the toast's status tints (`4.4 · Toast`).
+ * [topHighlight] is drawn inside the shape: dark mode only.
+ * [onStatus] is the colour of the glyph and action label on a status fill.
+ * [haloAlpha] and [ringAlpha] are the status colour's alpha in the 44 and 34 icon circles.
+ */
+@Immutable
+data class AppToastTokens(
+    val layers: List<AppShadow>,
+    val topHighlight: AppShadow?,
+    val washAlpha: Float,
+    val borderAlpha: Float,
+    val haloAlpha: Float,
+    val ringAlpha: Float,
+    val onStatus: Color,
 )
 
 internal val LightAppShadows = AppShadows(
@@ -249,9 +279,22 @@ internal val LightAppShadows = AppShadows(
     button = AppShadow(AppPalette.Blue600.copy(alpha = 0.30f), offsetY = 8.dp, blur = 20.dp),
     deal = AppShadow(AppPalette.Orange500.copy(alpha = 0.30f), offsetY = 8.dp, blur = 20.dp),
     screen = AppShadow(AppPalette.Slate900.copy(alpha = 0.10f), offsetY = 18.dp, blur = 44.dp),
+    toast = AppToastTokens(
+        layers = listOf(
+            AppShadow(AppPalette.Slate900.copy(alpha = 0.05f), offsetY = 1.dp, blur = 2.dp),
+            AppShadow(AppPalette.Slate900.copy(alpha = 0.10f), offsetY = 8.dp, blur = 20.dp, spread = (-4).dp),
+            AppShadow(AppPalette.Slate900.copy(alpha = 0.10f), offsetY = 20.dp, blur = 40.dp, spread = (-12).dp),
+        ),
+        topHighlight = null,
+        washAlpha = 0.09f,
+        borderAlpha = 0.18f,
+        haloAlpha = 0.10f,
+        ringAlpha = 0.16f,
+        onStatus = AppPalette.White,
+    ),
 )
 
-/** Figma 01b: surfaces go black + 1 dp night-700 border; button and deal keep a coloured glow. */
+/** Figma 1.2: surfaces go black + 1 dp night-700 border; button and deal keep a coloured glow. */
 internal val DarkAppShadows = AppShadows(
     card = AppShadow(
         AppPalette.Black.copy(alpha = 0.45f), offsetY = 4.dp, blur = 14.dp,
@@ -266,6 +309,18 @@ internal val DarkAppShadows = AppShadows(
     screen = AppShadow(
         AppPalette.Black.copy(alpha = 0.60f), offsetY = 18.dp, blur = 44.dp,
         outline = AppPalette.Night700,
+    ),
+    toast = AppToastTokens(
+        layers = listOf(
+            AppShadow(AppPalette.Black.copy(alpha = 0.40f), offsetY = 1.dp, blur = 2.dp),
+            AppShadow(AppPalette.Black.copy(alpha = 0.55f), offsetY = 12.dp, blur = 32.dp, spread = (-8).dp),
+        ),
+        topHighlight = AppShadow(AppPalette.White.copy(alpha = 0.06f), offsetY = 1.dp, blur = 0.dp),
+        washAlpha = 0.16f,
+        borderAlpha = 0.24f,
+        haloAlpha = 0.14f,
+        ringAlpha = 0.22f,
+        onStatus = AppPalette.Night900,
     ),
 )
 
@@ -294,6 +349,10 @@ fun Modifier.appShadow(shadow: AppShadow, shape: Shape): Modifier {
         withShadow
     }
 }
+
+/** A multi-layer Figma effect style, such as `Elevation/Toast`. Same modifier-order rule as [appShadow]. */
+fun Modifier.appShadowLayers(layers: List<AppShadow>, shape: Shape): Modifier =
+    layers.fold(this) { modifier, layer -> modifier.appShadow(layer, shape) }
 ```
 
 ## Explained
@@ -345,7 +404,7 @@ A shadow is four values that only make sense together (color + y + blur + spread
 
 - Gradients do not mirror in RTL. 135° goes from the top-**left** in both directions. Figma's brand moments (logo, banners) don't need mirroring. If a horizontal gradient must follow reading direction, flip it in the component with `LocalLayoutDirection`.
 - Brushes are created once (top-level `val`s), not inside composables, so they aren't allocated on every recomposition.
-- Pressed buttons have **no lift** (Figma `03b`): the button component simply skips `appShadow` while pressed (doc 10).
+- Pressed buttons have **no lift** (Figma `4.2`): the button component simply skips `appShadow` while pressed (doc 10).
 
 ## Check
 

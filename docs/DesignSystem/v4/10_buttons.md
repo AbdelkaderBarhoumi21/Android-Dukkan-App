@@ -54,23 +54,23 @@ All variants use the pill shape (`AppPillShape`), a label in `labelLarge` (Bold)
 | Size         | Figma token                             | Height | Horizontal padding | Label size           | Used for                  |
 | ------------ | --------------------------------------- | ------ | ------------------ | -------------------- | ------------------------- |
 | `Large`      | `size/button-lg` → `buttonLg`           | 52     | `space24`          | 15 sp (`labelLarge`) | primary & outline buttons |
-| `Compact`    | `size/button-compact` → `buttonCompact` | 48     | `space24`          | 14.5 sp              | danger / compact buttons  |
-| `Medium`     | `size/button-md` → `buttonMd`           | 44     | `space20`          | 14 sp                | secondary buttons         |
-| `Small`      | `size/button-sm` → `buttonSm`           | 36     | `space16`          | 12.5 sp              | small buttons             |
-| `ExtraSmall` | `size/button-xs` → `buttonXs`           | 26     | `space12`          | 12 sp                | inline "Apply" on coupons |
+| `Compact`    | `size/button-compact` → `buttonCompact` | 48     | `space24`          | 13.5 sp (`bodyStrong`) | danger / compact buttons  |
+| `Medium`     | `size/button-md` → `buttonMd`           | 44     | `space20`          | 13.5 sp (`bodyStrong`) | secondary buttons         |
+| `Small`      | `size/button-sm` → `buttonSm`           | 36     | `space16`          | 12.5 sp (`labelMedium`) | small buttons             |
+| `ExtraSmall` | `size/button-xs` → `buttonXs`           | 26     | `space12`          | 12.5 sp (`labelMedium`) | inline "Apply" on coupons |
 
-`Compact` and `ExtraSmall` label sizes and `ExtraSmall` padding are not listed in the Figma size tokens (it only gives the heights). They are our choice, between the neighbouring sizes. Check them against the Figma frames and adjust.
+Label styles come from the Figma atoms (`Button/primary M`, `Button/primary S`, `Button/checkout`, `Button/danger`). `ExtraSmall`'s label and padding are our choice, because no atom shows that size.
 
 **`size/button-slide` (58 dp, "slide to order / accept")** is **not** an `AppButtonSize`. It is a swipe-to-confirm control with a draggable thumb, so it gets its own composable (`AppSlideButton`, using `AppDimens.buttonSlide` and `gradients.button`) when the checkout screen needs it. It isn't built yet.
 
 Use the Figma name in new code (`buttonLg`), not the older `controlLg`. They have the same value.
 
-**States (Figma `03b · Atom states`).** "Default · Pressed · Disabled · Loading for the 3 main variants":
+**States (Figma `4.2 · Atom states`).** "Default · Pressed · Disabled · Loading for the 3 main variants":
 
 | State        | Primary                                                                 | Tonal            | Outline                      | Other variants (our rule, same idea)                          |
 | ------------ | ----------------------------------------------------------------------- | ---------------- | ---------------------------- | ------------------------------------------------------------- |
 | Default      | `gradients.button` + `shadows.button`                                   | `brandSoft`      | `card` + `border`            | as the table above                                            |
-| **Pressed**  | **solid `brandPressed` fill, no shadow** ("no lift")                    | `brandRing` fill | `field` fill, `border` stays | Deal: gradient, no shadow. Dark / Ghost / Danger: ripple only |
+| **Pressed**  | **solid `brandPressed` fill, no shadow** ("no lift")                    | `brandRing` fill | **`border` fill**, `border` stays | Deal: gradient, no shadow. Dark / Ghost / Danger: ripple only |
 | **Disabled** | `field` fill, `textTertiary` label, no border, no shadow                | same             | same                         | same (Ghost keeps a transparent fill)                         |
 | **Loading**  | fill stays; **the spinner replaces the trailing icon, the label stays** | same             | same                         | same                                                          |
 
@@ -79,7 +79,7 @@ Rules that apply to every variant:
 - **Pressed = no lift.** The shadow disappears while the finger is down, and there is no scale animation. The ripple still shows.
 - **Loading** ignores clicks and TalkBack reads "Loading". If the button has no trailing icon, the spinner takes the trailing icon's place (20 dp, after the label), so the label shifts a little. That's Figma's "spinner replaces the trailing icon, label stays".
 
-**Social button (`Social/Google`, `Social/Facebook`):** `card` fill, `border` 1.2 dp, height 52, label 14.5 sp Bold `textPrimary`, untinted brand logo at 20 dp.
+**Social button (`Social/Google`, `Social/Facebook`):** `card` fill, `border` 1.2 dp, height 52, label `labelLarge` 15 Bold `textPrimary`, untinted brand logo at 20 dp.
 
 **Icon button (`Icon button/*`):** a 44 dp circle (`iconButton`, Figma `size/icon-button`) with a 20 dp icon.
 
@@ -135,7 +135,7 @@ internal data class AppButtonStyle(
 )
 
 /**
- * Maps a variant + state to colors (Figma `03 · Atoms` + `03b · Atom states`).
+ * Maps a variant + state to colors (Figma `4.1 · Atoms` + `4.2 · Atom states`).
  * [pressed]: finger down. Pressed buttons have no shadow ("no lift").
  */
 @Composable
@@ -188,7 +188,7 @@ internal fun appButtonStyle(
         )
 
         AppButtonVariant.Outline -> AppButtonStyle(
-            background = SolidColor(if (pressed) colors.field else colors.card),
+            background = SolidColor(if (pressed) colors.border else colors.card),
             content = colors.textPrimary,
             border = BorderStroke(AppDimens.strokeThin, colors.border),
             shadow = null,
@@ -210,17 +210,12 @@ internal fun appButtonStyle(
     }
 }
 
-/** Label style per size. Large uses the token as is; the smaller sizes shrink it like Figma. */
+/** Label style per size: real Figma text styles, read from the atoms. */
 @Composable
-internal fun appButtonTextStyle(size: AppButtonSize): TextStyle {
-    val base = MaterialTheme.typography.labelLarge
-    return when (size) {
-        AppButtonSize.Large -> base
-        AppButtonSize.Compact -> base.copy(fontSize = 14.5.sp)
-        AppButtonSize.Medium -> base.copy(fontSize = 14.sp)
-        AppButtonSize.Small -> base.copy(fontSize = 12.5.sp, lineHeight = 16.sp)
-        AppButtonSize.ExtraSmall -> base.copy(fontSize = 12.sp, lineHeight = 16.sp)
-    }
+internal fun appButtonTextStyle(size: AppButtonSize): TextStyle = when (size) {
+    AppButtonSize.Large -> MaterialTheme.typography.labelLarge
+    AppButtonSize.Compact, AppButtonSize.Medium -> AppTheme.textStyles.bodyStrong
+    AppButtonSize.Small, AppButtonSize.ExtraSmall -> MaterialTheme.typography.labelMedium
 }
 ```
 
@@ -363,7 +358,7 @@ fun AppButton(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            // Figma 03b: "spinner replaces the trailing icon, label stays".
+            // Figma 4.2: "spinner replaces the trailing icon, label stays".
             when {
                 isLoading -> CircularProgressIndicator(
                     modifier = Modifier.size(AppDimens.icon),
@@ -509,7 +504,7 @@ fun AppSocialButton(
             Image(painter = logo, contentDescription = null, modifier = Modifier.size(AppDimens.icon))
             Text(
                 text = text,
-                style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.5.sp),
+                style = MaterialTheme.typography.labelLarge,
                 color = style.content,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

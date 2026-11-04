@@ -7,13 +7,13 @@
 | Doc | Done when |
 |---|---|
 | 02 Palette | `AppPalette.kt` compiles; every hex matches doc 01 (blue, azure, slate, night, green, amber, red, orange, rose) |
-| 03 Semantic colors | `AppColors` (with `sheet`), `LightAppColors`, `DarkAppColors` (Figma `01b` values), `LocalAppColors` compile |
+| 03 Semantic colors | `AppColors` (with `sheet`), `LightAppColors`, `DarkAppColors` (Figma `1.2` values), `LocalAppColors` compile |
 | 04 Color scheme | `AppColors.toColorScheme(isDark)` compiles with named arguments; sheets/dialogs use `sheet`; no dynamic color |
 | 05 Gradients / shadows | `AppGradients` (with `bottomFade`), `AppAurora` (3 blobs), `cardHighlight` + `Modifier.cardHighlight()`, `AppShadows` (with `screen`), `Modifier.appShadow` (draws the dark outline) compile; `dropShadow` resolves |
 | 06 Typography | 5 Plus Jakarta Sans + 4 Cairo `.ttf` in `res/font`; `LatinTypography`, `ArabicTypography`, `LatinTextStyles`, `ArabicTextStyles` compile |
-| 07 Dimens / shapes | old `iconSm` renamed to `icon` first; one radius scale (10/14/16/20/28/full); `navBar` 66 (`teamNavBar` 64), Figma `01c` size tokens added (`buttonLg`…`screenHeight`, `chip` 34, `iconMd` 18); `AppShapes` (10/14/16/20/28), `AppPillShape` moved and compile |
+| 07 Dimens / shapes | old `iconSm` renamed to `icon` first; one radius scale (10/14/16/20/28/full); `navBar` 66 (`teamNavBar` 64), Figma `1.4` size tokens added (`buttonLg`…`screenHeight`, `chip` 34, `iconMd` 18); `AppShapes` (10/14/16/20/28), `AppPillShape` moved and compile |
 | 08 Theme | new `AppTheme(darkTheme, isArabic)` used in `MainActivity` and every preview; theme mode saved in DataStore; old theme files deleted |
-| 09 Icons / logo | 76 Lucide icons (incl. eye-off, user-plus, star-filled, wifi-off, search-x, mic), `AppIcons` compiles, logo, adaptive launcher icon (`05b`), splash updated, Iconsax removed |
+| 09 Icons / logo | 76 Lucide icons (incl. eye-off, user-plus, star-filled, wifi-off, search-x, mic), `AppIcons` compiles, logo, adaptive launcher icon (`3.2`), splash updated, Iconsax removed |
 | 10 Buttons | primary gradient + glow; pressed = solid `brandPressed` with no glow; disabled = field + tertiary; loading = spinner replaces trailing icon |
 | 11 Text fields | pill fields; 6 states match the doc 01 input table; disabled drawn with tokens (no alpha) |
 | 12 Selection / chips / badges | checkbox, radio, switch, chips, badges, rating (filled gold star), empty states and shimmer skeletons match |
@@ -86,7 +86,7 @@ For each cell:
 - [ ] Status bar icons readable in both modes.
 - [ ] Theme mode Light / Dark / System on screen 11.3 applies instantly and survives a restart.
 - [ ] Lists show the empty state when empty and the shimmer skeleton while loading (Figma 14).
-- [ ] Launcher icon in circle, squircle and themed modes (Figma 05b).
+- [ ] Launcher icon in circle, squircle and themed modes (Figma 3.2).
 
 ## 5. Contrast spot checks
 
@@ -113,21 +113,21 @@ Measure with any WCAG contrast checker if you change a token.
 
 | Was | Now |
 |---|---|
-| Light mode only | Official dark tokens in `01b · Dark mode` (doc 03, 05) |
+| Light mode only | Official dark tokens in `1.2 · Dark mode` (doc 03, 05) |
 | Two radius scales (10/14/18/22/28 vs 10/16/20/28) | One scale 10 / 14 / 16 / 20 / 28 / full (doc 07) |
-| No specimen for Display/Medium, Headline/Medium, Label/Medium, Field/Text, Helper | All defined in `01 · Foundations` (doc 06) |
+| No specimen for Display/Medium, Headline/Medium, Label/Medium, Field/Text, Helper | All defined in `1.1 · Colour & effects` (doc 06) |
 | Auth titles drawn at 26 / 25 / 24 | All 24 ExtraBold (`headlineLarge`) |
 | Arabic font not named | Cairo with its own Arabic type scale (doc 06) |
 | eye-off, user-plus, filled star missing from the icon sheet | On the sheet (76 icons, doc 09) |
-| No pressed / disabled / loading button states | `03b · Atom states` (doc 10) |
+| No pressed / disabled / loading button states | `4.2 · Atom states` (doc 10) |
 | Disabled input = 50 % opacity | Drawn with tokens (doc 11) |
-| No Android adaptive icon spec | `05b · Android app icon` (doc 09) |
+| No Android adaptive icon spec | `3.2 · Android app icon` (doc 09) |
 | Email verification not designed | 02.6 / 02.7 (doc 14) |
 | Bottom-nav total "39.1 TND" | "39.900 TND" (3 decimals) |
-| No dark `status/success-text`, no `brand/soft-text` | Both defined in `01` + `01b`: `successText`, `brandSoftText` (doc 03) |
+| No dark `status/success-text`, no `brand/soft-text` | Both defined in `1.1` + `1.2`: `successText`, `brandSoftText` (doc 03) |
 | Dark `status/error-border` = `status/error-soft` (invisible border) | Dark error-border = red-400 at 50 % (doc 03) |
 | Dark text on `brandSoft` ≈ 3.4 : 1 | `brandSoftText` (blue-300 in dark) ≈ 7 : 1 |
-| Dark `float`, `deal`, `screen` shadows missing | All 5 dark shadows in `01b`; all dark surfaces add the night-700 border (doc 05) |
+| Dark `float`, `deal`, `screen` shadows missing | All 5 dark shadows in `1.2`; all dark surfaces add the night-700 border (doc 05) |
 | Dark aurora blob colors missing, white blob position unknown | `13.1b · Header glow · spec`: 3 blobs, dark blue-500 35 % / blue-800 45 % / amber-300 8 %; white 35 % is the **card highlight** inside gradient cards (docs 05, 13) |
 | Compose chapter mapped Caption to `bodySmall` | Chapter now maps `bodySmall` = Body/Small 13/18 (Arabic Cairo Regular 13/20) and Caption is a separate style, same as our code (doc 06) |
 
@@ -136,11 +136,10 @@ Measure with any WCAG contrast checker if you change a token.
 | # | Figma | Code | Why / how to close |
 |---|---|---|---|
 | 1 | No semantic token for `borderStrong`, `dealSoft`, `inverse`, `onInverse`, `scrim`, `shadow` | Derived values (doc 03 table) | Components need them; values follow Figma's dark rules. Ask the designer if they want official tokens |
-| 2 | Only 5 Arabic styles specified (+ bodySmall and Caption in the Compose chapter) | Other slots derived with Figma's rule (one weight lighter, ≈ 1.5× line height) | Ask for the full Arabic scale, or confirm the rule |
 | 3 | Figma blur values | `Modifier.dropShadow` radius = Figma blur | Compose and Figma blur may differ slightly; compare the catalog preview and tweak `blur` if needed. If `dropShadow` is unavailable, the `Modifier.shadow` fallback won't match |
 | 4 | 135° gradients | `Offset.Zero → Offset.Infinite` (corner to corner) | Equals 135° only on square shapes; on wide banners the angle is flatter. Acceptable visually |
 | 5 | Focus ring (3 px soft blue pill) | Drawn by `AppTextField` (doc 11) outside the box | Material has no focus-ring slot |
-| 6 | Tonal / Outline pressed state colors | `brandRing` / `field` (doc 10) | `03b` shows them; values read from the frames, confirm if they look off |
+| 6 | Tonal / Outline pressed state colors | `brandRing` / `border` (doc 10) | `4.2` shows them; values read from the frames, confirm if they look off |
 | 7 | Splash screen text "Shop smart. Delivered fast." | System splash shows only the mark | Put the slogan on the first Compose screen if needed |
 | 8 | Figma colors for Material widgets that don't exist in Figma (snackbar, menus, date picker) | Derived through `toColorScheme` | Review the first time you use such a widget |
 | 9 | Pager dot 22 × 6, onboarding illustration size | Feature sizes in `AppDimens` | Move into the onboarding feature when you refactor it |
@@ -151,5 +150,5 @@ Measure with any WCAG contrast checker if you change a token.
 
 - [ ] All greps in section 3 return nothing (except the allowed exceptions).
 - [ ] The QA matrix in section 4 is fully ticked for Welcome, Log in, Sign up, Verify email and Language.
-- [ ] `ThemeCatalog` previews (light, dark, Arabic) look like Figma `01 · Foundations` and `01b · Dark mode`.
+- [ ] `ThemeCatalog` previews (light, dark, Arabic) look like Figma `1.1 · Colour & effects` and `1.2 · Dark mode`.
 - [ ] Every open gap in section 6 is either closed or has a note in the PR description.

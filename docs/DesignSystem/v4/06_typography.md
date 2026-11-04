@@ -53,42 +53,42 @@ Every style has a `lineHeight`, because Figma always gives one and lines would j
 
 Android resource names may only contain `a–z`, `0–9` and `_`. A dash or capital letter breaks the build with "invalid resource name".
 
-> Figma's Compose chapter calls the Jakarta files `pjs_*.ttf`. We keep the longer `plus_jakarta_sans_*` names, which say what the font is. Only the file names differ.
-
 Regular (400) Jakarta is not used by any Figma style, but keep it as the fallback for `FontWeight.Normal`, used by Material widgets we don't style. Cairo has **no ExtraBold** in our set: Figma's Arabic styles never go above Bold.
 
 ## Figma spec — Latin (Plus Jakarta Sans)
 
 | Slot | Figma style | Weight | Size / line (sp) | Use it for |
 |---|---|---|---|---|
-| `displayLarge` | Display/Large | ExtraBold | 40 / 48 | splash, big hero |
-| `displayMedium` | Display/Medium | ExtraBold | 32 / 40 | big numbers, hero |
-| `displaySmall` | Display/Small | ExtraBold | 28 / 36 | "My addresses" large title, onboarding |
-| `headlineLarge` | Headline/Large | ExtraBold | 24 / 32 | auth & page titles: "Welcome back", "Verify your email" |
-| `headlineMedium` | Headline/Medium | ExtraBold | 22 / 28 | "Order placed!" |
-| `headlineSmall` | Headline/Small | ExtraBold | 20 / 26 | sheet titles, "Choose your language" |
-| `titleLarge` | Title/Large | Bold | 18 / 24 | section headers "Flash deals", top app bar |
-| `titleMedium` | Title/Medium | Bold | 16 / 22 | card titles "Order #DK-2048" |
-| `titleSmall` | Title/Small | Bold | 14 / 20 | product name "Air Runner 2", list row title |
-| `bodyLarge` | Body/Large | Medium | 15 / 22 | paragraphs |
-| `bodyMedium` | Body/Medium | Medium | 14 / 20 | default body, subtitles |
-| `bodySmall` | Body/Small | Medium | 13 / 18 | secondary lines, footer prompts |
-| `labelLarge` | Label/Large | Bold | 15 / 20 | button labels |
-| `labelMedium` | Label/Medium | Bold | 12.5 / 16 | input labels "Email", chip labels |
-| `labelSmall` | Label/Small | Bold | 12 / 16 | "See all", small links |
-| `fieldText` | Field/Text | SemiBold | 14.5 / 20 | input value |
-| `fieldPlaceholder` | (Field/Text, Medium) | Medium | 14.5 / 20 | hint inside a field (Figma atoms draw it Medium) |
-| `helper` | Helper | SemiBold | 11.5 / 14 | helper & error: "Verified with Google", "Enter a valid email address" |
-| `caption` | Caption | SemiBold | 11 / 14 | "Delivered in 25–35 min", meta |
-| `overline` | Overline | ExtraBold | 10.5 / 12, +0.9 sp tracking, UPPERCASE | "NEW ARRIVAL", "SUMMER DROP" |
-| `priceLarge` | Price/Large | ExtraBold | 24 / 28 | product details price |
-| `priceSmall` | Price/Small | ExtraBold | 15 / 20 | card price, cart line |
+| `displayLarge` | M3/displayLarge | ExtraBold | 40 / 48, −2 % | hero prices, big numbers |
+| `displayMedium` | M3/displayMedium | ExtraBold | 32 / 40, −2 % | order total, OTP digits |
+| `displaySmall` | M3/displaySmall | ExtraBold | 28 / 36, −2 % | onboarding & success titles |
+| `headlineLarge` | M3/headlineLarge | ExtraBold | 24 / 32, −2 % | screen hero titles: "Welcome back", "Verify your email" |
+| `headlineMedium` | M3/headlineMedium | ExtraBold | 22 / 28, −1.5 % | sheet & page titles |
+| `headlineSmall` | M3/headlineSmall | ExtraBold | 20 / 26, −1 % | section titles, card amounts |
+| `titleLarge` | M3/titleLarge | **ExtraBold** | **17** / 24, −1 % | top app bar titles |
+| `titleMedium` | M3/titleMedium | **ExtraBold** | 16 / 22 | card titles, list headers |
+| `titleSmall` | M3/titleSmall | **ExtraBold** | 14 / 20 | product names, row titles, toast title |
+| `bodyLarge` | M3/bodyLarge | Medium | 15 / 22 | long paragraphs, subtitles |
+| `bodyMedium` | M3/bodyMedium | Medium | 14 / 20 | body copy, descriptions |
+| `bodySmall` | M3/bodySmall | Medium | 13 / 18 | secondary lines, meta, toast subtitle |
+| `labelLarge` | M3/labelLarge | Bold | 15 / 20 | buttons |
+| `labelMedium` | M3/labelMedium | Bold | 12.5 / 16 | chips, tabs, links, small buttons, input labels, toast action |
+| `labelSmall` | M3/labelSmall | Bold | **10.5 / 14** | badges, nav labels, tags |
+| `titleCompact` | Dukkan/titleCompact | ExtraBold | 15 / 20 | compact headers, price rows |
+| `labelStrong` | Dukkan/labelStrong | ExtraBold | 12.5 / 16 | emphasised small labels, pills |
+| `bodyStrong` | Dukkan/bodyStrong | Bold | 13.5 / 18 | row values, bold body |
+| `supporting` | Dukkan/supporting | Medium | 11.5 / 16 | supporting lines |
+| `micro` | Dukkan/micro | Medium | 10.5 / 14 | smallest meta text |
+| `fieldText` | Dukkan/fieldText | SemiBold | 14.5 / 20 | text inside inputs |
+| `helper` | Dukkan/helper | SemiBold | 11.5 / 14 | input helper & error text |
+| `caption` | Dukkan/caption | SemiBold | 11 / 14 | "Delivered in 25–35 min", meta |
+| `overline` | Dukkan/overline | ExtraBold | 10.5 / 12, +8.6 % (≈ 0.9 sp), UPPERCASE | section overlines: "NEW ARRIVAL" |
 
-All 22 Latin styles are now real Figma styles (Display/Medium, Headline/Medium, Label/Medium, Field/Text and Helper were added in the latest Figma version). Only `fieldPlaceholder` is a weight variant of Field/Text.
+These are real Figma text styles: `M3/<slot>` (15 Material slots) and `Dukkan/<name>` (9 extras), read straight from the file. Tracking is in **em**: Figma −2 % = `(-0.02).em`. **`Price/*` are gone from the file:** a price is now two regular styles (table below). There's no placeholder style either: inputs use `bodyMedium`.
 
 ## Figma spec — Arabic (Cairo)
 
-Figma defines 5 Arabic styles. The rule it shows: **one weight step lighter than Latin** (ExtraBold → Bold, Bold → SemiBold, SemiBold → Medium, Medium → Regular) and **line height ≈ 1.5× the size**. We apply the same rule to every other slot ("derived").
+Figma now defines **every style** in Cairo (`Arabic/*`): the 15 Material slots and the 9 `Dukkan/*` extras. Nothing here is derived any more.
 
 | Slot | Figma | Cairo weight | Size / line (sp) |
 |---|---|---|---|
@@ -97,27 +97,27 @@ Figma defines 5 Arabic styles. The rule it shows: **one weight step lighter than
 | `bodyMedium` | **Body/Medium** | Regular | 14 / 22 |
 | `labelLarge` | **Label/Large** | SemiBold | 15 / 22 |
 | `caption` | **Caption** | Medium | 11 / 16 |
-| `displayLarge` | derived | Bold | 40 / 56 |
-| `displayMedium` | derived | Bold | 32 / 46 |
-| `displaySmall` | derived | Bold | 28 / 40 |
-| `headlineMedium` | derived | Bold | 22 / 32 |
-| `headlineSmall` | derived | Bold | 20 / 30 |
-| `titleLarge` | derived | SemiBold | 18 / 28 |
-| `titleSmall` | derived | SemiBold | 14 / 22 |
-| `bodyLarge` | derived | Regular | 15 / 24 |
-| `bodySmall` | **Body/Small** (Compose chapter) | Regular | 13 / 20 |
-| `labelMedium` | derived | SemiBold | 12.5 / 18 |
-| `labelSmall` | derived | SemiBold | 12 / 18 |
-| `fieldText` | derived | Medium | 14.5 / 22 |
-| `fieldPlaceholder` | derived | Regular | 14.5 / 22 |
-| `helper` | derived | Medium | 11.5 / 16 |
-| `overline` | derived | Bold | 10.5 / 16, **no tracking** |
-| `priceLarge` | derived | Bold | 24 / 32 |
-| `priceSmall` | derived | Bold | 15 / 22 |
+| `displayLarge` | **Arabic/displayLarge** | Bold | 40 / 60 |
+| `displayMedium` | **Arabic/displayMedium** | Bold | 32 / 48 |
+| `displaySmall` | **Arabic/displaySmall** | Bold | 28 / 42 |
+| `headlineMedium` | **Arabic/headlineMedium** | Bold | 22 / 34 |
+| `headlineSmall` | **Arabic/headlineSmall** | Bold | 20 / 30 |
+| `titleLarge` | **Arabic/titleLarge** | SemiBold | 17 / 26 |
+| `titleSmall` | **Arabic/titleSmall** | SemiBold | 14 / 22 |
+| `bodyLarge` | **Arabic/bodyLarge** | Regular | 15 / 24 |
+| `bodySmall` | **Arabic/bodySmall** | Regular | 13 / 20 |
+| `labelMedium` | **Arabic/labelMedium** | SemiBold | **13** / 20 (toast subtitle) |
+| `labelSmall` | **Arabic/labelSmall** | SemiBold | 10.5 / 16 |
+| `titleCompact` | **Arabic/titleCompact** | Bold | 15 / 24 |
+| `labelStrong` | **Arabic/labelStrong** | Bold | 12.5 / 20 |
+| `bodyStrong` | **Arabic/bodyStrong** | SemiBold | 13.5 / 22 |
+| `supporting` | **Arabic/supporting** | Regular | 11.5 / 18 |
+| `micro` | **Arabic/micro** | Regular | 10.5 / 16 |
+| `fieldText` | **Arabic/fieldText** | Medium | 14.5 / 22 |
+| `helper` | **Arabic/helper** | Medium | 11.5 / 18 |
+| `overline` | **Arabic/overline** | Bold | 10.5 / 16, **no tracking** |
 
-Display sizes use ≈ 1.4× instead of 1.5×: at 28 sp and above, 1.5× leaves visibly too much air. Prices stay close to the Latin height because they are digits.
-
-**No letter spacing in Arabic.** Arabic letters join to their neighbours; extra tracking breaks the joins. That's why `overline` drops its +0.9 sp in Arabic.
+**No letter spacing in Arabic.** Arabic letters join to their neighbours; extra tracking breaks the joins. That's why `overline` drops its tracking in Arabic.
 
 ## Code — `AppTypography.kt`
 
@@ -125,11 +125,14 @@ Display sizes use ≈ 1.4× instead of 1.5×: at 28 sp and above, 1.5× leaves v
 package com.example.dukkanapp.core.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.example.dukkanapp.R
 
@@ -163,6 +166,9 @@ internal fun figmaStyle(
     fontSize = size,
     lineHeight = lineHeight,
     letterSpacing = letterSpacing,
+    // Figma centers text in its line box, with no extra font padding above or below.
+    platformStyle = PlatformTextStyle(includeFontPadding = false),
+    lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.None),
 )
 
 /** Figma's Arabic rule: one weight step lighter than the Latin style. */
@@ -174,8 +180,8 @@ internal fun FontWeight.arabicWeight(): FontWeight = when (this) {
 }
 
 /**
- * One Figma style in both scripts. [latinWeight] is the Plus Jakarta weight;
- * the Cairo weight is derived with [arabicWeight].
+ * One Figma style in both scripts. [latinWeight] is the Plus Jakarta weight.
+ * Cairo defaults to one step lighter, unless Figma gives its own [cairoWeight] or [cairoSize].
  */
 internal fun scriptStyle(
     arabic: Boolean,
@@ -184,34 +190,43 @@ internal fun scriptStyle(
     latinLineHeight: TextUnit,
     arabicLineHeight: TextUnit,
     latinLetterSpacing: TextUnit = 0.sp,
+    cairoWeight: FontWeight = latinWeight.arabicWeight(),
+    cairoSize: TextUnit = size,
 ): TextStyle =
     if (arabic) {
-        figmaStyle(AppArabicFontFamily, latinWeight.arabicWeight(), size, arabicLineHeight)
+        figmaStyle(AppArabicFontFamily, cairoWeight, cairoSize, arabicLineHeight)
     } else {
         figmaStyle(AppFontFamily, latinWeight, size, latinLineHeight, latinLetterSpacing)
     }
 
-/** Builds the 15 Material slots. Columns: weight, size, Latin line, Arabic line. */
+/** Builds the 15 Material slots. Columns: weight, size, Latin line, Arabic line, then optional tracking. */
 internal fun appTypography(arabic: Boolean): Typography {
-    fun s(weight: FontWeight, size: TextUnit, latinLine: TextUnit, arabicLine: TextUnit) =
-        scriptStyle(arabic, weight, size, latinLine, arabicLine)
+    fun s(
+        weight: FontWeight,
+        size: TextUnit,
+        latinLine: TextUnit,
+        arabicLine: TextUnit,
+        tracking: TextUnit = 0.sp,
+        cairoWeight: FontWeight = weight.arabicWeight(),
+        cairoSize: TextUnit = size,
+    ) = scriptStyle(arabic, weight, size, latinLine, arabicLine, tracking, cairoWeight, cairoSize)
 
     return Typography(
-        displayLarge = s(FontWeight.ExtraBold, 40.sp, 48.sp, 56.sp),
-        displayMedium = s(FontWeight.ExtraBold, 32.sp, 40.sp, 46.sp),
-        displaySmall = s(FontWeight.ExtraBold, 28.sp, 36.sp, 40.sp),
-        headlineLarge = s(FontWeight.ExtraBold, 24.sp, 32.sp, 36.sp),
-        headlineMedium = s(FontWeight.ExtraBold, 22.sp, 28.sp, 32.sp),
-        headlineSmall = s(FontWeight.ExtraBold, 20.sp, 26.sp, 30.sp),
-        titleLarge = s(FontWeight.Bold, 18.sp, 24.sp, 28.sp),
-        titleMedium = s(FontWeight.Bold, 16.sp, 22.sp, 26.sp),
-        titleSmall = s(FontWeight.Bold, 14.sp, 20.sp, 22.sp),
+        displayLarge = s(FontWeight.ExtraBold, 40.sp, 48.sp, 60.sp, tracking = (-0.02).em),
+        displayMedium = s(FontWeight.ExtraBold, 32.sp, 40.sp, 48.sp, tracking = (-0.02).em),
+        displaySmall = s(FontWeight.ExtraBold, 28.sp, 36.sp, 42.sp, tracking = (-0.02).em),
+        headlineLarge = s(FontWeight.ExtraBold, 24.sp, 32.sp, 36.sp, tracking = (-0.02).em),
+        headlineMedium = s(FontWeight.ExtraBold, 22.sp, 28.sp, 34.sp, tracking = (-0.015).em),
+        headlineSmall = s(FontWeight.ExtraBold, 20.sp, 26.sp, 30.sp, tracking = (-0.01).em),
+        titleLarge = s(FontWeight.ExtraBold, 17.sp, 24.sp, 26.sp, tracking = (-0.01).em, cairoWeight = FontWeight.SemiBold),
+        titleMedium = s(FontWeight.ExtraBold, 16.sp, 22.sp, 26.sp, cairoWeight = FontWeight.SemiBold),
+        titleSmall = s(FontWeight.ExtraBold, 14.sp, 20.sp, 22.sp, cairoWeight = FontWeight.SemiBold),
         bodyLarge = s(FontWeight.Medium, 15.sp, 22.sp, 24.sp),
         bodyMedium = s(FontWeight.Medium, 14.sp, 20.sp, 22.sp),
         bodySmall = s(FontWeight.Medium, 13.sp, 18.sp, 20.sp),
         labelLarge = s(FontWeight.Bold, 15.sp, 20.sp, 22.sp),
-        labelMedium = s(FontWeight.Bold, 12.5.sp, 16.sp, 18.sp),
-        labelSmall = s(FontWeight.Bold, 12.sp, 16.sp, 18.sp),
+        labelMedium = s(FontWeight.Bold, 12.5.sp, 16.sp, 20.sp, cairoSize = 13.sp),
+        labelSmall = s(FontWeight.Bold, 10.5.sp, 14.sp, 16.sp),
     )
 }
 
@@ -229,22 +244,25 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
 /**
  * Figma text styles that have no Material slot.
- * Read them with `AppTheme.textStyles.priceSmall`.
+ * Read them with `AppTheme.textStyles.bodyStrong`.
  */
 @Immutable
 data class AppTextStyles(
     val caption: TextStyle,
     /** Write the text in UPPERCASE yourself (Compose has no text-transform). */
     val overline: TextStyle,
-    val priceLarge: TextStyle,
-    val priceSmall: TextStyle,
     val fieldText: TextStyle,
-    val fieldPlaceholder: TextStyle,
     val helper: TextStyle,
+    val titleCompact: TextStyle,
+    val labelStrong: TextStyle,
+    val bodyStrong: TextStyle,
+    val supporting: TextStyle,
+    val micro: TextStyle,
 )
 
 /** Columns: weight, size, Latin line, Arabic line. */
@@ -252,13 +270,15 @@ internal fun appTextStyles(arabic: Boolean): AppTextStyles = AppTextStyles(
     caption = scriptStyle(arabic, FontWeight.SemiBold, 11.sp, 14.sp, 16.sp),
     overline = scriptStyle(
         arabic, FontWeight.ExtraBold, 10.5.sp, 12.sp, 16.sp,
-        latinLetterSpacing = 0.9.sp, // Latin only: tracking breaks Arabic letter joins
+        latinLetterSpacing = 0.086.em, // Latin only: tracking breaks Arabic letter joins
     ),
-    priceLarge = scriptStyle(arabic, FontWeight.ExtraBold, 24.sp, 28.sp, 32.sp),
-    priceSmall = scriptStyle(arabic, FontWeight.ExtraBold, 15.sp, 20.sp, 22.sp),
     fieldText = scriptStyle(arabic, FontWeight.SemiBold, 14.5.sp, 20.sp, 22.sp),
-    fieldPlaceholder = scriptStyle(arabic, FontWeight.Medium, 14.5.sp, 20.sp, 22.sp),
-    helper = scriptStyle(arabic, FontWeight.SemiBold, 11.5.sp, 14.sp, 16.sp),
+    helper = scriptStyle(arabic, FontWeight.SemiBold, 11.5.sp, 14.sp, 18.sp),
+    titleCompact = scriptStyle(arabic, FontWeight.ExtraBold, 15.sp, 20.sp, 24.sp),
+    labelStrong = scriptStyle(arabic, FontWeight.ExtraBold, 12.5.sp, 16.sp, 20.sp),
+    bodyStrong = scriptStyle(arabic, FontWeight.Bold, 13.5.sp, 18.sp, 22.sp),
+    supporting = scriptStyle(arabic, FontWeight.Medium, 11.5.sp, 16.sp, 18.sp),
+    micro = scriptStyle(arabic, FontWeight.Medium, 10.5.sp, 14.sp, 16.sp),
 )
 
 internal val LatinTextStyles: AppTextStyles = appTextStyles(arabic = false)
@@ -277,7 +297,7 @@ The first version of this doc multiplied every Latin line height by 1.15 for Ara
 
 ### `bodySmall` and Caption are two different styles
 
-Figma's Compose chapter (`06 · Compose tokens`) now matches the type scale: `bodySmall` = **Body/Small**, Jakarta Medium 13/18 (Arabic: Cairo Regular 13/20), and **Caption** is a separate style, Jakarta SemiBold 11/14 (Arabic: Cairo Medium 11/16), kept outside the Material slots. That is exactly our split: Body/Small in `bodySmall`, Caption in `AppTheme.textStyles.caption`. (An earlier version of the chapter put Caption in `bodySmall`; it is fixed, so there is no conflict any more.)
+`1.3 · Typography` confirms the split: `bodySmall` = Jakarta Medium 13/18 (Arabic: Cairo Regular 13/20), and **Caption** is a separate style, Jakarta SemiBold 11/14 (Arabic: Cairo Medium 11/16), kept outside the Material slots. That is exactly our split: Body/Small in `bodySmall`, Caption in `AppTheme.textStyles.caption`. (An earlier version of the chapter put Caption in `bodySmall`; it is fixed, so there is no conflict any more.)
 
 ### Why a `figmaStyle` helper?
 
@@ -285,7 +305,14 @@ Every Figma style is "weight · size/lineHeight". One function turns that into a
 
 ### Prices with a smaller currency
 
-Figma writes "279.000 **TND**" with a smaller "TND". Use `priceLarge` for the number and `caption` (or `labelSmall`) for the currency in a `buildAnnotatedString`. `AppPriceText` (doc 12) does this.
+Figma writes "279.000 **TND**" with a smaller "TND", and it's two text styles in one line. `AppPriceText` (doc 12) does this:
+
+| Size | Amount | Currency | Example |
+|---|---|---|---|
+| `Large` | `headlineLarge` 24 | `titleCompact` 15 | product details |
+| `Medium` | `titleMedium` 16 | `overline` 10.5 | cart total |
+| `Small` | `titleCompact` 15 | `overline` 10.5 | price rows, cart bar |
+| `Compact` | `titleSmall` 14 | `overline` 10.5 | small highlighted prices |
 
 ### Why no `fontSize` in feature screens
 
@@ -306,15 +333,18 @@ A hard-coded size also breaks Arabic: it keeps the Latin line height.
 | Screen title (auth, success) | `headlineLarge` (all auth titles are 24 ExtraBold in Figma) |
 | Screen subtitle | `bodyMedium` + `colors.textSecondary` (Figma auth subtitles are 13 Medium: `bodySmall` if you want it exact) |
 | Section header ("Flash deals") | `titleLarge` |
-| "See all" link | `labelSmall` + `colors.brand` |
+| "See all" link | `labelMedium` + `colors.brand` (`labelSmall` is now 10.5, for badges) |
 | Button label | `labelLarge` (M button 14 sp: `labelLarge.copy(fontSize = 14.sp)` inside the button component only) |
 | Field label | `labelMedium` + `colors.textPrimary` |
-| Field value / placeholder | `textStyles.fieldText` / `textStyles.fieldPlaceholder` |
+| Field value / placeholder | `textStyles.fieldText` / `bodyMedium` (14 Medium) |
 | Field helper / error | `textStyles.helper` |
 | Checkbox label | `labelMedium` with `fontWeight = SemiBold` (Figma 12.5 SemiBold) + `colors.textLabel` |
 | Product name on card | `titleSmall` |
-| Card price | `textStyles.priceSmall` |
-| Badge | `textStyles.overline` without tracking, or `caption` (10.5 Bold in Figma) |
+| Card price | `AppPriceText` (doc 12) |
+| Badge, nav label, tag | `labelSmall` (10.5 / 14 Bold) |
+| Row value, bold body | `textStyles.bodyStrong` |
+| Price row, compact header | `textStyles.titleCompact` |
+| Toast title / subtitle / action | `titleSmall` / `bodySmall` / `labelMedium` (Arabic: `labelLarge` / `labelMedium` / `labelMedium`) |
 | Footer "Already have an account? Log in" | `bodySmall`, action in `colors.brand` Bold |
 
 ## Check

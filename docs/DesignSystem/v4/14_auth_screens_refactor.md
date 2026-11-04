@@ -799,7 +799,7 @@ fun SignUpScreenContent(
             )
             Text(
                 text = stringResource(R.string.signup_step, SIGN_UP_STEP, SIGN_UP_TOTAL_STEPS),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = AppTheme.colors.textSecondary,
             )
         },
@@ -1123,7 +1123,7 @@ fun EmailVerificationScreenContent(
             AppProgressBar(progress = 1f, modifier = Modifier.weight(1f))
             Text(
                 text = stringResource(R.string.signup_step, SIGN_UP_STEP, SIGN_UP_TOTAL_STEPS),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = AppTheme.colors.textSecondary,
             )
         },
@@ -1255,7 +1255,7 @@ private fun StepRow(number: Int, title: String, body: String) {
             )
         }
         Column(modifier = Modifier.padding(start = AppDimens.space12)) {
-            Text(title, style = MaterialTheme.typography.titleSmall.copy(fontSize = 13.5.sp), color = colors.textPrimary)
+            Text(title, style = AppTheme.textStyles.bodyStrong, color = colors.textPrimary)
             Text(body, style = AppTheme.textStyles.helper.copy(fontWeight = FontWeight.Medium), color = colors.textSecondary)
         }
     }
@@ -1276,7 +1276,7 @@ private fun NotVerifiedCard() {
             Column(modifier = Modifier.padding(start = AppDimens.space12)) {
                 Text(
                     stringResource(R.string.verify_not_verified_title),
-                    style = MaterialTheme.typography.titleSmall.copy(fontSize = 13.sp),
+                    style = AppTheme.textStyles.bodyStrong,
                     color = colors.textPrimary,
                 )
                 Text(
@@ -1297,11 +1297,11 @@ private fun HelpCard() {
         Column(verticalArrangement = Arrangement.spacedBy(AppDimens.space4)) {
             Text(
                 stringResource(R.string.verify_help_title),
-                style = MaterialTheme.typography.titleSmall.copy(fontSize = 13.5.sp),
+                style = AppTheme.textStyles.bodyStrong,
                 color = colors.textPrimary,
             )
-            Text(stringResource(R.string.verify_help_spam), style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium), color = colors.textSecondary)
-            Text(stringResource(R.string.verify_help_expiry), style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium), color = colors.textSecondary)
+            Text(stringResource(R.string.verify_help_spam), style = AppTheme.textStyles.supporting, color = colors.textSecondary)
+            Text(stringResource(R.string.verify_help_expiry), style = AppTheme.textStyles.supporting, color = colors.textSecondary)
         }
     }
 }

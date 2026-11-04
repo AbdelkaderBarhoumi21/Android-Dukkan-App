@@ -23,7 +23,7 @@ Figma's field (`Input/Email`) is **not** a Material outlined field:
 2. **The box is exactly 52 dp tall and fully rounded** (a pill, "fully rounded like buttons" in Figma). `OutlinedTextField` has a 56 dp minimum and internal paddings you can't fully remove. The old code forced `height(45.dp)`, which clips descenders on large font scales.
 3. **Focus adds a 3 dp soft blue ring *outside* the border**, also a pill (58 dp tall). Material has no ring.
 4. **Error and success tint the fill** (red-soft and white) and show a helper with an icon.
-5. **Disabled is drawn with tokens, not 50 % opacity** (Figma `03b`), "so it also works on dark".
+5. **Disabled is drawn with tokens, not 50 % opacity** (Figma `4.2`), "so it also works on dark".
 
 So we build on `BasicTextField` plus `decorationBox`. `BasicTextField` gives us the editing engine (cursor, selection, IME, autofill) and nothing else. We draw the rest from tokens.
 
@@ -33,24 +33,24 @@ So we build on `BasicTextField` plus `decorationBox`. `BasicTextField` gives us 
 
 ---
 
-## Figma spec: `Input/Email` (`03 · Atoms` + `03b · Atom states`)
+## Figma spec: `Input/Email` (`4.1 · Atoms` + `4.2 · Atom states`)
 
 Layout:
 
 - Label (`labelMedium`, 12.5/16 Bold, `textPrimary`), then a gap of `space8`.
 - Box: height `controlLg` (52), shape **`AppPillShape`** (radius/full → 26 dp corners), content padding start `space20` and end `space12` (the round end needs a little more room than a square corner).
 - Leading icon at `icon` (20) with a gap of `space8` before the text.
-- Text in `textStyles.fieldText` (Field/Text 14.5 SemiBold). Placeholder in `textStyles.fieldPlaceholder` (14.5 Medium, `textTertiary`).
+- Text in `textStyles.fieldText` (Field/Text 14.5 SemiBold). Placeholder in `bodyMedium` (14 Medium, `textTertiary`), the style on the Figma atom.
 - Helper: gap `space4`, a 14 dp icon, then the text in `textStyles.helper` (Helper 11.5 SemiBold).
 
 | State | Fill | Border | Ring (outside) | Label | Value / icon | Helper |
 |---|---|---|---|---|---|---|
 | Default | `field` | none | none | `textPrimary` | `textPrimary` / `textTertiary` | none, or `textSecondary` text |
-| Focus | `card` | `brand` 1.5 dp (`strokeFocus`) | `brandRing` 3 dp pill (`focusRing`) | `textPrimary` | `textPrimary` / `brand` | as Default |
+| Focus | `card` | `brand` 1.5 dp (`strokeFocus`) | `brandRing` at 70 %, 3 dp pill (`focusRing`) | `textPrimary` | `textPrimary` / `brand` | as Default |
 | Filled (not focused) | `field` | none | none | `textPrimary` | `textPrimary` / `textTertiary` | none |
 | Error | `errorSoft` | `error` 1.5 dp | none (error wins over focus) | `textPrimary` | `textPrimary` / `error` | `error` + `CircleAlert` icon |
 | Success | `card` | `success` 1.5 dp | none | `textPrimary` | `textPrimary` / `textTertiary` | `success` + `CircleCheck` icon |
-| **Disabled** | `field` | **none** | **none** | **`textTertiary`** | **`textTertiary` / `textTertiary`** | `textTertiary` |
+| **Disabled** | `field` | **none** | **none** | **`textTertiary`** | **`textTertiary` / `borderStrong`** (trailing `lock` icon on the atom) | `textTertiary` |
 
 Priority when several apply: **Disabled > Error > Success > Focused > Default.**
 
@@ -90,14 +90,14 @@ internal fun appFieldColors(
 ): AppFieldColors {
     val colors = AppTheme.colors
     return when {
-        // Figma 03b: disabled is drawn with tokens, not 50 % opacity, so it also works on dark.
+        // Figma 4.2: disabled is drawn with tokens, not 50 % opacity, so it also works on dark.
         !enabled -> AppFieldColors(
             fill = colors.field,
             border = null,
             showRing = false,
             label = colors.textTertiary,
             text = colors.textTertiary,
-            leadingIcon = colors.textTertiary,
+            leadingIcon = colors.borderStrong, // Figma: slate-300
             helper = colors.textTertiary,
         )
 
@@ -216,7 +216,7 @@ fun AppTextField(
     val source = interactionSource ?: remember { MutableInteractionSource() }
     val isFocused by source.collectIsFocusedAsState()
     val fieldColors = appFieldColors(status, isFocused, enabled)
-    val ringColor = AppTheme.colors.brandRing
+    val ringColor = AppTheme.colors.brandRing.copy(alpha = 0.7f)
     val textStyles = AppTheme.textStyles
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -288,7 +288,7 @@ fun AppTextField(
                         if (value.isEmpty() && placeholder != null) {
                             Text(
                                 text = placeholder,
-                                style = textStyles.fieldPlaceholder,
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = AppTheme.colors.textTertiary,
                                 maxLines = 1,
                             )
@@ -406,7 +406,7 @@ fun AppPasswordField(
 }
 ```
 
-> **Icon note.** Figma `03b → Password field`: "eye toggles to eye-off when the password is visible". Both are on the Figma icon sheet now (`AppIcons.Eye`, `AppIcons.EyeOff`, doc 09). `IconButton` gives the 48 dp touch target, and the visible icon stays 20 dp.
+> **Icon note.** Figma `4.2 → Password field`: "eye toggles to eye-off when the password is visible". Both are on the Figma icon sheet now (`AppIcons.Eye`, `AppIcons.EyeOff`, doc 09). `IconButton` gives the 48 dp touch target, and the visible icon stays 20 dp.
 
 ### `AppPasswordStrength.kt`
 
@@ -639,7 +639,7 @@ fun AppOtpField(
 ) {
     val colors = AppTheme.colors
     val shape = RoundedCornerShape(AppDimens.radiusLg)
-    val digitStyle = MaterialTheme.typography.headlineSmall.copy(fontSize = 22.sp, color = colors.textPrimary)
+    val digitStyle = MaterialTheme.typography.headlineMedium.copy(color = colors.textPrimary)
 
     // Codes are read left to right in every language, including Arabic.
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -693,7 +693,7 @@ fun AppOtpField(
 - **Keyboard:** pass `KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)` for email. Use `ImeAction.Done` plus a submit in `keyboardActions` on the last field.
 - **Autofill (recommended):** add `Modifier.semantics { contentType = ContentType.EmailAddress }` (and `ContentType.Password` / `ContentType.NewPassword`) at the call site. Google Password Manager then offers saved credentials. This is available from Compose UI 1.8, so the BOM 2026 has it.
 - **The ring is drawn, not laid out.** `drawBehind` paints 3 dp outside the box, so leave at least `space4` around fields (screens already use 16–20 dp). Don't put a field inside a parent that `clip`s tightly, or the ring gets cut.
-- **Disabled uses tokens, not alpha** (Figma `03b`): `field` fill, `textTertiary` label, value and icon, no border, no ring. With alpha, the dark `field` (`#1A2540`) would blend into the background and the field would almost disappear.
+- **Disabled uses tokens, not alpha** (Figma `4.2`): `field` fill, `textTertiary` label, value and icon, no border, no ring. With alpha, the dark `field` (`#1A2540`) would blend into the background and the field would almost disappear.
 
 ---
 

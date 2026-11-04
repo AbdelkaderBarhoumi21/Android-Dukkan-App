@@ -1,6 +1,6 @@
 # 12: Selection controls, badges, prices and feedback
 
-This doc covers the small atoms and molecules from Figma pages **03 · Atoms**, **04 · Molecules** and the customer board **14 · Empty & loading states**. Each section has the spec table, then the code. Type them in this order: the auth screens (doc 14) only need **12.1 Checkbox**, **12.9 Progress bar** and **12.12 Message banner**. The rest you can type when the Home, Cart and Orders features start (**12.14 Empty state** and **12.15 Skeleton** come with the first list screen).
+This doc covers the small atoms and molecules from Figma pages **4.1 · Atoms**, **4.3 · Molecules** and the customer board **14 · Empty & loading states**. Each section has the spec table, then the code. Type them in this order: the auth screens (doc 14) only need **12.1 Checkbox**, **12.9 Progress bar** and **12.12 Message banner**. The rest you can type when the Home, Cart and Orders features start (**12.14 Empty state** and **12.15 Skeleton** come with the first list screen).
 
 **Folders (new):**
 
@@ -9,7 +9,7 @@ core/designsystem/components/
 ├── selection/   AppCheckbox.kt · AppRadio.kt · AppSwitch.kt · AppChip.kt
 ├── display/     AppBadge.kt · AppPriceText.kt · AppQuantity.kt · AppAvatar.kt · AppRating.kt
 │                AppPagerIndicator.kt · AppProgressBar.kt · AppStatusSteps.kt
-├── feedback/    AppToast.kt · AppMessageBanner.kt · AppEmptyState.kt · AppSkeleton.kt
+├── feedback/    AppToast.kt · AppToastHost.kt · AppMessageBanner.kt · AppEmptyState.kt · AppSkeleton.kt
 └── layout/      AppListRow.kt
 ```
 
@@ -371,8 +371,7 @@ fun AppBadge(
         AppBadgeVariant.LowStock, AppBadgeVariant.Rating -> SolidColor(c.warningSoft) to c.warningText
         AppBadgeVariant.FreeDelivery -> SolidColor(c.successSoft) to c.successText
     }
-    // Badge text = caption weight bumped to Bold and size to 10.5 (Figma "Badge/*").
-    val style = AppTheme.textStyles.caption.copy(fontSize = 10.5.sp, lineHeight = 12.sp, fontWeight = FontWeight.Bold)
+    val style = MaterialTheme.typography.labelSmall // Figma "Badge/*": M3/labelSmall 10.5/14 Bold
 
     Row(
         modifier = modifier
@@ -390,7 +389,16 @@ fun AppBadge(
 
 ## 12.6 Price
 
-Figma `Price`: the amount is ExtraBold, the currency is smaller and sits on the same baseline, and the old price is struck through in `textTertiary`. Prices in Firestore are **integer millimes** (1 TND = 1000 millimes), so `279.000 TND` is stored as `279000`. Never store a `Double` for money.
+Figma `Price`: one line with **two text styles**, the amount and a smaller currency on the same baseline, and the old price struck through in `textTertiary`. Figma has no `Price/*` styles any more:
+
+| Size | Amount | Currency | Use |
+|---|---|---|---|
+| `Large` | `headlineLarge` 24 | `titleCompact` 15 | product details |
+| `Medium` | `titleMedium` 16 | `overline` 10.5 | cart total |
+| `Small` | `titleCompact` 15 | `overline` 10.5 | price rows, cart bar |
+| `Compact` | `titleSmall` 14 | `overline` 10.5 | small highlighted prices |
+
+ Prices in Firestore are **integer millimes** (1 TND = 1000 millimes), so `279.000 TND` is stored as `279000`. Never store a `Double` for money.
 
 ```kotlin
 package com.example.dukkanapp.core.designsystem.components.display
@@ -402,16 +410,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.em
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 import java.util.Locale
 
-enum class AppPriceSize { Large, Small }
+enum class AppPriceSize { Large, Medium, Small, Compact }
 
 /** 279000 → "279.000". Tunisian dinar has 3 decimals; always Latin digits. */
 fun formatTnd(millimes: Long): String =
@@ -426,15 +432,22 @@ fun AppPriceText(
     size: AppPriceSize = AppPriceSize.Small,
     color: Color = AppTheme.colors.textPrimary,
 ) {
-    val style = if (size == AppPriceSize.Large) AppTheme.textStyles.priceLarge else AppTheme.textStyles.priceSmall
+    val typography = MaterialTheme.typography
+    val textStyles = AppTheme.textStyles
+    val (amountStyle, currencyStyle) = when (size) {
+        AppPriceSize.Large -> typography.headlineLarge to textStyles.titleCompact
+        AppPriceSize.Medium -> typography.titleMedium to textStyles.overline
+        AppPriceSize.Small -> textStyles.titleCompact to textStyles.overline
+        AppPriceSize.Compact -> typography.titleSmall to textStyles.overline
+    }
 
     Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(AppDimens.space4)) {
         Text(
             text = buildAnnotatedString {
                 append(formatTnd(millimes))
-                withStyle(SpanStyle(fontSize = 0.6.em)) { append(" $currency") }
+                withStyle(currencyStyle.toSpanStyle()) { append(" $currency") }
             },
-            style = style,
+            style = amountStyle,
             color = color,
             modifier = Modifier.alignByBaseline(),
         )
@@ -456,9 +469,9 @@ fun AppPriceText(
 |---|---|
 | Add button (not in cart) | 32 dp circle, `card` fill, `shadows.card`, `plus` icon in `brand` |
 | Add button (in cart) | 32 dp circle, `brand` fill, white `plus` |
-| Qty stepper (card) | 88 × 32 pill, `brand` fill, `minus` · count (13.5 ExtraBold, `onBrand`) · `plus` |
-| Cart stepper (cart line) | 112 × 52 pill, `field` fill, count 16 ExtraBold `textPrimary`, icons `textPrimary` |
-| Count bubble (on cart) | 30 dp circle, `brand` fill, 2.5 dp `card` border, 12 ExtraBold `onBrand` |
+| Qty stepper (card) | 88 × 32 pill, `brand` fill, `minus` · count (`titleSmall` 14 ExtraBold, `onBrand`) · `plus` |
+| Cart stepper (cart line) | 112 × 52 pill, `field` fill, count `titleMedium` 16 ExtraBold `textPrimary`, icons `textPrimary` |
+| Count bubble (on cart) | 30 dp circle, `brand` fill, 2.5 dp `card` border, `labelStrong` 12.5 ExtraBold `onBrand` |
 
 The rule from Figma is: the **Add (+) button turns into the stepper when the item is in the cart.**
 
@@ -518,10 +531,7 @@ fun AppQuantityControl(
     val isLarge = style == AppStepperStyle.Large
     val fill = if (isLarge) c.field else c.brand
     val content = if (isLarge) c.textPrimary else c.onBrand
-    val countStyle = MaterialTheme.typography.titleSmall.copy(
-        fontWeight = FontWeight.ExtraBold,
-        fontSize = if (isLarge) 16.sp else 13.5.sp,
-    )
+    val countStyle = if (isLarge) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleSmall
 
     Row(
         modifier = modifier
@@ -552,7 +562,7 @@ fun AppCountBubble(count: Int, modifier: Modifier = Modifier) {
     ) {
         Text(
             text = if (count > 99) "99+" else count.toString(),
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.ExtraBold),
+            style = AppTheme.textStyles.labelStrong,
             color = c.onBrand,
         )
     }
@@ -611,7 +621,7 @@ fun AppAvatar(
         if (photo != null) {
             Image(photo, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(size))
         } else {
-            Text(initials.take(2).uppercase(), style = MaterialTheme.typography.titleSmall, color = AppTheme.colors.brandSoftText)
+            Text(initials.take(2).uppercase(), style = MaterialTheme.typography.labelLarge, color = AppTheme.colors.brandSoftText)
         }
     }
 }
@@ -626,14 +636,14 @@ fun AppRating(value: String, count: String?, modifier: Modifier = Modifier) {
         Icon(painterResource(AppIcons.StarFilled), null, tint = AppTheme.colors.gold, modifier = Modifier.size(12.dp))
         Text(
             text = if (count != null) "$value ($count)" else value,
-            style = AppTheme.textStyles.caption,
+            style = MaterialTheme.typography.labelSmall,
             color = AppTheme.colors.textLabel,
         )
     }
 }
 ```
 
-> Avatars and product photos come from Firebase Storage URLs. When you start Home, add **Coil 3** (`io.coil-kt.coil3:coil-compose` and `coil-network-okhttp`) and pass `rememberAsyncImagePainter(url)` as `photo`. Ratings use `AppIcons.StarFilled` tinted `colors.gold` (Figma `02 · Icons`: "ratings use the filled star in accent/gold"; doc 09).
+> Avatars and product photos come from Firebase Storage URLs. When you start Home, add **Coil 3** (`io.coil-kt.coil3:coil-compose` and `coil-network-okhttp`) and pass `rememberAsyncImagePainter(url)` as `photo`. Ratings use `AppIcons.StarFilled` tinted `colors.gold` (Figma `2.1 · Icons`: "ratings use the filled star in accent/gold"; doc 09).
 
 ## 12.9 Pager indicator and progress bar
 
@@ -756,7 +766,7 @@ fun AppStatusSteps(steps: List<AppStep>, currentIndex: Int, modifier: Modifier =
                     horizontalArrangement = Arrangement.spacedBy(AppDimens.space4),
                 ) {
                     Icon(painterResource(step.icon), null, tint = c.onBrand, modifier = Modifier.size(12.dp))
-                    Text(step.label, style = AppTheme.textStyles.helper.copy(fontWeight = FontWeight.ExtraBold), color = c.onBrand)
+                    Text(step.label, style = AppTheme.textStyles.labelStrong, color = c.onBrand)
                 }
 
                 else -> Box(
@@ -775,34 +785,95 @@ fun AppStatusSteps(steps: List<AppStep>, currentIndex: Int, modifier: Modifier =
 }
 ```
 
-## 12.11 Toast (snackbar)
+## 12.11 Toast (Figma `4.4 · Toast`, the "aura toast")
 
-Figma toasts are cards: `card` fill, radius `radiusLg`, `shadows.float`, a 3 dp colored bar on the start edge, an icon, a title (`titleSmall`), an optional subtitle (`bodySmall`, `textSecondary`), and an action link at the end.
+Floating feedback that confirms, warns or offers one quick action, then gets out of the way. It **replaces the old accent-bar toast everywhere**. Figma has 2 component sets (`Toast` and `Toast · RTL`), each with 10 variants: Type (`Success`, `Error`, `Warning`, `Info`, `Loading`) × Theme (`Light`, `Dark`). Component properties: `Title`, `Subtitle`, `Action` (text) and `Show subtitle`, `Show action`, `Show close`, `Show timer` (boolean).
 
-| Variant | Bar and icon | Example | Action |
+### Figma spec: anatomy and tokens
+
+| Part | Figma value | Our code |
+|---|---|---|
+| Container | 353 wide (screen − 2 × 20), **64 high**, `radius/card` 20, padding 10 top/bottom/icon side, 12 on the close side, gap `space/12` | `AppDimens.toast`, `radiusCard`, `space12` |
+| Surface | `surface/card` + status wash: linear gradient, status colour **9 % → 0 at 62 %** (**16 %** in dark) | `card` + `shadows.toast.washAlpha` |
+| Border | 1 px, status colour at **18 %** (**24 %** in dark), inner alignment | `shadows.toast.borderAlpha` |
+| Shadow | `Elevation/Toast`, `Dark/Elevation/Toast` (3 layers, doc 05) | `shadows.toast.layers`, `topHighlight` |
+| Halo icon | 44 halo (status 10 %; **14 % in dark**) → 34 ring (status 16 %; **22 % in dark**) → 24 core (status, drop shadow 0 3 8 status 35 %, inner shadow 0 1 0 white 25 %) → 13 glyph, stroke 1.73 | `ToastHalo`, `ToastCore` |
+| Glyph colour | `on/primary` (`surface/card` in dark) | `shadows.toast.onStatus` |
+| Loading | 20 spinner in the ring, stroke 2.5, track `border/default`, arc status | `CircularProgressIndicator` |
+| Title | `M3/titleSmall` 14/20 ExtraBold, `text/primary`, 1 line (RTL: `Arabic/labelLarge`) | `titleSmall` / `labelLarge` |
+| Subtitle | `M3/bodySmall` 13/18 Medium, `text/secondary`, max 2 lines (RTL: `Arabic/labelMedium`) | `bodySmall` / `labelMedium` |
+| Action | solid pill, `radius/full`, 32 high, padding 8 / 14, status colour fill, `M3/labelMedium` `on/primary`, shadow 0 4 10 −2 status 30 % | `ToastAction` |
+| Close + timer | 28 ring, stroke 2: track `text/tertiary` 25 % + status arc that drains over the duration, × 12 (stroke 1.3) `text/secondary`, 44 touch target | `ToastClose` |
+| Info / Loading | no status/info token: `brand/primary` + brand colours | `statusColor()` |
+
+Status colours follow the theme automatically:
+
+| Type | Token | Light | Dark | Glyph |
+|---|---|---|---|---|
+| `Success` | `success` | `#16A34A` | `#22C55E` | check |
+| `Error` | `error` | `#DC2626` | `#F87171` | × |
+| `Warning` | `warning` | `#D97706` | `#F59E0B` | ! |
+| `Info` | `brand` | `#2563EB` | `#6090FA` | i |
+| `Loading` | `brand` | `#2563EB` | `#6090FA` | spinner |
+
+> **Dark mode:** the glyph and action label use `surface/card` (`#111A2E`), confirmed on the dark variants. The spec text still says `on/primary`, but the components are correct: white on `#22C55E` would be only about 2.3 : 1.
+
+### Figma spec: behaviour
+
+| Topic | Rule |
+|---|---|
+| Position | Top: 8 below the status bar. Above the nav bar (12 gap) when the keyboard or a sheet is open |
+| Duration | 4 s. 6 s with an action. An error with an action stays until dismissed or acted on |
+| Stacking | One at a time. A new toast replaces the current one (no pile-up) |
+| Dismiss | Swipe up or sideways, tap close, or the action. Pause the timer while pressed |
+| Motion | In: slide 16 px + fade, 240 ms ease-out-back. Out: fade + scale 0.96, 160 ms. Reduced motion: fade only |
+| Haptics | Success: light impact. Error: notification error. None for info |
+| Accessibility | Live region (polite; assertive for Error). The icon carries meaning with the text, never colour alone. Contrast ≥ 4.5 : 1 for text, ≥ 3 : 1 for the glyph |
+| RTL | Use the `Toast · RTL` set: icon right, close left, timer drains right → left |
+| Copy | Title ≤ 32 chars, says what happened. Subtitle adds the one detail that matters. Action is one verb |
+
+**Do:** confirm an action the user just took (added, saved, copied, removed). Offer Undo for destructive actions instead of a confirm dialog. Use Warning for soft blockers the user can still act on.
+
+**Don't:** use a toast for errors that block the flow (use an inline error or a sheet). Put two actions or links in the subtitle. Stack toasts or show one on top of a bottom sheet handle.
+
+### Real copy from Figma ("In context")
+
+| Type | Title | Subtitle | Action |
 |---|---|---|---|
-| `Success` | `success` · `circle-check` | Added to cart | View cart (`brand`) |
-| `Error` | `error` · `circle-alert` | Couldn't apply coupon | Retry (`error`) |
-| `Warning` | `warning` · `circle-alert` | Only 2 left in stock | View (`warningText`) |
-| `Info` | `brand` · `info` | Item removed from cart | Undo (`brand`) |
+| Success | Added to cart | Air Runner 2 · EU 42 | View |
+| Success | Order placed | Arrives 08:54 – 09:14 | Track |
+| Success | Address saved | — | — |
+| Success | Copied to clipboard | — | — |
+| Error | Couldn't apply coupon | This code has expired | Retry |
+| Error | No internet connection | We'll retry automatically | Retry |
+| Error | Payment failed | Your card was declined | — |
+| Warning | Only 2 left in stock | Order now to get it today | View |
+| Warning | Email not verified | Verify to place orders | Verify |
+| Info | Item removed from cart | Air Runner 2 · EU 42 | Undo |
+| Info | Reset link sent | Check your inbox | — |
+| Loading | Placing your order… | 765.300 TND · cash on delivery | — |
+| Loading | Uploading photo… | 2 of 3 · 1.2 MB | Cancel |
+
+### Code: `AppToast.kt`
 
 ```kotlin
 package com.example.dukkanapp.core.designsystem.components.feedback
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -810,94 +881,552 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.innerShadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.R
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppPillShape
+import com.example.dukkanapp.core.theme.AppShadow
 import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.theme.AppToastTokens
 import com.example.dukkanapp.core.theme.appShadow
+import com.example.dukkanapp.core.theme.appShadowLayers
 
-enum class AppToastVariant { Success, Error, Warning, Info }
+enum class AppToastType { Success, Error, Warning, Info, Loading }
 
+/** Figma has no status/info token: Info and Loading use the brand colour. */
+@Composable
+internal fun AppToastType.statusColor(): Color {
+    val c = AppTheme.colors
+    return when (this) {
+        AppToastType.Success -> c.success
+        AppToastType.Error -> c.error
+        AppToastType.Warning -> c.warning
+        AppToastType.Info, AppToastType.Loading -> c.brand
+    }
+}
+
+/**
+ * The toast itself: no timer logic, no position. [AppToastHost] adds those.
+ * Pass [timerProgress] (1 → 0) to show the draining ring, [onClose] to show the close button.
+ */
 @Composable
 fun AppToast(
     title: String,
-    variant: AppToastVariant,
+    type: AppToastType,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     actionText: String? = null,
     onAction: () -> Unit = {},
+    onClose: (() -> Unit)? = null,
+    timerProgress: (() -> Float)? = null,
 ) {
-    val c = AppTheme.colors
-    val shape = RoundedCornerShape(AppDimens.radiusLg)
-    val (accent: Color, icon: Int, actionColor: Color) = when (variant) {
-        AppToastVariant.Success -> Triple(c.success, AppIcons.CircleCheck, c.brand)
-        AppToastVariant.Error -> Triple(c.error, AppIcons.CircleAlert, c.error)
-        AppToastVariant.Warning -> Triple(c.warning, AppIcons.CircleAlert, c.warningText)
-        AppToastVariant.Info -> Triple(c.brand, AppIcons.Info, c.brand)
+    val colors = AppTheme.colors
+    val tokens = AppTheme.shadows.toast
+    val status = type.statusColor()
+    val shape = RoundedCornerShape(AppDimens.radiusCard)
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val wash = status.copy(alpha = tokens.washAlpha)
+    val washBrush = if (isRtl) {
+        Brush.horizontalGradient(0.38f to Color.Transparent, 1f to wash)
+    } else {
+        Brush.horizontalGradient(0f to wash, 0.62f to Color.Transparent)
     }
+    val typography = MaterialTheme.typography
 
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .appShadow(AppTheme.shadows.float, shape)
-            .clip(shape)
-            .background(c.card),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(Modifier.width(3.dp).fillMaxHeight().background(accent))
-        Row(
-            modifier = Modifier.weight(1f).padding(AppDimens.space12),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(AppDimens.space12),
-        ) {
-            Icon(painterResource(icon), null, tint = accent, modifier = Modifier.size(AppDimens.icon))
-            Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleSmall, color = c.textPrimary)
-                subtitle?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = c.textSecondary) }
+            .semantics {
+                liveRegion = if (type == AppToastType.Error) LiveRegionMode.Assertive else LiveRegionMode.Polite
             }
-            if (actionText != null) {
+            .heightIn(min = AppDimens.toast)
+            .appShadowLayers(tokens.layers, shape)
+            .clip(shape)
+            .background(colors.card)
+            .background(washBrush)
+            .border(1.dp, status.copy(alpha = tokens.borderAlpha), shape)
+            .then(
+                tokens.topHighlight?.let { highlight ->
+                    Modifier.innerShadow(
+                        shape = shape,
+                        shadow = Shadow(
+                            radius = highlight.blur,
+                            color = highlight.color,
+                            offset = DpOffset(0.dp, highlight.offsetY),
+                        ),
+                    )
+                } ?: Modifier,
+            )
+            // Padding is 10 on the icon side and 12 on the close side; start/end mirror in RTL.
+            .padding(PaddingValues(start = 10.dp, end = 12.dp, top = 10.dp, bottom = 10.dp)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(AppDimens.space12),
+    ) {
+        ToastHalo(type = type, status = status, tokens = tokens)
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = if (isRtl) typography.labelLarge else typography.titleSmall,
+                color = colors.textPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            subtitle?.let {
                 Text(
-                    text = actionText,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = actionColor,
-                    modifier = Modifier.clip(RoundedCornerShape(AppDimens.radiusSm)).clickable(onClick = onAction)
-                        .padding(AppDimens.space8),
+                    text = it,
+                    style = if (isRtl) typography.labelMedium else typography.bodySmall,
+                    color = colors.textSecondary,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
+        }
+        actionText?.let {
+            ToastAction(text = it, status = status, onStatus = tokens.onStatus, onClick = onAction)
+        }
+        if (onClose != null || timerProgress != null) {
+            ToastClose(status = status, onClose = onClose, timerProgress = timerProgress, isRtl = isRtl)
+        }
+    }
+}
+
+/** 44 halo → 34 ring → 24 core → 13 glyph. */
+@Composable
+private fun ToastHalo(type: AppToastType, status: Color, tokens: AppToastTokens) {
+    Box(
+        modifier = Modifier
+            .size(44.dp)
+            .clip(CircleShape)
+            .background(status.copy(alpha = tokens.haloAlpha)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(34.dp)
+                .clip(CircleShape)
+                .background(status.copy(alpha = tokens.ringAlpha)),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (type == AppToastType.Loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = status,
+                    trackColor = AppTheme.colors.border,
+                    strokeWidth = 2.5.dp,
+                )
+            } else {
+                ToastCore(type = type, status = status, onStatus = tokens.onStatus)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ToastCore(type: AppToastType, status: Color, onStatus: Color) {
+    Box(
+        modifier = Modifier
+            .size(24.dp)
+            .appShadow(AppShadow(status.copy(alpha = 0.35f), offsetY = 3.dp, blur = 8.dp), CircleShape)
+            .background(status, CircleShape)
+            .innerShadow(
+                shape = CircleShape,
+                shadow = Shadow(radius = 0.dp, color = Color.White.copy(alpha = 0.25f), offset = DpOffset(0.dp, 1.dp)),
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        when (type) {
+            AppToastType.Success -> ToastGlyphIcon(AppIcons.Check, onStatus)
+            AppToastType.Error -> ToastGlyphIcon(AppIcons.X, onStatus)
+            // "!" and "i" are bare glyphs. The Lucide icons of the same name carry their own circle.
+            AppToastType.Warning -> ToastGlyphText("!", onStatus)
+            AppToastType.Info -> ToastGlyphText("i", onStatus)
+            AppToastType.Loading -> Unit
+        }
+    }
+}
+
+@Composable
+private fun ToastGlyphIcon(icon: Int, tint: Color) {
+    Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.size(13.dp))
+}
+
+@Composable
+private fun ToastGlyphText(text: String, color: Color) {
+    Text(text = text, style = AppTheme.textStyles.labelStrong, color = color)
+}
+
+@Composable
+private fun ToastAction(text: String, status: Color, onStatus: Color, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .heightIn(min = 32.dp)
+            .appShadow(
+                AppShadow(status.copy(alpha = 0.30f), offsetY = 4.dp, blur = 10.dp, spread = (-2).dp),
+                AppPillShape,
+            )
+            .clip(AppPillShape)
+            .background(status)
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text = text, style = MaterialTheme.typography.labelMedium, color = onStatus)
+    }
+}
+
+/** 28 ring inside a 44 touch target: track + status arc that drains, × 12 in the middle. */
+@Composable
+private fun ToastClose(
+    status: Color,
+    onClose: (() -> Unit)?,
+    timerProgress: (() -> Float)?,
+    isRtl: Boolean,
+) {
+    val colors = AppTheme.colors
+    val track = colors.textTertiary.copy(alpha = 0.25f)
+    Box(
+        modifier = Modifier
+            .size(AppDimens.iconButton)
+            .then(
+                if (onClose != null) {
+                    Modifier.clip(CircleShape).clickable(role = Role.Button, onClick = onClose)
+                } else {
+                    Modifier
+                },
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(Modifier.size(28.dp)) {
+            val strokePx = 2.dp.toPx()
+            val inset = strokePx / 2
+            val arcSize = Size(size.width - strokePx, size.height - strokePx)
+            drawCircle(color = track, radius = arcSize.width / 2, style = Stroke(strokePx))
+            // Reading the lambda here redraws only the ring on each tick, not the whole toast.
+            val progress = timerProgress?.invoke() ?: 1f
+            val direction = if (isRtl) -1f else 1f
+            drawArc(
+                color = status,
+                startAngle = -90f,
+                sweepAngle = direction * 360f * progress,
+                useCenter = false,
+                topLeft = Offset(inset, inset),
+                size = arcSize,
+                style = Stroke(strokePx, cap = StrokeCap.Round),
+            )
+        }
+        if (onClose != null) {
+            Icon(
+                painter = painterResource(AppIcons.X),
+                contentDescription = stringResource(R.string.cd_dismiss),
+                tint = colors.textSecondary,
+                modifier = Modifier.size(12.dp),
+            )
         }
     }
 }
 ```
 
-**To show it as a snackbar:** keep Material's `SnackbarHostState` (it handles queueing and timeouts) and replace only the drawing:
+Note the shape of `ToastCore`: `appShadow` first, then `background`, the same modifier order as cards (doc 05).
+
+### Code: `AppToastHost.kt`
+
+Material's `SnackbarHost` is **not** used. It queues messages (Figma says a new toast replaces the current one), sits at the bottom (Figma says top), and has fixed durations. A small state holder and host are simpler than fighting it.
 
 ```kotlin
-SnackbarHost(hostState) { data ->
-    val visuals = data.visuals as AppToastVisuals
-    AppToast(
-        title = visuals.message,
-        variant = visuals.variant,
-        subtitle = visuals.subtitle,
-        actionText = visuals.actionLabel,
-        onAction = { data.performAction() },
-        modifier = Modifier.padding(horizontal = AppDimens.screenPadding),
-    )
+package com.example.dukkanapp.core.designsystem.components.feedback
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseOutBack
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.dp
+import com.example.dukkanapp.core.theme.AppDimens
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlin.math.abs
+
+private const val DURATION_MS = 4_000L
+private const val DURATION_WITH_ACTION_MS = 6_000L
+private const val TIMER_TICK_MS = 50L
+
+@Immutable
+data class AppToastData(
+    val title: String,
+    val type: AppToastType,
+    val subtitle: String? = null,
+    val actionText: String? = null,
+    val onAction: (() -> Unit)? = null,
+    val showClose: Boolean = true,
+    internal val id: Long = 0L,
+) {
+    /** null = stays until dismissed: Loading, and an Error with an action. */
+    internal val durationMs: Long?
+        get() = when {
+            type == AppToastType.Loading -> null
+            type == AppToastType.Error && actionText != null -> null
+            actionText != null -> DURATION_WITH_ACTION_MS
+            else -> DURATION_MS
+        }
 }
 
-data class AppToastVisuals(
-    override val message: String,
-    val variant: AppToastVariant,
-    val subtitle: String? = null,
-    override val actionLabel: String? = null,
-    override val withDismissAction: Boolean = false,
-    override val duration: SnackbarDuration = SnackbarDuration.Short,
-) : SnackbarVisuals
+/** One toast at a time: [show] replaces the current one. */
+@Stable
+class AppToastState {
+    var current by mutableStateOf<AppToastData?>(null)
+        private set
+    private var lastId = 0L
+
+    fun show(toast: AppToastData) {
+        lastId += 1
+        current = toast.copy(id = lastId)
+    }
+
+    fun dismiss() {
+        current = null
+    }
+}
+
+@Composable
+fun rememberAppToastState(): AppToastState = remember { AppToastState() }
+
+/** Top by default. Use [Bottom] when the keyboard or a sheet is open. */
+enum class AppToastPlacement { Top, Bottom }
+
+/** Put it last in a full-screen Box, so it draws above the screen. `AppScaffold` does this (doc 13). */
+@Composable
+fun AppToastHost(
+    state: AppToastState,
+    modifier: Modifier = Modifier,
+    placement: AppToastPlacement = AppToastPlacement.Top,
+) {
+    val slidePx = with(LocalDensity.current) { 16.dp.roundToPx() }
+    val reducedMotion = animationsDisabled()
+
+    Box(modifier.fillMaxSize()) {
+        AnimatedContent(
+            targetState = state.current,
+            contentKey = { it?.id },
+            transitionSpec = {
+                val enter = fadeIn(tween(240))
+                val exit = fadeOut(tween(160))
+                if (reducedMotion) {
+                    enter togetherWith exit
+                } else {
+                    (enter + slideInVertically(tween(240, easing = EaseOutBack)) { -slidePx }) togetherWith
+                        (exit + scaleOut(tween(160), targetScale = 0.96f))
+                }
+            },
+            modifier = Modifier
+                .align(if (placement == AppToastPlacement.Top) Alignment.TopCenter else Alignment.BottomCenter)
+                .then(
+                    if (placement == AppToastPlacement.Top) {
+                        Modifier.statusBarsPadding().padding(top = AppDimens.space8)
+                    } else {
+                        Modifier.navigationBarsPadding().imePadding()
+                            .padding(bottom = AppDimens.navBar + AppDimens.space12)
+                    },
+                )
+                .padding(horizontal = AppDimens.screenPadding),
+            label = "toast",
+        ) { toast ->
+            if (toast != null) ToastWithBehaviour(toast = toast, onDismiss = state::dismiss)
+        }
+    }
+}
+
+@Composable
+private fun ToastWithBehaviour(toast: AppToastData, onDismiss: () -> Unit) {
+    val haptics = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
+    val swipeThresholdPx = with(LocalDensity.current) { 56.dp.toPx() }
+    val swipe = remember(toast.id) { Animatable(Offset.Zero, Offset.VectorConverter) }
+    var isPressed by remember(toast.id) { mutableStateOf(false) }
+    var progress by remember(toast.id) { mutableFloatStateOf(1f) }
+
+    LaunchedEffect(toast.id) {
+        when (toast.type) {
+            AppToastType.Success -> haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+            AppToastType.Error -> haptics.performHapticFeedback(HapticFeedbackType.Reject)
+            else -> Unit
+        }
+    }
+
+    // A delay loop, not an animation: when the user removes animations an animation would
+    // finish instantly and the toast would vanish, while a delay still takes the full time.
+    LaunchedEffect(toast.id) {
+        val total = toast.durationMs ?: return@LaunchedEffect
+        var remaining = total
+        snapshotFlow { isPressed }.collectLatest { pressed ->
+            if (pressed) return@collectLatest
+            while (remaining > 0) {
+                delay(TIMER_TICK_MS)
+                remaining -= TIMER_TICK_MS
+                progress = remaining.toFloat() / total
+            }
+            onDismiss()
+        }
+    }
+
+    AppToast(
+        title = toast.title,
+        type = toast.type,
+        subtitle = toast.subtitle,
+        actionText = toast.actionText,
+        onAction = {
+            toast.onAction?.invoke()
+            onDismiss()
+        },
+        onClose = if (toast.showClose) onDismiss else null,
+        timerProgress = if (toast.durationMs != null) ({ progress }) else null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .graphicsLayer {
+                translationX = swipe.value.x
+                translationY = swipe.value.y
+                val distance = maxOf(abs(swipe.value.x), abs(swipe.value.y))
+                alpha = 1f - (distance / (swipeThresholdPx * 2)).coerceIn(0f, 1f)
+            }
+            // Pause the timer while a finger is down, whatever the gesture turns out to be.
+            .pointerInput(toast.id) {
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false)
+                    isPressed = true
+                    do {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                    } while (event.changes.any { it.pressed })
+                    isPressed = false
+                }
+            }
+            // Swipe up or sideways to dismiss; downward drags are ignored.
+            .pointerInput(toast.id) {
+                detectDragGestures(
+                    onDragEnd = {
+                        val value = swipe.value
+                        if (abs(value.x) > swipeThresholdPx || value.y < -swipeThresholdPx) {
+                            onDismiss()
+                        } else {
+                            scope.launch { swipe.animateTo(Offset.Zero) }
+                        }
+                    },
+                    onDragCancel = { scope.launch { swipe.animateTo(Offset.Zero) } },
+                ) { change, drag ->
+                    change.consume()
+                    val next = swipe.value + drag
+                    scope.launch { swipe.snapTo(Offset(next.x, minOf(next.y, 0f))) }
+                }
+            },
+    )
+}
 ```
 
-The ViewModel sends an effect (for example `ShowToast(AppUiText, variant)`). The screen collects it with `AppCollectEffect` and calls `hostState.showSnackbar(AppToastVisuals(...))`.
+`animationsDisabled()` is the helper from 12.15. Change it there from `private` to `internal`, because both files are in the `feedback` package.
+
+### Using it from MVI
+
+The ViewModel doesn't know about Compose. It sends an effect, and the screen shows the toast:
+
+```kotlin
+// The ViewModel's effect
+data class ShowToast(
+    val title: AppUiText,
+    val type: AppToastType,
+    val subtitle: AppUiText? = null,
+) : CartEffect
+
+// The screen
+val toastState = rememberAppToastState()
+val context = LocalContext.current
+
+AppCollectEffect(viewModel.effect) { effect ->
+    when (effect) {
+        is CartEffect.ShowToast -> toastState.show(
+            AppToastData(
+                title = effect.title.asString(context),
+                type = effect.type,
+                subtitle = effect.subtitle?.asString(context),
+            ),
+        )
+    }
+}
+
+AppScaffold(toastState = toastState) { padding -> /* ... */ }
+```
+
+Add this string (`values`, `values-ar`, `values-fr`):
+
+| Key | EN | AR | FR |
+|---|---|---|---|
+| `cd_dismiss` | Dismiss | إغلاق | Fermer |
+
+### Check
+
+- [ ] Toast is 64 high, 353 wide on a 393 frame (`screenPadding` on both sides), radius 20.
+- [ ] Light wash is 9 % fading out at 62 %, dark wash is 16 %.
+- [ ] Border is the status colour at 18 % light, 24 % dark.
+- [ ] Icon shows all three rings: 44 → 34 → 24, with a 13 glyph. In dark, the halo and ring are stronger (14 % / 22 %).
+- [ ] Loading shows a spinner in the ring and has no timer.
+- [ ] Toast disappears after 4 s; 6 s with an action; an Error with an action stays.
+- [ ] Pressing and holding pauses the ring; releasing continues from the same point.
+- [ ] A new toast replaces the current one, and nothing stacks.
+- [ ] Swiping up or sideways dismisses; swiping down does nothing.
+- [ ] With "Remove animations" on, the toast only fades and still stays the full 4 s.
+- [ ] Arabic: icon on the right, close on the left, title in Cairo, timer drains the other way.
+- [ ] TalkBack reads the toast without moving focus; Error interrupts.
 
 ## 12.12 Message banner (restyle of the existing `AppMessageBanner`)
 
@@ -1045,7 +1574,7 @@ For a row with a switch, pass `trailing = { AppSwitch(checked, onCheckedChange =
 
 ## 12.14 Empty state (`AppEmptyState`)
 
-Figma board **14 · Empty & loading states**: empty lists for orders (14.1), notifications (14.2) and addresses (14.3). Empty search is the separate "No results" screen (05b.4). They all share one shape:
+Figma board **14 · Empty & loading states**: empty lists for orders (14.1), notifications (14.2) and addresses (14.3). Empty search is the separate "No results" screen (3.2.4). They all share one shape:
 
 | Part | Spec |
 |---|---|
@@ -1201,7 +1730,7 @@ private const val SHIMMER_DURATION_MS = 1_200
 
 /** True when the user turned animations off (Settings → Accessibility → Remove animations). */
 @Composable
-private fun animationsDisabled(): Boolean {
+internal fun animationsDisabled(): Boolean {
     val resolver = LocalContext.current.contentResolver
     return remember(resolver) {
         Settings.Global.getFloat(resolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
@@ -1215,7 +1744,7 @@ private fun animationsDisabled(): Boolean {
 fun Modifier.shimmer(): Modifier = composed {
     if (animationsDisabled()) return@composed this
 
-    val highlight = AppTheme.colors.card.copy(alpha = 0.6f)
+    val highlight = AppTheme.colors.skeletonHighlight // Figma `Skeleton/Shimmer` middle stop
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val progress by rememberInfiniteTransition(label = "shimmer").animateFloat(
         initialValue = 0f,
@@ -1249,7 +1778,7 @@ fun AppSkeletonBox(shape: Shape, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .clip(shape)
-            .background(AppTheme.colors.field)
+            .background(AppTheme.colors.skeleton)
             .shimmer(),
     )
 }

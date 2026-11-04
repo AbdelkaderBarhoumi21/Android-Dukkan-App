@@ -48,7 +48,7 @@ There are **exactly 3 blobs**, in light and dark, at the same positions (Figma `
 
 The Figma "white · 35 %" is **not** a header blob: it is the **card highlight**, drawn only inside gradient cards (promo banners, wallet, earnings) with `Modifier.cardHighlight()` from doc 05. It does not belong in this composable.
 
-**Dark mode** comes from the tokens (doc 05, Figma `01b` and `13.1b`): "Tint and fades go to night", and the blobs are re-tinted. Every value is official, so the code below is identical for both modes.
+**Dark mode** comes from the tokens (doc 05, Figma `1.2` and `13.1b`): "Tint and fades go to night", and the blobs are re-tinted. Every value is official, so the code below is identical for both modes.
 
 **Arabic (RTL):** mirror the x positions (x becomes w − x). The brand blob then sits behind the back button on the right, like it sits behind it on the left in LTR.
 
@@ -189,6 +189,9 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.designsystem.components.button.AppIconButton
 import com.example.dukkanapp.core.designsystem.components.button.AppIconButtonVariant
+import com.example.dukkanapp.core.designsystem.components.feedback.AppToastHost
+import com.example.dukkanapp.core.designsystem.components.feedback.AppToastPlacement
+import com.example.dukkanapp.core.designsystem.components.feedback.AppToastState
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.designsystem.icon.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
@@ -202,7 +205,8 @@ fun AppScaffold(
     onNavigateBack: (() -> Unit)? = null,
     topBarActions: @Composable RowScope.() -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
-    snackbarHost: @Composable () -> Unit = {},
+    toastState: AppToastState? = null,
+    toastPlacement: AppToastPlacement = AppToastPlacement.Top,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     AppScreenBackgroundBox(background = background, modifier = modifier) {
@@ -221,9 +225,10 @@ fun AppScaffold(
                 }
             },
             bottomBar = bottomBar,
-            snackbarHost = snackbarHost,
             content = content,
         )
+        // Drawn over the whole screen, not in Scaffold's snackbar slot, which only sits at the bottom.
+        toastState?.let { AppToastHost(state = it, placement = toastPlacement) }
     }
 }
 
@@ -465,7 +470,7 @@ fun AppOrDivider(text: String, modifier: Modifier = Modifier, showLines: Boolean
         if (showLines) HorizontalDivider(Modifier.weight(1f), thickness = AppDimens.strokeThin, color = AppTheme.colors.border)
         Text(
             text = text,
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
             color = AppTheme.colors.textTertiary,
         )
         if (showLines) HorizontalDivider(Modifier.weight(1f), thickness = AppDimens.strokeThin, color = AppTheme.colors.border)

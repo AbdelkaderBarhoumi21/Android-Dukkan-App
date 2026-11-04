@@ -9,7 +9,7 @@
 | `res/drawable/ic_dukkan_mark.xml`                                                                     | new (replaces `ic_app_logo.xml`)               |
 | `core/designsystem/icon/AppIcons.kt`                                                                  | new                                            |
 | `core/designsystem/components/logo/AppLogo.kt`                                                        | new                                            |
-| `res/drawable/ic_launcher_foreground.xml`, `ic_launcher_background.xml`, `ic_launcher_monochrome.xml` | rewrite (Figma `05b · Android app icon`)       |
+| `res/drawable/ic_launcher_foreground.xml`, `ic_launcher_background.xml`, `ic_launcher_monochrome.xml` | rewrite (Figma `3.2 · Android app icon`)       |
 | `res/mipmap-anydpi-v26/ic_launcher.xml`, `ic_launcher_round.xml`                                      | rewrite                                        |
 | `res/mipmap-*/ic_launcher.png` (legacy)                                                               | regenerate                                     |
 | `res/values/colors.xml`, `res/values/themes.xml`                                                      | edit: splash colors, remove purple/teal        |
@@ -17,7 +17,7 @@
 
 ## Why
 
-Figma chapter `02 · Icons`: **"76 icons from Lucide, used at 20–24 px with 2 px stroke."** The latest version adds six: **user-plus, eye-off, star-filled** ("ratings use the filled star in accent/gold"), **wifi-off, search-x, mic**.
+Figma chapter `2.1 · Icons`: **"76 icons from Lucide, used at 20–24 px with 2 px stroke."** The latest version adds six: **user-plus, eye-off, star-filled** ("ratings use the filled star in accent/gold"), **wifi-off, search-x, mic**.
 
 Today the app mixes two icon sets: Iconsax (`Iconsax.Linear.Sms`) and Material (`Icons.AutoMirrored.Filled.ArrowBack`). They have different stroke widths and corner styles, so screens look slightly off next to Figma.
 Importing the exact Lucide SVGs as vector drawables means:
@@ -119,7 +119,7 @@ Importing the exact Lucide SVGs as vector drawables means:
 | search-x (**new**)    | `ic_lucide_search_x`           | `SearchX`           |
 | mic (**new**)         | `ic_lucide_mic`                | `Mic`               |
 
-Where the new ones are used: `EyeOff` in the password field when the password is visible (Figma `03b`), `StarFilled` (tinted `colors.gold`) on every rating, `WifiOff` on the offline screens, `SearchX` on "No results" (05b.4), `Mic` in the search bar and the address voice note, `UserPlus` on the Sign up header tile.
+Where the new ones are used: `EyeOff` in the password field when the password is visible (Figma `4.2`), `StarFilled` (tinted `colors.gold`) on every rating, `WifiOff` on the offline screens, `SearchX` on "No results" (3.2.4), `Mic` in the search bar and the address voice note, `UserPlus` on the Sign up header tile.
 
 ## Step 1 — Import the SVGs
 
@@ -280,7 +280,7 @@ Never mirror icons that aren't directional (search, heart, clock).
 
 ## Step 3 — Logo
 
-Figma `05 · Logo`: **"A shop awning with a smile — 'dukkan' means 'shop'. 4.4 px stroke on a 48 grid, Brand gradient. No background. Use the mark alone at 48 px and below."**
+Figma `3.1 · Logo`: **"A shop awning with a smile — 'dukkan' means 'shop'. 4.4 px stroke on a 48 grid, Brand gradient. No background. Use the mark alone at 48 px and below."**
 
 | Asset             | Spec                                                                                  |
 | ----------------- | ------------------------------------------------------------------------------------- |
@@ -288,11 +288,11 @@ Figma `05 · Logo`: **"A shop awning with a smile — 'dukkan' means 'shop'. 4.4
 | Horizontal lockup | mark + "dukkan" wordmark, ExtraBold, −3.5 % tracking                                  |
 | Arabic lockup     | mark + "دكّان"                                                                        |
 | On colour / mono  | white mark on brand or dark backgrounds                                               |
-| App icon          | launcher only: full spec in `05b · Android app icon` (Step 4)                         |
+| App icon          | launcher only: full spec in `3.2 · Android app icon` (Step 4)                         |
 
 ### Export the mark
 
-1. In Figma, select the `Mark` layer in `05 · Logo` → **Export → SVG**.
+1. In Figma, select the `Mark` layer in `3.1 · Logo` → **Export → SVG**.
 2. Import with Vector Asset as `ic_dukkan_mark` (the gradient stroke becomes an `<aapt:attr>` gradient, supported on our `minSdk 24`).
 3. Also export a **white** version as `ic_dukkan_mark_white` (for the launcher foreground and dark backgrounds).
 4. Delete `ic_app_logo.xml` once nothing references it.
@@ -359,7 +359,7 @@ fun AppLogo(modifier: Modifier = Modifier) {
 Add `logo_wordmark` to the strings files: `dukkan` in `values/` and `values-fr/`, `دكّان` in `values-ar/`.
 `(-0.035).em` is Figma's −3.5 % tracking: `em` scales with the font size, just like a Figma percentage.
 
-## Step 4 — Launcher icon (adaptive), Figma `05b · Android app icon`
+## Step 4 — Launcher icon (adaptive), Figma `3.2 · Android app icon`
 
 ### Figma spec
 
@@ -408,7 +408,7 @@ Add `logo_wordmark` to the strings files: `dukkan` in `values/` and `values-fr/`
 
 ### 4.2 Foreground — `res/drawable/ic_launcher_foreground.xml`
 
-1. In Figma, select the white mark in `05b → Foreground` → **Export → SVG**.
+1. In Figma, select the white mark in `3.2 → Foreground` → **Export → SVG**.
 2. Android Studio: **New → Vector Asset** → *Local file* → name `ic_launcher_foreground_mark`.
 3. Create `ic_launcher_foreground.xml` that places the 40 dp mark in the middle of the 108 dp canvas with an `<inset>`:
 
@@ -453,7 +453,7 @@ Copy the same file to `ic_launcher_round.xml`. `<monochrome>` is read on Android
 1. Right-click `res` → **New → Image Asset** → *Launcher Icons (Legacy only)*.
 2. Foreground: *Image* → `ic_launcher_foreground_mark`, background: *Image* → `ic_launcher_background`.
 3. It writes `mipmap-mdpi … xxxhdpi/ic_launcher.png` at **48 / 72 / 96 / 144 / 192 px**. Don't let it overwrite the `mipmap-anydpi-v26` files above (uncheck them if asked).
-4. Export a **512 × 512 px** PNG from Figma `05b → Legacy & store sizes` for the Play Console.
+4. Export a **512 × 512 px** PNG from Figma `3.2 → Legacy & store sizes` for the Play Console.
 
 ## Step 5 — Splash screen and XML colors
 
@@ -629,7 +629,7 @@ In your project
 - [ ] `ic_lucide_arrow_left` flips in Arabic.
 - [ ] `AppIcons` compiles (missing drawables commented out).
 - [ ] Google and Facebook logos keep their colors (`tint = Color.Unspecified`).
-- [ ] Launcher icon: blue gradient background, white mark, looks right in circle, squircle, rounded square and themed (light + dark) modes, like Figma `05b`.
+- [ ] Launcher icon: blue gradient background, white mark, looks right in circle, squircle, rounded square and themed (light + dark) modes, like Figma `3.2`.
 - [ ] Legacy PNGs exist at 48 / 72 / 96 / 144 / 192 px; a 512 px store icon is exported.
 - [ ] Splash background is `#F7F9FB` in light and `#0B1220` in dark.
 - [ ] Iconsax is removed from Gradle once unused.

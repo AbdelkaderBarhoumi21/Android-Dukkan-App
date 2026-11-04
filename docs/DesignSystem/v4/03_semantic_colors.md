@@ -18,7 +18,7 @@ Doc 04 then **derives** Material's `ColorScheme` from `AppColors`, so there is o
 
 ## Figma spec
 
-Light values: `01 · Foundations → Semantic tokens · light`. Dark values: `01b · Dark mode → Semantic tokens · dark`. Both are **official Figma values** now. Same names in both modes; only the values change.
+Light values: `1.1 · Colour & effects → Semantic tokens · light`. Dark values: `1.2 · Dark mode → Semantic tokens · dark`. Both are **official Figma values** now. Same names in both modes; only the values change.
 
 | Field | Figma name | Light | Dark | Used by |
 |---|---|---|---|---|
@@ -49,6 +49,19 @@ Light values: `01 · Foundations → Semantic tokens · light`. Dark values: `01
 | `deal` | accent/deal | Orange500 `#F97316` | Orange400 `#FB923C` | "Hot deal" badge, timers |
 | `gold` | accent/gold | Amber500 `#F59E0B` | Amber300 `#FCD34D` | filled stars, points, Gold member |
 
+### Newer Figma tokens
+
+| Field | Figma | Light | Dark | Used for |
+|---|---|---|---|---|
+| `iconWishlist` | icon/wishlist | Red500 `#EF4444` | Red400 `#F87171` | filled wishlist heart |
+| `borderSubtle` | border/subtle | Slate150 `#EEF2F6` | Night800 `#1A2540` | dividers inside cards |
+| `handle` | surface/handle | Slate250 `#D5DCE6` | Night700 `#24314F` | bottom-sheet drag handle |
+| `skeleton` | surface/skeleton | SkeletonBase `#E9EEF4` | Night800 `#1A2540` | loading blocks |
+| `skeletonHighlight` | `Skeleton/Shimmer` middle stop | SkeletonHighlight `#F6F8FB` | Night700 `#24314F` (`Dark/Skeleton/Shimmer`) | shimmer sweep |
+| `textPoints` | text/points | Amber800 `#92400E` | Amber300 `#FCD34D` | "1 stop before you", "+74 points earned" |
+| `textFlash` | text/flash | Orange600 `#EA580C` | Orange400 `#FB923C` | label on the white flash-sale CTA |
+| `iconSilver` | icon/silver | Slate600 `#475569` | Slate400 `#94A3B8` | Silver member badge icon |
+
 ### Fields Figma does not define (derived by us)
 
 These fields exist in our code because components need them, but Figma has no semantic token for them. The values follow the same rules as Figma's own dark mode. Everything else in this doc is an official Figma value.
@@ -60,7 +73,7 @@ These fields exist in our code because components need them, but Figma has no se
 | `inverse` | Slate900 | Slate100 | Dark button, toast, "New" badge. Flips to light in dark mode |
 | `onInverse` | White | Slate900 | Text on `inverse` |
 | `scrim` | Slate900 | Black | Behind sheets and dialogs (the component adds alpha) |
-| `shadow` | Slate900 | Black | Figma `01b`: "Shadows go black" |
+| `shadow` | Slate900 | Black | Figma `1.2`: "Shadows go black" |
 
 ### What Figma's dark mode does (so you can read the values)
 
@@ -131,6 +144,16 @@ data class AppColors(
     val onInverse: Color,
     val scrim: Color,
     val shadow: Color,
+
+    // Newer tokens
+    val iconWishlist: Color,
+    val iconSilver: Color,
+    val borderSubtle: Color,
+    val handle: Color,
+    val skeleton: Color,
+    val skeletonHighlight: Color,
+    val textPoints: Color,
+    val textFlash: Color,
 )
 
 internal val LightAppColors = AppColors(
@@ -172,9 +195,18 @@ internal val LightAppColors = AppColors(
     onInverse = AppPalette.White,
     scrim = AppPalette.Slate900,
     shadow = AppPalette.Slate900,
+
+    iconWishlist = AppPalette.Red500,
+    iconSilver = AppPalette.Slate600,
+    borderSubtle = AppPalette.Slate150,
+    handle = AppPalette.Slate250,
+    skeleton = AppPalette.SkeletonBase,
+    skeletonHighlight = AppPalette.SkeletonHighlight,
+    textPoints = AppPalette.Amber800,
+    textFlash = AppPalette.Orange600,
 )
 
-/** Official Figma `01b · Dark mode` values. Fields marked "derived" are ours (see the table above). */
+/** Official Figma `1.2 · Dark mode` values. Fields marked "derived" are ours (see the table above). */
 internal val DarkAppColors = AppColors(
     background = AppPalette.Night950,
     card = AppPalette.Night900,
@@ -214,6 +246,15 @@ internal val DarkAppColors = AppColors(
     onInverse = AppPalette.Slate900, // derived
     scrim = AppPalette.Black,
     shadow = AppPalette.Black,
+
+    iconWishlist = AppPalette.Red400,
+    iconSilver = AppPalette.Slate400,
+    borderSubtle = AppPalette.Night800,
+    handle = AppPalette.Night700,
+    skeleton = AppPalette.Night800,
+    skeletonHighlight = AppPalette.Night700,
+    textPoints = AppPalette.Amber300,
+    textFlash = AppPalette.Orange400,
 )
 
 internal val LocalAppColors = staticCompositionLocalOf<AppColors> {
@@ -244,7 +285,7 @@ The old `AppExtendedColors.kt` had a `lerp` function for animated theme changes.
 |---|---|---|
 | `info` / `infoContainer` | `brand` / `brandSoft` | Figma uses soft blue for info badges ("25 min", "Bestseller") |
 | `sale` / `onSale` | `deal` + `onBrand`, or the `deal` gradient | Figma `accent/deal` |
-| `favorite` | `error` | The heart on the product card is red (#DC2626) |
+| `favorite` | `iconWishlist` | Figma `icon/wishlist`: the heart is `#EF4444`, not `status/error` |
 | `successContainer` | `successSoft` | Figma naming |
 | `onSuccessContainer` | `successText` | Figma naming |
 
@@ -260,6 +301,6 @@ The old `AppExtendedColors.kt` had a `lerp` function for animated theme changes.
 
 - [ ] `AppColors.kt` compiles.
 - [ ] Every value comes from `AppPalette` (no `Color(0x…)` in this file).
-- [ ] Dark values match Figma `01b · Dark mode` (except the 6 derived fields).
+- [ ] Dark values match Figma `1.2 · Dark mode` (except the 6 derived fields).
 - [ ] Badges and the tonal button use `brandSoftText` for their label, not `brandPressed`.
 - [ ] I can say why dark `brand` is Blue400 and not Blue600.

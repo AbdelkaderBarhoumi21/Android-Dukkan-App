@@ -10,7 +10,7 @@ Each doc creates or edits one or two small files. Follow the docs in order. Buil
 ## 1. How a token reaches a pixel
 
 ```
-Figma "01 · Foundations" + "01b · Dark mode"
+Figma "1.1 · Colour & effects" + "1.2 · Dark mode"
         │
         ▼
 AppPalette            raw hex, named like Figma          Blue600 = #2563EB, Night950 = #0B1220
@@ -69,9 +69,22 @@ Both point to the same color. Prefer `AppTheme.colors` in our own components bec
 
 Docs 10–14 use exactly the names defined in docs 02–09.
 
-**Figma version.** These docs follow the updated Figma file: one radius scale, official dark mode (`01b`), Cairo Arabic type scale, atom states (`03b`), Android app icon (`05b`), email verification screens (02.6/02.7), dark & Arabic screens (13.x) and empty & loading states (14.x).
+**Figma version.** These docs follow the updated Figma file: one radius scale, official dark mode (`1.2`), Cairo Arabic type scale, atom states (`4.2`), Android app icon (`3.2`), email verification screens (02.6/02.7), dark & Arabic screens (13.x) and empty & loading states (14.x).
 
 ---
+
+### Figma chapter names
+
+The Design System page is now organized in 4 sections. These docs use the new numbers:
+
+| Section | Chapter | Old name |
+|---|---|---|
+| 1 Foundations | 1.1 Colour & effects · 1.2 Dark mode · 1.3 Typography · 1.4 Sizes & spacing | 01 · 01b · 01d · 01c |
+| 2 Iconography | 2.1 Icons | 02 |
+| 3 Brand | 3.1 Logo · 3.2 Android app icon | 05 · 05b |
+| 4 Components | 4.1 Atoms · 4.2 Atom states · 4.3 Molecules · 4.4 Toast | 03 · 03b · 04 · 04b |
+
+The old `06 · Compose tokens` chapter is gone. The Kotlin in these docs is written by us from the variables and styles.
 
 ## 3. Final folder tree
 
@@ -157,13 +170,13 @@ Tip: move files with Android Studio **Refactor → Move** (F6). It rewrites impo
 | Extra styles | none | caption, overline, prices, field text, helper | Figma has styles Material lacks |
 | Spacing | `spaceXs…space5Xl` (t-shirt) | `space4…space64` (by value) | Figma names `space/16` → `space16` |
 | Radius | 2…32 + 999 | one scale: 10 / 14 / 16 / 20 / 28 / full | Figma "Radius · one scale" |
-| Inputs | rounded 24 dp, 45 dp tall | **pill**, 52 dp tall, focus ring, token-based disabled | Figma atoms + `03b` |
+| Inputs | rounded 24 dp, 45 dp tall | **pill**, 52 dp tall, focus ring, token-based disabled | Figma atoms + `4.2` |
 | Control heights | `buttonHeight = 45` | 52 / 44 / 36 | Figma sizes |
 | Screen padding | 16 | 20 | Figma |
 | Shapes | xs 6, sm 8, md 12, lg 16, xl 24 | xs 10, sm 14, md 16, lg 20, xl 28 + pill | Figma Compose-tokens chapter |
 | Icons | Iconsax + Material icons | 76 Lucide SVGs → Vector Asset | Figma chapter 02 |
-| Dark mode | hand-made dark scheme | **official Figma dark tokens** (`night` palette) | Figma `01b` |
-| Launcher icon | default template | adaptive icon with gradient background + monochrome | Figma `05b` |
+| Dark mode | hand-made dark scheme | **official Figma dark tokens** (`night` palette) | Figma `1.2` |
+| Launcher icon | default template | adaptive icon with gradient background + monochrome | Figma `3.2` |
 | Theme mode | always follows system | Light / Dark / System saved in DataStore | Figma screen 11.3 |
 
 ---

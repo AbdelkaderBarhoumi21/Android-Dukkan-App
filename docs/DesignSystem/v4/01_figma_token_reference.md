@@ -3,9 +3,9 @@
 **File:** none. This doc is the lookup table you keep open while typing docs 02–14.
 
 Source: Figma file **Dukkan App**, page **Design System**:
-`01 · Foundations`, `01b · Dark mode`, `02 · Icons`, `03 · Atoms`, `03b · Atom states`, `04 · Molecules`, `05 · Logo`, `05b · Android app icon`, `06 · Compose tokens`.
+`1.1 · Colour & effects`, `1.2 · Dark mode`, `2.1 · Icons`, `4.1 · Atoms`, `4.2 · Atom states`, `4.3 · Molecules`, `3.1 · Logo`, `3.2 · Android app icon`, plus the file's local variables and styles.
 The file has **no Figma variables or styles**. Every value below was read from the drawn swatches and specimens.
-**Light and dark are both official Figma values now** (`01` and `01b`). Values marked *derived* are ours, for slots Figma doesn't define.
+**Light and dark are both official Figma values now** (`1.1` and `1.2`). Values marked *derived* are ours, for slots Figma doesn't define.
 
 ---
 
@@ -71,6 +71,22 @@ Every color used anywhere in the file is now a named primitive.
 | `White`     | white      | `#FFFFFF` | on/primary                                                  |
 | `Black`     | —          | `#000000` | dark shadows                                                |
 
+Newer primitives:
+
+| Kotlin | Figma | Hex | Used for |
+|---|---|---|---|
+| `Slate150` | slate/150 | `#EEF2F6` | via `borderSubtle` |
+| `Slate250` | slate/250 | `#D5DCE6` | via `handle` |
+| `Slate600` | slate/600 | `#475569` | via `iconSilver` |
+| `Amber800` | amber/800 | `#92400E` | via `textPoints` |
+| `Red500` | red/500 | `#EF4444` | via `iconWishlist` |
+| `Orange600` | orange/600 | `#EA580C` | via `textFlash` |
+| `SkeletonBase` | skeleton/base | `#E9EEF4` | loading blocks (via `skeleton`) |
+| `SkeletonHighlight` | `Skeleton/Shimmer` middle stop | `#F6F8FB` | shimmer (via `skeletonHighlight`; dark: `Dark/Skeleton/Shimmer` uses `night/700`) |
+| `FacebookBlue`, `WhatsAppGreen`, `WhatsAppSoft`, `WhatsAppText` | external/* | `#1877F2`, `#25D366`, `#E7F8EE`, `#128C4B` | other brands, never recoloured |
+
+`map/*`, `external/google-*`, `external/tunisia-flag` and `docs/specimen` aren't in `AppPalette`: they only draw map mock-ups, logos that ship as drawables, and the canvas docs.
+
 ## 2. Semantic colors (`AppColors`, doc 03)
 
 | Kotlin          | Figma                              | Light               | Dark                             |
@@ -108,36 +124,52 @@ Every color used anywhere in the file is now a named primitive.
 | `scrim`         | *derived* (sheet scrim)            | Slate900            | Black                            |
 | `shadow`        | *derived* (shadow base)            | Slate900            | Black                            |
 
+Newer semantic tokens:
+
+| Kotlin | Figma | Light | Dark |
+|---|---|---|---|
+| `iconWishlist` | icon/wishlist | Red500 `#EF4444` | Red400 `#F87171` |
+| `iconSilver` | icon/silver | Slate600 `#475569` | Slate400 `#94A3B8` |
+| `borderSubtle` | border/subtle | Slate150 `#EEF2F6` | Night800 `#1A2540` |
+| `handle` | surface/handle | Slate250 `#D5DCE6` | Night700 `#24314F` |
+| `skeleton` | surface/skeleton | SkeletonBase `#E9EEF4` | Night800 `#1A2540` |
+| `textPoints` | text/points | Amber800 `#92400E` | Amber300 `#FCD34D` |
+| `textFlash` | text/flash | Orange600 `#EA580C` | Orange400 `#FB923C` |
+
 ## 3. Typography (doc 06)
 
 Format in Figma: `Weight · size/lineHeight`. Latin = Plus Jakarta Sans, Arabic = Cairo (same names, switched by locale).
 
 | Kotlin                        | Figma                | Latin                   | Arabic (Cairo)                      | Sample                                   |
 | ----------------------------- | -------------------- | ----------------------- | ----------------------------------- | ---------------------------------------- |
-| `displayLarge`                | Display/Large        | ExtraBold 40/48         | Bold 40/56 *derived*                | Shop smart, delivered fast               |
-| `displayMedium`               | Display/Medium       | ExtraBold 32/40         | Bold 32/46 *derived*                |                                          |
-| `displaySmall`                | Display/Small        | ExtraBold 28/36         | Bold 28/40 *derived*                | My addresses                             |
-| `headlineLarge`               | Headline/Large       | ExtraBold 24/32         | **Bold 24/36**                      | Welcome back · ماذا تريد أن تتسوق اليوم؟ |
-| `headlineMedium`              | Headline/Medium      | ExtraBold 22/28         | Bold 22/32 *derived*                | Order placed!                            |
-| `headlineSmall`               | Headline/Small       | ExtraBold 20/26         | Bold 20/30 *derived*                | Choose your language                     |
-| `titleLarge`                  | Title/Large          | Bold 18/24              | SemiBold 18/28 *derived*            | Flash deals                              |
-| `titleMedium`                 | Title/Medium         | Bold 16/22              | **SemiBold 16/26**                  | Order #DK-2048 · تفاصيل الطلب            |
-| `titleSmall`                  | Title/Small          | Bold 14/20              | SemiBold 14/22 *derived*            | Air Runner 2                             |
-| `bodyLarge`                   | Body/Large           | Medium 15/22            | Regular 15/24 *derived*             | Free delivery on orders over 150 TND.    |
-| `bodyMedium`                  | Body/Medium          | Medium 14/20            | **Regular 14/22**                   | توصيل مجاني للطلبات فوق 150 د.ت          |
-| `bodySmall`                   | Body/Small           | Medium 13/18            | **Regular 13/20**                   |                                          |
-| `labelLarge`                  | Label/Large          | Bold 15/20              | **SemiBold 15/22**                  | Add to cart · أضف إلى السلة              |
-| `labelMedium`                 | Label/Medium         | Bold 12.5/16            | SemiBold 12.5/18 *derived*          | Email (input label)                      |
-| `labelSmall`                  | Label/Small          | Bold 12/16              | SemiBold 12/18 *derived*            | See all                                  |
-| `textStyles.fieldText`        | Field/Text           | SemiBold 14.5/20        | Medium 14.5/22 *derived*            | amira.bensalah@gmail.com                 |
-| `textStyles.fieldPlaceholder` | (Field/Text, Medium) | Medium 14.5/20          | Regular 14.5/22 *derived*           | name@example.com                         |
-| `textStyles.helper`           | Helper               | SemiBold 11.5/14        | Medium 11.5/16 *derived*            | Verified with Google                     |
+| `displayLarge`                | M3/displayLarge |  ExtraBold 40/48         | **Bold 40/60** | Shop smart, delivered fast               |
+| `displayMedium`               | M3/displayMedium |  ExtraBold 32/40         | **Bold 32/48** |                                          |
+| `displaySmall`                | M3/displaySmall |  ExtraBold 28/36         | **Bold 28/42** | My addresses                             |
+| `headlineLarge`               | M3/headlineLarge |  ExtraBold 24/32         | **Bold 24/36** | Welcome back · ماذا تريد أن تتسوق اليوم؟ |
+| `headlineMedium`              | M3/headlineMedium |  ExtraBold 22/28         | **Bold 22/34** | Order placed!                            |
+| `headlineSmall`               | M3/headlineSmall |  ExtraBold 20/26         | **Bold 20/30** | Choose your language                     |
+| `titleLarge`                  | M3/titleLarge |  **ExtraBold 17/24, −1 %** | **SemiBold 17/26** | top app bar titles                       |
+| `titleMedium`                 | M3/titleMedium |  **ExtraBold** 16/22     | **SemiBold 16/26** | Order #DK-2048 · تفاصيل الطلب            |
+| `titleSmall`                  | M3/titleSmall |  **ExtraBold** 14/20     | **SemiBold 14/22** | Air Runner 2, toast title                |
+| `bodyLarge`                   | M3/bodyLarge |  Medium 15/22            | **Regular 15/24** | Free delivery on orders over 150 TND.    |
+| `bodyMedium`                  | M3/bodyMedium |  Medium 14/20            | **Regular 14/22** | توصيل مجاني للطلبات فوق 150 د.ت          |
+| `bodySmall`                   | M3/bodySmall |  Medium 13/18            | **Regular 13/20** | toast subtitle                           |
+| `labelLarge`                  | M3/labelLarge |  Bold 15/20              | **SemiBold 15/22** | Add to cart · أضف إلى السلة              |
+| `labelMedium`                 | M3/labelMedium |  Bold 12.5/16            | **SemiBold 13/20** | Email (input label), toast action        |
+| `labelSmall`                  | M3/labelSmall |  **Bold 10.5/14**        | **SemiBold 10.5/16** | badges, nav labels, tags                 |
+| `textStyles.titleCompact`     | Dukkan/titleCompact |  ExtraBold 15/20         | **Bold 15/24** | compact headers, price rows              |
+| `textStyles.labelStrong`      | Dukkan/labelStrong |  ExtraBold 12.5/16       | **Bold 12.5/20** | emphasised small labels, pills           |
+| `textStyles.bodyStrong`       | Dukkan/bodyStrong |  Bold 13.5/18            | **SemiBold 13.5/22** | row values, bold body                    |
+| `textStyles.supporting`       | Dukkan/supporting |  Medium 11.5/16          | **Regular 11.5/18** | supporting lines                         |
+| `textStyles.micro`            | Dukkan/micro |  Medium 10.5/14          | **Regular 10.5/16** | smallest meta text                       |
+| `textStyles.fieldText`        | Dukkan/fieldText |  SemiBold 14.5/20        | **Medium 14.5/22** | amira.bensalah@gmail.com                 |
+| `textStyles.helper`           | Dukkan/helper |  SemiBold 11.5/14        | **Medium 11.5/18** | Verified with Google                     |
 | `textStyles.caption`          | Caption              | SemiBold 11/14          | **Medium 11/16**                    | Delivered in 25–35 min                   |
-| `textStyles.overline`         | Overline             | ExtraBold 10.5/12, +0.9 | Bold 10.5/16, no tracking *derived* | NEW ARRIVAL                              |
-| `textStyles.priceLarge`       | Price/Large          | ExtraBold 24/28         | Bold 24/32 *derived*                | 279.000 TND                              |
-| `textStyles.priceSmall`       | Price/Small          | ExtraBold 15/20         | Bold 15/22 *derived*                | 39.900 TND                               |
+| `textStyles.overline`         | Dukkan/overline |  ExtraBold 10.5/12, +8.6 % | **Bold 10.5/16, no tracking** | NEW ARRIVAL                            |
 
 All auth titles in the screens are **24 ExtraBold** (`headlineLarge`); the Arabic log in (13.4) uses Cairo Bold 24.
+
+Tracking (Figma `1.3`, in em): display and `headlineLarge` −2 %, `headlineMedium` −1.5 %, `headlineSmall` and `titleLarge` −1 %, `overline` +8.6 %; none for the rest and none in Arabic. Prices use two styles (doc 12.6); placeholders use `bodyMedium`.
 
 ## 4. Gradients (doc 05)
 
@@ -175,8 +207,9 @@ Band heights: Welcome 520, Log in 300, Verify email 260; last 90 dp = bottom fad
 | `button` | Button        | blue-600 30 %, y 8, blur 20   | **azure-400 25 %**, y 8, blur 20                         |
 | `deal`   | Deal          | orange-500 30 %, y 8, blur 20 | **orange-400 25 %**, y 8, blur 20                        |
 | `screen` | Screen        | slate-900 10 %, y 18, blur 44 | **black 60 %**, y 18, blur 44 **+ border**               |
+| `toast`  | Elevation/Toast | 3 layers: `0 1 2` 5 %, `0 8 20 −4` 10 %, `0 20 40 −12` 10 % (`#0F172A`) | 3 layers: `0 1 2` black 40 %, `0 12 32 −8` black 55 %, `0 1 0` white 6 % |
 
-All dark **surfaces** (card, float/sheet, screen) add a 1 dp night-700 border. Button and Deal keep their coloured glow and get no border. Every dark value is official (Figma `01b`).
+All dark **surfaces** (card, float/sheet, screen) add a 1 dp night-700 border. Button and Deal keep their coloured glow and get no border. Every dark value is official (Figma `1.2`).
 
 ## 6. Spacing, radius, sizes (doc 07)
 
@@ -198,7 +231,7 @@ All dark **surfaces** (card, float/sheet, screen) add a 1 dp night-700 border. B
 | `optionLg` / `optionMd` / `optionSm` | size/option-* | 66 / 52 / 48 |
 | `stepper` / `addButton` / `wishlist` / `checkbox` | size/stepper · add-button · wishlist · checkbox | 32 / 32 / 28 / 20 |
 | `switchHeight` × `switchWidth` | size/switch-* | 28 × 46 |
-| `toast` | size/toast | 58 |
+| `toast` | size/toast | **64** |
 | `screenWidth` × `screenHeight` | size/screen-* (design frame) | 393 × 852 |
 | `radiusScreen` | radius/screen (Figma only) | 44 |
 | `iconSm` / `iconMd` / `icon` / `iconLg` | icon/sm · md · lg · xl | 16 / **18** / 20 / 24 |
@@ -212,22 +245,22 @@ All dark **surfaces** (card, float/sheet, screen) add a 1 dp night-700 border. B
 | Variant                    | Size      | Fill              | Border            | Label                   | Shadow   |
 | -------------------------- | --------- | ----------------- | ----------------- | ----------------------- | -------- |
 | primary L                  | 52 h      | gradient `button` | —                 | 15 Bold White           | `button` |
-| primary M                  | 44 h      | gradient `button` | —                 | 14 Bold White           | `button` |
+| primary M                  | 44 h      | gradient `button` | —                 | `bodyStrong` 13.5 White | `button` |
 | primary S                  | 36 h      | gradient `button` | —                 | 12.5 Bold White         | `button` |
 | deal                       | 52 h      | gradient `deal`   | —                 | 15 Bold White           | `deal`   |
 | dark                       | 52 h      | `inverse`         | —                 | 15 Bold `onInverse`     | —        |
 | tonal                      | 52 h      | `brandSoft`       | —                 | 15 Bold `brandSoftText` | —        |
 | outline                    | 52 h      | `card`            | 1.2 `border`      | 15 Bold `textPrimary`   | —        |
 | ghost                      | text only | —                 | —                 | 15 Bold `brand`         | —        |
-| danger                     | 44 h      | `errorSoft`       | 1.2 `errorBorder` | 13.5 Bold `error`       | —        |
-| social (Google / Facebook) | 52 h      | `card`            | 1.2 `border`      | 14.5 Bold `textPrimary` | —        |
+| danger                     | 44 h      | `errorSoft`       | 1.2 `errorBorder` | `bodyStrong` 13.5 `error` | —        |
+| social (Google / Facebook) | 52 h      | `card`            | 1.2 `border`      | `labelLarge` 15 `textPrimary` | —        |
 | slide to place order       | 58 h      | gradient `button` | —                 | 15 Bold White           | `button` |
 
-Button states (`03b`, Primary / Tonal / Outline):
+Button states (`4.2`, Primary / Tonal / Outline):
 
 | State    | Rule                                            |
 | -------- | ----------------------------------------------- |
-| Pressed  | `brandPressed` fill, no lift (no shadow)        |
+| Pressed  | Primary `brandPressed`, Tonal `brandRing`, Outline `border` fill; no lift (no shadow) |
 | Disabled | `field` fill + `textTertiary` label, no shadow  |
 | Loading  | spinner replaces the trailing icon, label stays |
 
@@ -275,9 +308,9 @@ pill. elevated: 52 h, `card`, shadow `float`; field: 48 h, `field`. Placeholder 
 | Item        | Spec                                                                                         |
 | ----------- | -------------------------------------------------------------------------------------------- |
 | Empty state | icon tile + title + body + optional button (14.1 orders, 14.2 notifications, 14.3 addresses) |
-| Skeleton    | `field` blocks with a left → right shimmer, 1.2 s loop (14.4 Home, 14.5 product grid)        |
+| Skeleton    | `skeleton` blocks with a left → right `skeletonHighlight` shimmer, 1.2 s loop (14.4 Home, 14.5 product grid) |
 
-### Android app icon (`05b`)
+### Android app icon (`3.2`)
 
 108 × 108 dp layers, 72 dp visible, 66 dp safe zone. Foreground white mark ≈ 40 dp, background gradient azure-400 → blue-700, monochrome layer. Legacy 48 / 72 / 96 / 144 / 192 px, Play Store 512 px.
 

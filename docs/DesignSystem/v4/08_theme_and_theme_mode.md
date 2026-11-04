@@ -52,7 +52,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 /**
  * Accessor for Dukkan tokens inside composables:
  * `AppTheme.colors.brand`, `AppTheme.gradients.button`, `AppTheme.shadows.card`,
- * `AppTheme.textStyles.priceSmall`.
+ * `AppTheme.textStyles.bodyStrong`.
  */
 object AppTheme {
     val colors: AppColors
@@ -79,7 +79,7 @@ object AppTheme {
 /**
  * Dukkan theme. Wrap every screen and every preview in it.
  *
- * @param darkTheme light or dark tokens (Figma 01 / 01b).
+ * @param darkTheme light or dark tokens (Figma 01 / 1.2).
  * @param isArabic Cairo type scale instead of Plus Jakarta Sans (Figma "Typography · Cairo").
  *   Defaults to the current app language.
  */
@@ -118,7 +118,7 @@ fun AppTheme(
 - **`@ReadOnlyComposable`** tells Compose the getter only reads a local and doesn't emit UI, so it skips some bookkeeping.
 - **`remember(darkTheme)`** builds the 36-slot `ColorScheme` only when the mode changes, not on every recomposition.
 - **`dynamicColor` is gone.** See doc 04 for why.
-- **Light and dark values are both official Figma values** (`01 · Foundations` and `01b · Dark mode`), except the few derived fields listed in doc 03.
+- **Light and dark values are both official Figma values** (`1.1 · Colour & effects` and `1.2 · Dark mode`), except the few derived fields listed in doc 03.
 
 ### Arabic typography
 
@@ -405,7 +405,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 
-/** Every Dukkan token on one scrollable page. Compare it with Figma "01 · Foundations". */
+/** Every Dukkan token on one scrollable page. Compare it with Figma "1.1 · Colour & effects". */
 @Composable
 fun ThemeCatalog() {
     val colors = AppTheme.colors
@@ -528,14 +528,15 @@ private fun typeSamples(): List<Pair<String, TextStyle>> {
         "displayLarge 40/48" to t.displayLarge, "displayMedium 32/40" to t.displayMedium,
         "displaySmall 28/36" to t.displaySmall, "headlineLarge 24/32" to t.headlineLarge,
         "headlineMedium 22/28" to t.headlineMedium, "headlineSmall 20/26" to t.headlineSmall,
-        "titleLarge 18/24" to t.titleLarge, "titleMedium 16/22" to t.titleMedium,
+        "titleLarge 17/24" to t.titleLarge, "titleMedium 16/22" to t.titleMedium,
         "titleSmall 14/20" to t.titleSmall, "bodyLarge 15/22" to t.bodyLarge,
         "bodyMedium 14/20" to t.bodyMedium, "bodySmall 13/18" to t.bodySmall,
         "labelLarge 15/20" to t.labelLarge, "labelMedium 12.5/16" to t.labelMedium,
-        "labelSmall 12/16" to t.labelSmall, "caption 11/14" to x.caption,
-        "OVERLINE 10.5/12" to x.overline, "priceLarge 279.000 TND" to x.priceLarge,
-        "priceSmall 39.900 TND" to x.priceSmall, "fieldText 14.5/20" to x.fieldText,
-        "helper 11.5/14" to x.helper,
+        "labelSmall 10.5/14" to t.labelSmall, "caption 11/14" to x.caption,
+        "OVERLINE 10.5/12" to x.overline, "fieldText 14.5/20" to x.fieldText,
+        "helper 11.5/14" to x.helper, "titleCompact 15/20" to x.titleCompact,
+        "labelStrong 12.5/16" to x.labelStrong, "bodyStrong 13.5/18" to x.bodyStrong,
+        "supporting 11.5/16" to x.supporting, "micro 10.5/14" to x.micro,
     )
 }
 
@@ -653,7 +654,7 @@ private fun OnboardingScreenPreview() {
 - [ ] After adding the settings screen: choosing Dark survives an app restart.
 - [ ] No white flash at launch in dark mode (the splash waits for `themeMode`).
 - [ ] Status bar icons are dark on light theme and light on dark theme.
-- [ ] `ThemeCatalog` previews render in light, dark and Arabic. Dark matches Figma `01b · Dark mode` (background `#0B1220`, brand `#6090FA`).
+- [ ] `ThemeCatalog` previews render in light, dark and Arabic. Dark matches Figma `1.2 · Dark mode` (background `#0B1220`, brand `#6090FA`).
 - [ ] Switching the app to Arabic shows Cairo everywhere, with taller lines.
 - [ ] A screen preview annotated with `@AppPreviews` shows Light, Dark and Arabic variants side by side.
 - [ ] `core/config/theme/` is empty and deleted.

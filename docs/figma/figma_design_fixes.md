@@ -1,23 +1,17 @@
-# Dukkan App: Figma fixes, round 4
+# Dukkan App: Figma fixes, round 8
 
-File: **Dukkan App** (Figma), pages *Customer app*, *Design System*, *Team app · Picker & Courier*.
-Date: 2026-10-29. From: the Android team (Jetpack Compose).
+File: **Dukkan App** (Figma), all 3 pages.
+Date: 2026-11-04. From: the Android team (Jetpack Compose).
 
-**All requests are done.** Nothing is open. Thank you!
+**All requests are done. Nothing is open.**
 
-## Round 3: status
+## Round 7: status
 
 | # | Item | Status |
 |---|---|---|
-| 1 | "SMS" → "WhatsApp" on C03.2 and 10.7 | ✅ Done, with the WhatsApp icon (`#25D366`) and a green "WhatsApp" button on C03.2 |
-| 2 | WhatsApp opt-in checkbox at checkout and in Edit profile | ✅ Done: unchecked by default, under a new "Contact" row on 09.1 |
-| 2b | WhatsApp switch in 11.3 App settings | ✅ Done |
-| 3 | Tier hint on 11.1 Account | ✅ Done: "Silver member · 235 TND to Gold" |
-| — | Card payment on 09.2 | ✅ "Coming soon · via Konnect" |
-
-## Earlier rounds
-
-Rounds 1–3 are all fixed (dark mode, Cairo Arabic scale, one radius scale, search, email verification, order data, tokens, button and input states, adaptive icon, extra screens, WhatsApp copy).
+| 1 | Dark shimmer | ✅ `Dark/Skeleton/Shimmer`: `night/800` → `night/700` → `night/800` |
+| 2 | Arabic `Dukkan/*` styles | ✅ All added |
+| 3 | `amber/50` | ✅ Removed |
 
 ## Next time
 
