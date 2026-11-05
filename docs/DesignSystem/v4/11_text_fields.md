@@ -43,14 +43,14 @@ Layout:
 - Text in `textStyles.fieldText` (Field/Text 14.5 SemiBold). Placeholder in `bodyMedium` (14 Medium, `textTertiary`), the style on the Figma atom.
 - Helper: gap `space4`, a 14 dp icon, then the text in `textStyles.helper` (Helper 11.5 SemiBold).
 
-| State | Fill | Border | Ring (outside) | Label | Value / icon | Helper |
-|---|---|---|---|---|---|---|
-| Default | `field` | none | none | `textPrimary` | `textPrimary` / `textTertiary` | none, or `textSecondary` text |
-| Focus | `card` | `brand` 1.5 dp (`strokeFocus`) | `brandRing` at 70 %, 3 dp pill (`focusRing`) | `textPrimary` | `textPrimary` / `brand` | as Default |
-| Filled (not focused) | `field` | none | none | `textPrimary` | `textPrimary` / `textTertiary` | none |
-| Error | `errorSoft` | `error` 1.5 dp | none (error wins over focus) | `textPrimary` | `textPrimary` / `error` | `error` + `CircleAlert` icon |
-| Success | `card` | `success` 1.5 dp | none | `textPrimary` | `textPrimary` / `textTertiary` | `success` + `CircleCheck` icon |
-| **Disabled** | `field` | **none** | **none** | **`textTertiary`** | **`textTertiary` / `borderStrong`** (trailing `lock` icon on the atom) | `textTertiary` |
+| State                | Fill        | Border                         | Ring (outside)                               | Label              | Value / icon                                                           | Helper                         |
+| -------------------- | ----------- | ------------------------------ | -------------------------------------------- | ------------------ | ---------------------------------------------------------------------- | ------------------------------ |
+| Default              | `field`     | none                           | none                                         | `textPrimary`      | `textPrimary` / `textTertiary`                                         | none, or `textSecondary` text  |
+| Focus                | `card`      | `brand` 1.5 dp (`strokeFocus`) | `brandRing` at 70 %, 3 dp pill (`focusRing`) | `textPrimary`      | `textPrimary` / `brand`                                                | as Default                     |
+| Filled (not focused) | `field`     | none                           | none                                         | `textPrimary`      | `textPrimary` / `textTertiary`                                         | none                           |
+| Error                | `errorSoft` | `error` 1.5 dp                 | none (error wins over focus)                 | `textPrimary`      | `textPrimary` / `error`                                                | `error` + `CircleAlert` icon   |
+| Success              | `card`      | `success` 1.5 dp               | none                                         | `textPrimary`      | `textPrimary` / `textTertiary`                                         | `success` + `CircleCheck` icon |
+| **Disabled**         | `field`     | **none**                       | **none**                                     | **`textTertiary`** | **`textTertiary` / `borderStrong`** (trailing `lock` icon on the atom) | `textTertiary`                 |
 
 Priority when several apply: **Disabled > Error > Success > Focused > Default.**
 
@@ -145,6 +145,36 @@ internal fun appFieldColors(
 ```
 
 ### `AppTextField.kt`
+
+Pourquoi un lambda `@Composable () -> Unit` pour `trailingIcon`
+---------------------------------------------------------------
+
+Pas seulement pour ajouter de la logique. C'est surtout parce que l'**appelant décide quoi dessiner** à cet endroit. Le champ réserve un emplacement (un « slot ») et l'appelant le remplit.
+Comparaison
+-----------
+
+Si on avait mis un simple `Painter` :
+    trailingIcon: Painter? = null
+
+On ne pourrait afficher **qu'une image**. Mais ton champ mot de passe a besoin d'un **bouton cliquable** (l'œil) qui change l'état :
+    trailingIcon = {
+        IconButton(onClick = { isVisible = !isVisible }) {
+            Icon(painterResource(if (isVisible) AppIcons.EyeOff else AppIcons.Eye), ...)
+        }
+    }
+
+Avec un lambda composable, tu peux envoyer **n'importe quoi** : une icône, un bouton, un texte, un spinner, deux icônes côte à côte.
+
+| Morceau       | Sens                                                         |
+| ------------- | ------------------------------------------------------------ |
+| `() -> Unit`  | une fonction sans paramètre qui ne renvoie rien              |
+| `@Composable` | cette fonction peut dessiner de l'UI                         |
+| `( ... )?`    | **tout le lambda** est nullable, donc on peut ne rien passer |
+| `= null`      | par défaut, aucun icône à droite                             |
+
+Les parenthèses sont importantes. Sans elles, `@Composable () -> Unit?` voudrait dire autre chose (une fonction qui renvoie un `Unit` nullable).
+Comment il est utilisé dans le champ
+------------------------------------
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.textfield
@@ -680,7 +710,7 @@ fun AppOtpField(
 ## Notes and rules
 
 - **What the ViewModel sends:** the value, the error `AppUiText?` and (on sign-up) whether the field is valid. The screen maps these to a status:
-
+  
   ```kotlin
   status = when {
       state.emailError != null -> AppFieldStatus.Error
@@ -688,11 +718,15 @@ fun AppOtpField(
       else -> AppFieldStatus.Default
   }
   ```
-
+  
   On **login** don't show Success. Figma never turns login fields green, and old accounts may predate the password rule.
+
 - **Keyboard:** pass `KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)` for email. Use `ImeAction.Done` plus a submit in `keyboardActions` on the last field.
+
 - **Autofill (recommended):** add `Modifier.semantics { contentType = ContentType.EmailAddress }` (and `ContentType.Password` / `ContentType.NewPassword`) at the call site. Google Password Manager then offers saved credentials. This is available from Compose UI 1.8, so the BOM 2026 has it.
+
 - **The ring is drawn, not laid out.** `drawBehind` paints 3 dp outside the box, so leave at least `space4` around fields (screens already use 16–20 dp). Don't put a field inside a parent that `clip`s tightly, or the ring gets cut.
+
 - **Disabled uses tokens, not alpha** (Figma `4.2`): `field` fill, `textTertiary` label, value and icon, no border, no ring. With alpha, the dark `field` (`#1A2540`) would blend into the background and the field would almost disappear.
 
 ---
