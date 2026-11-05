@@ -58,6 +58,7 @@ object AppDimens {
     val screenHeight = 852.dp  // design frame (previews only)
 
     // Icons (Lucide, 24 grid): Figma icon/sm, md, lg, xl
+    val iconXs = 14.dp
     val iconSm = 16.dp
     val iconMd = 18.dp
     val icon = 20.dp   // Figma icon/lg

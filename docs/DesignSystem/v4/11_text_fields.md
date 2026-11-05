@@ -151,6 +151,7 @@ Pourquoi un lambda `@Composable () -> Unit` pour `trailingIcon`
 
 Pas seulement pour ajouter de la logique. C'est surtout parce que l'**appelant décide quoi dessiner** à cet endroit. Le champ réserve un emplacement (un « slot ») et l'appelant le remplit.
 Comparaison
+
 -----------
 
 Si on avait mis un simple `Painter` :
@@ -174,6 +175,7 @@ Avec un lambda composable, tu peux envoyer **n'importe quoi** : une icône, un b
 
 Les parenthèses sont importantes. Sans elles, `@Composable () -> Unit?` voudrait dire autre chose (une fonction qui renvoie un `Unit` nullable).
 Comment il est utilisé dans le champ
+
 ------------------------------------
 
 ```kotlin
@@ -364,7 +366,86 @@ private fun AppFieldHelper(text: String, status: AppFieldStatus, color: Color) {
 
 > `14.dp` for the helper icon is the only raw size here. Figma draws it at 14, which is between `iconSm` (16) and nothing smaller. If you use it twice, add `iconXs = 14.dp` to `AppDimens` and replace it.
 
-### `AppPasswordField.kt`
+### ``decorationBox`
+
+`BasicTextField` ne dessine que le texte brut et le curseur. Le paramètre `decorationBox` te laisse **l'habiller** : ajouter une icône, un placeholder, un bouton à droite.
+
+C'est comme un cadre photo : la photo (le texte tapé) est fournie, et toi tu dessines le cadre autour.
+    decorationBox = { innerTextField ->
+        ... ton habillage ...
+        innerTextField()   // ← ici, tu dis où poser le vrai champ
+    }
+`innerTextField`
+----------------
+
+C'est le **vrai champ de saisie**, donné par `BasicTextField` : la zone où le texte s'affiche, où le curseur clignote et où on sélectionne.
+
+C'est un **lambda** `@Composable () -> Unit`. Tu l'appelles avec `innerTextField()` à l'endroit exact où tu veux qu'il apparaisse.
+
+Règle importante : **tu dois l'appeler une fois**. Si tu l'oublies, le champ n'affiche plus le texte tapé.
+    BasicTextField dit :  "Voici mon champ de saisie (innerTextField).
+                           Dessine ce que tu veux autour, mais place-le quelque part."
+    Toi tu réponds :      "OK, je le mets entre l'icône et le bouton."
+Ce que ton code construit
+-------------------------
+
+    Row (padding start=20, end=12, centré verticalement)
+     ├─ Icon (leadingIcon, 20 dp)     si fournie
+     ├─ Spacer (8 dp)
+     ├─ Box (weight 1 = prend tout l'espace restant)
+     │    ├─ Text(placeholder)        si le champ est vide
+     │    └─ innerTextField()         le vrai champ
+     └─ trailingIcon?.invoke()        si fourni (ex. œil)
+
+Dessiné :
+    ╭──────────────────────────────────────╮
+    │ ✉  you@example.com                👁  │
+    ╰──────────────────────────────────────╯
+      ↑    ↑                            ↑
+    leading  Box (placeholder +         trailing
+    icon     innerTextField)            icon
+Détail par morceau
+------------------
+
+**`Row` avec `verticalAlignment = CenterVertically`** : aligne icône, texte et bouton au milieu de la hauteur de 52 dp.
+
+**`Modifier.padding(start = space20, end = space12)`** : les marges intérieures de la pilule.
+
+**`if (leadingIcon != null)`** : n'affiche l'icône et son espace que si on en a fourni une.
+
+**`Box(modifier = Modifier.weight(1f), contentAlignment = CenterStart)`** :
+
+* `weight(1f)` : prend toute la largeur restante, entre l'icône de gauche et celle de droite.
+* `contentAlignment = CenterStart` : place le contenu au début (gauche en LTR, droite en arabe) et centré en hauteur.
+
+Pourquoi le placeholder et `innerTextField()` sont dans le même `Box`
+---------------------------------------------------------------------
+
+Un `Box` **empile** ses enfants les uns sur les autres :
+    Box {
+        if (value.isEmpty() && placeholder != null) Text(placeholder)   // en dessous
+        innerTextField()                                                // par-dessus
+    }
+
+* Champ vide : tu vois le placeholder gris. Le champ de saisie est là aussi, mais il n'affiche rien.
+* Dès que tu tapes, `value.isEmpty()` devient faux, le placeholder disparaît et le texte tapé s'affiche à la même place.
+
+`BasicTextField` n'a pas de placeholder intégré (contrairement à `TextField` de Material), donc on le fait à la main avec cette technique.
+`contentDescription = null` sur l'icône
+---------------------------------------
+
+L'icône à gauche est décorative : le label au-dessus dit déjà de quoi il s'agit. `null` évite que TalkBack lise deux fois.
+Équivalent Flutter
+------------------
+
+Dans `InputDecoration` de Flutter, tu donnes `prefixIcon`, `hintText` et `suffixIcon`, et Flutter les place. En Compose avec `BasicTextField`, c'est **toi** qui fais la mise en page dans `decorationBox`, donc tu as plus de contrôle (pilule, anneau, hauteur 52 dp), mais plus de travail.
+En résumé
+---------
+
+* `decorationBox` = « dessine l'habillage autour du champ ».
+* `innerTextField` = « le vrai champ de saisie, que tu poses où tu veux, une seule fois ».
+
+### AppPasswordField.kt`
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.textfield
