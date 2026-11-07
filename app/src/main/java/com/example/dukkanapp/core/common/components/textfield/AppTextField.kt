@@ -43,7 +43,7 @@ import com.example.dukkanapp.core.utils.constants.AppIcons
 @Composable
 fun AppTextField(
     value: String,
-    onValueChanged: (String) -> Unit,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     label: String? = null,
     placeholder: String? = null,
@@ -81,7 +81,7 @@ fun AppTextField(
         // TalkBack reads "Error: <helper>" on the field itself.
         BasicTextField(
             value = value,
-            onValueChange = onValueChanged,
+            onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(AppDimens.controlLg)
