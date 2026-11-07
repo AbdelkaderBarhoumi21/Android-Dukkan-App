@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
 fun AuthButton(

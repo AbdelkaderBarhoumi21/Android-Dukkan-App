@@ -13,7 +13,6 @@ import com.example.dukkanapp.core.common.components.dividers.AppDivider
 import com.example.dukkanapp.core.common.components.footer.AppAuthFooterLink
 import com.example.dukkanapp.core.common.components.header.AppAuthHeader
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
-import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
 fun AuthOptionsScreenContent(

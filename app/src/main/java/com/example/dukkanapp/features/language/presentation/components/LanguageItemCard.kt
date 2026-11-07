@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.features.language.presentation.model.LanguageUiModel
 
 @Composable

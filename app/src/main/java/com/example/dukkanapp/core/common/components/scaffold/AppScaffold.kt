@@ -25,7 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppIcons
 
 @OptIn(ExperimentalMaterial3Api::class)

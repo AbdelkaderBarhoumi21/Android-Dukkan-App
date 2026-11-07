@@ -13,7 +13,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
-import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppIcons
 
 @Composable

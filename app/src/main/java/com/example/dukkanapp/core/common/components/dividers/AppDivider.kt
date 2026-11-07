@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
 fun AppDivider(

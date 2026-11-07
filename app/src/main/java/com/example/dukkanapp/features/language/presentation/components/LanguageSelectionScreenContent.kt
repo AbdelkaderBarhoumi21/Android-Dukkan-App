@@ -16,7 +16,6 @@ import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.theme.AppTheme
-import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.language.presentation.logic.LanguageSelectionIntent
 import com.example.dukkanapp.features.language.presentation.logic.LanguageSelectionUiState

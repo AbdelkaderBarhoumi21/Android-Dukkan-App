@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.features.onboarding.presentation.model.OnboardingPageUiModel
 
 @Composable

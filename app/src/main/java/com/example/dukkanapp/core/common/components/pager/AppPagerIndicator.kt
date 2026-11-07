@@ -19,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
 fun AppPagerIndicator(

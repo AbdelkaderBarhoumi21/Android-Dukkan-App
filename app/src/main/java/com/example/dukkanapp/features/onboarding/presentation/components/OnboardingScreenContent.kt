@@ -30,7 +30,6 @@ import com.example.dukkanapp.core.common.components.footer.AppAuthFooterLink
 import com.example.dukkanapp.core.common.components.pager.AppHorizontalPager
 import com.example.dukkanapp.core.common.components.pager.AppPagerIndicator
 import com.example.dukkanapp.core.theme.AppTheme
-import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingIntent
 import com.example.dukkanapp.features.onboarding.presentation.logic.OnboardingUiState
 import com.example.dukkanapp.features.onboarding.presentation.model.OnboardingPageUiModel

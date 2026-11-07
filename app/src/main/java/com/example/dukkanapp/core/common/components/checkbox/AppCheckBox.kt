@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
-import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppIcons
 
 object AppCheckBoxDefaults {

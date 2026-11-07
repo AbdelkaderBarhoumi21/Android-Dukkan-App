@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
-import com.example.dukkanapp.core.utils.constants.AppDimens
 
 object AppTextButtonDefaults {
     // By default -> text button has padding 8.dp vertical and 12.dp horizontal

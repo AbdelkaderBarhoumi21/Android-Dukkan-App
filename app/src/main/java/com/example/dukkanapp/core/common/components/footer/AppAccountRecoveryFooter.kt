@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
 import com.example.dukkanapp.core.common.components.buttons.AppTextButton
-import com.example.dukkanapp.core.utils.constants.AppDimens
 
 @Composable
 fun AppAccountRecoveryFooter(

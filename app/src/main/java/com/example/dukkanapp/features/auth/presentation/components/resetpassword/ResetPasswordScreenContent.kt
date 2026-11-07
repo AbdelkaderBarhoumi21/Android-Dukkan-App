@@ -22,7 +22,6 @@ import com.example.dukkanapp.core.common.components.header.AppAccountRecoveryHea
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.text.asString
-import com.example.dukkanapp.core.utils.constants.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
 import com.example.dukkanapp.features.auth.presentation.logic.resetpassword.ResetPasswordIntent
