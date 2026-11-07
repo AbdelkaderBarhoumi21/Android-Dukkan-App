@@ -95,5 +95,9 @@
     <!-- values-fr/strings.xml -->
     <string name="error_storage_unavailable">Impossible d\'enregistrer sur cet appareil. Vérifiez l\'espace de stockage et réessayez.</string>
     <string name="logo_wordmark">dukkan</string>
-
+    <string name="password_strength_weak">Faible</string>
+    <string name="password_strength_fair">Moyen</string>
+    <string name="password_strength_good">Bon</string>
+    <string name="password_strength_strong">Fort</string>
+    <string name="password_strength_format">Force du mot de passe : %1$s</string>
 </resources>

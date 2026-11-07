@@ -95,4 +95,9 @@
     <!-- values/strings.xml -->
     <string name="error_storage_unavailable">Couldn\'t save on this device. Check your free storage and try again.</string>
     <string name="logo_wordmark">dukkan</string>
+    <string name="password_strength_weak">Weak</string>
+    <string name="password_strength_fair">Fair</string>
+    <string name="password_strength_good">Good</string>
+    <string name="password_strength_strong">Strong</string>
+    <string name="password_strength_format">Password strength: %1$s</string>
 </resources>

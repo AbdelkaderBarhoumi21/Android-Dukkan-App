@@ -95,4 +95,9 @@
     <!-- values-ar/strings.xml -->
     <string name="error_storage_unavailable">تعذّر الحفظ على هذا الجهاز. تحقق من مساحة التخزين وحاول مرة أخرى.</string>
     <string name="logo_wordmark">دكّان</string>
+    <string name="password_strength_weak">ضعيفة</string>
+    <string name="password_strength_fair">مقبولة</string>
+    <string name="password_strength_good">جيدة</string>
+    <string name="password_strength_strong">قوية</string>
+    <string name="password_strength_format">قوة كلمة المرور: %1$s</string>
 </resources>
