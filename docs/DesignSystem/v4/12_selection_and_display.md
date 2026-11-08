@@ -70,58 +70,7 @@ import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
 
-private val CheckboxShape = RoundedCornerShape(percent = 30)
 
-@Composable
-fun AppCheckbox(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    label: AnnotatedString,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    val colors = AppTheme.colors
-    val fill by animateColorAsState(if (checked) colors.brand else colors.card, label = "checkboxFill")
-
-    Row(
-        modifier = modifier
-            .heightIn(min = AppDimens.touchTargetMin)
-            .alpha(if (enabled) 1f else 0.5f)
-            .toggleable(
-                value = checked,
-                enabled = enabled,
-                role = Role.Checkbox,
-                onValueChange = onCheckedChange,
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(AppDimens.space8),
-    ) {
-        Box(
-            modifier = Modifier
-                .size(AppDimens.icon)
-                .background(fill, CheckboxShape)
-                .then(
-                    if (checked) Modifier
-                    else Modifier.border(AppDimens.strokeFocus, colors.borderStrong, CheckboxShape)
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (checked) {
-                Icon(
-                    painter = painterResource(AppIcons.Check),
-                    contentDescription = null,
-                    tint = colors.onBrand,
-                    modifier = Modifier.size(14.dp),
-                )
-            }
-        }
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
-            color = colors.textLabel,
-        )
-    }
-}
 
 /** Convenience overload for a plain string label. */
 @Composable
@@ -1838,6 +1787,181 @@ The 14.4 Home skeleton is built the same way in the Home feature: a 52 dp pill (
 - **Ratings** use `AppIcons.StarFilled` tinted `colors.gold`.
 
 ---
+
+## Compose works in 3 steps, every frame
+
+| Phase              | What it does                                            | Analogy                     |
+| ------------------ | ------------------------------------------------------- | --------------------------- |
+| 1. **Composition** | Runs your `@Composable` code and decides *what* to show | Writing the plan            |
+| 2. **Layout**      | Measures sizes and decides *where* each thing goes      | Placing furniture in a room |
+| 3. **Draw**        | Paints the pixels                                       | Painting the picture        |
+
+When an animated value changes, Compose redoes the phase that **reads** that value, and every phase after it.
+
+## What "skip" means
+
+If the value is only read in a later phase, the earlier phases are skipped. That means less work per frame.
+
+### 1. Plain version (what the doc uses)
+
+
+
+```kotlin
+val thumbOffset by animateDpAsState(...)
+Modifier.offset(x = thumbOffset)
+```
+
+`thumbOffset` is read directly inside the composable. So on **every animation frame** (about 60 times per second), Compose does composition, then layout, then draw. This is the most work.
+
+### 2. Lambda version
+
+
+
+```kotlin
+Modifier.offset { IntOffset(thumbOffset.roundToPx(), 0) }
+```
+
+The value is read inside the lambda, which runs during **layout**. So composition is **skipped**. Only layout and draw run.
+
+### 3. `graphicsLayer` version
+
+
+
+```kotlin
+Modifier.graphicsLayer { translationX = thumbOffset.toPx() }
+```
+
+The value is read during **draw**. Composition and layout are both **skipped**. This is the cheapest option.
+
+## Picture it
+
+
+
+```
+Plain offset(x = value):   Composition → Layout → Draw   (all 3, each frame)
+offset { lambda }:                       Layout → Draw   (skips composition)
+graphicsLayer { }:                                Draw   (skips composition + layout)
+```
+
+## Is it worth it here?
+
+For a tiny switch that animates for about 200 ms, no. The extra work is too small to notice, so the doc keeps the simple version.
+
+It matters when many items animate at once, or the animation runs constantly. An example is the shimmer in 12.15, which loops forever. That is why the shimmer reads its progress inside `drawWithContent`, in the draw phase.
+
+## What I got wrong earlier
+
+I said the lambda version "moves at draw time". That is not exact: the lambda `offset` works at **layout** time, and `graphicsLayer` is the one that works at **draw** time. I also said `offset` doesn't change the layout around it. That part is right: it moves the item without changing the parent's size or pushing its neighbors.
+
+## The one rule
+
+**The phase is decided by where you read the state value.**
+
+| Where you read the value                                     | Phase       |
+| ------------------------------------------------------------ | ----------- |
+| Directly in the composable body                              | Composition |
+| Inside a layout lambda (`offset { }`, `layout { }`)          | Layout      |
+| Inside a draw lambda (`drawBehind { }`, `graphicsLayer { }`, `Canvas { }`) | Draw        |
+
+Compose tracks which phase reads the value. When the value changes, it reruns only that phase and the ones after it.
+
+## Example: a box that moves when you tap it
+
+
+
+```kotlin
+@Composable
+fun MovingBox() {
+    var moved by remember { mutableStateOf(false) }             // (A) state, nothing read yet
+    val x by animateDpAsState(if (moved) 100.dp else 0.dp)      // (B) READ in COMPOSITION
+
+    Box(
+        modifier = Modifier
+            .clickable { moved = !moved }                       // (C) runs on tap, not a phase
+            .offset(x = x)                                      // (D) uses x from (B)
+            .size(50.dp)                                        // (E) layout: size is measured
+            .background(Color.Blue)                             // (F) draw: paints blue
+    )
+}
+```
+
+### Which line belongs to which phase
+
+| Line                           | Phase           | Why                                                          |
+| ------------------------------ | --------------- | ------------------------------------------------------------ |
+| `var moved by remember {…}`    | Composition     | Runs the composable code                                     |
+| `val x by animateDpAsState(…)` | **Composition** | The `by x` delegate reads the value here, in the body        |
+| `.clickable { … }`             | none (event)    | The lambda runs only on a tap                                |
+| `.offset(x = x)`               | Layout          | `offset` places the box during layout, but it was *given* a value read in composition |
+| `.size(50.dp)`                 | Layout          | Measuring size is a layout job                               |
+| `.background(Color.Blue)`      | Draw            | Painting is a draw job                                       |
+
+The key: on line `(B)` the value `x` is **read in the composable body**. So every animation frame, Compose reruns **composition, then layout, then draw**. This is the slowest option.
+
+## Same example, reading later
+
+### Version 2: read in layout
+
+
+
+```kotlin
+@Composable
+fun MovingBox2() {
+    var moved by remember { mutableStateOf(false) }
+    val x = animateDpAsState(if (moved) 100.dp else 0.dp)       // no "by": we hold the State, not the value. Nothing is read yet.
+
+    Box(
+        Modifier
+            .offset { IntOffset(x.value.roundToPx(), 0) }       // READ in LAYOUT
+            .size(50.dp)
+            .background(Color.Blue)
+    )
+}
+```
+
+- Without `by`, `x` is a `State` object. Nothing has been read at that line.
+- `x.value` is read **inside the `offset { }` lambda**, which runs in the layout phase.
+- Each frame: **layout → draw**. Composition is skipped.
+
+### Version 3: read in draw
+
+
+
+```kotlin
+@Composable
+fun MovingBox3() {
+    var moved by remember { mutableStateOf(false) }
+    val x = animateDpAsState(if (moved) 100.dp else 0.dp)
+
+    Box(
+        Modifier
+            .size(50.dp)
+            .graphicsLayer { translationX = x.value.toPx() }    // READ in DRAW
+            .background(Color.Blue)
+    )
+}
+```
+
+- `x.value` is read **inside `graphicsLayer { }`**, which runs in the draw phase.
+- Each frame: **draw only**. Composition and layout are skipped.
+
+## Summary
+
+| Version                         | Where the value is read | Work per frame              |
+| ------------------------------- | ----------------------- | --------------------------- |
+| 1. `offset(x = x)` with `by`    | composable body         | composition + layout + draw |
+| 2. `offset { x.value… }`        | layout lambda           | layout + draw               |
+| 3. `graphicsLayer { x.value… }` | draw lambda             | draw only                   |
+
+## How to spot it in any code
+
+1. Find the state value (`by` or `.value`).
+2. Ask: **am I reading it in the body, or inside a `{ }` lambda?**
+3. If it is in a lambda, ask what kind of lambda it is: layout (`offset {}`, `layout {}`) or draw (`graphicsLayer {}`, `drawBehind {}`, `drawWithContent {}`, `Canvas {}`).
+
+That is the whole trick. In the shimmer from 12.15, the progress is read inside `drawWithContent { … }`, so it is a **draw-only** animation, which is right for something that loops forever.
+
+
 
 ## Check
 

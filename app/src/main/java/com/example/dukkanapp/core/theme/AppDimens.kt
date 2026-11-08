@@ -45,6 +45,7 @@ object AppDimens {
     val chip = 34.dp           // filter & choice chips
     val badge = 20.dp          // status & deal badges
     val radio = 22.dp          // radio buttons
+    val thumbOffsetDistance = 18.dp // thumb offset for switch button
     val optionLg = 66.dp       // option row with subtitle
     val optionMd = 52.dp       // single-line option row
     val optionSm = 48.dp       // language rows
@@ -54,6 +55,7 @@ object AppDimens {
     val checkbox = 20.dp       // checkbox
     val switchHeight = 28.dp   // switch track
     val switchWidth = 46.dp    // switch track
+    val switchPadding = 3.dp   // switch track
     val toast = 64.dp          // toast
     val screenWidth = 393.dp   // design frame (previews only)
     val screenHeight = 852.dp  // design frame (previews only)
