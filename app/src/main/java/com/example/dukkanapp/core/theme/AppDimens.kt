@@ -44,6 +44,7 @@ object AppDimens {
     val iconButtonSm = 36.dp   // sheet close
     val chip = 34.dp           // filter & choice chips
     val badge = 20.dp          // status & deal badges
+    val radio = 22.dp          // radio buttons
     val optionLg = 66.dp       // option row with subtitle
     val optionMd = 52.dp       // single-line option row
     val optionSm = 48.dp       // language rows
