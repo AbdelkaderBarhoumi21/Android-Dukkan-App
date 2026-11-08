@@ -814,12 +814,12 @@ fun AppOtpField(
 
 ## Check
 
-- [ ] The field is a pill (fully round ends), 52 dp tall, like the buttons.
-- [ ] Tap the email field: the fill turns white, a blue 1.5 dp border and a soft blue pill ring appear, and the mail icon turns blue. Nothing below moves.
-- [ ] Disabled field: grey fill, grey label/value/icon, no border, no ring, fully opaque (also readable in dark mode).
-- [ ] Type an invalid email and submit: the field turns red-soft with a red border, and "Enter a valid email address" appears with the alert icon.
-- [ ] Sign-up valid email: white field, green border, "Looks good" with a check icon.
-- [ ] The password eye toggles between hidden and visible. TalkBack reads "Show password" / "Hide password".
-- [ ] Font scale 200 %: text isn't clipped. The box stays 52 dp and the text scrolls horizontally.
-- [ ] Arabic: the label is right-aligned, the icon is on the right and the eye is on the left. The OTP boxes still read left to right.
-- [ ] `grep -rn "OutlinedTextField" app/src/main/java` returns nothing.
+- [x] The field is a pill (fully round ends), 52 dp tall, like the buttons.
+- [x] Tap the email field: the fill turns white, a blue 1.5 dp border and a soft blue pill ring appear, and the mail icon turns blue. Nothing below moves.
+- [x] Disabled field: grey fill, grey label/value/icon, no border, no ring, fully opaque (also readable in dark mode).
+- [x] Type an invalid email and submit: the field turns red-soft with a red border, and "Enter a valid email address" appears with the alert icon.
+- [x] Sign-up valid email: white field, green border, "Looks good" with a check icon.
+- [x] The password eye toggles between hidden and visible. TalkBack reads "Show password" / "Hide password".
+- [x] Font scale 200 %: text isn't clipped. The box stays 52 dp and the text scrolls horizontally.
+- [x] Arabic: the label is right-aligned, the icon is on the right and the eye is on the left. The OTP boxes still read left to right.
+- [x] `grep -rn "OutlinedTextField" app/src/main/java` returns nothing.
