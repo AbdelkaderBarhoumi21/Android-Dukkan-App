@@ -96,6 +96,45 @@ Two old names don't follow that rule, because renaming them would silently chang
 
 `controlLg` / `controlMd` / `controlSm` stay: they have the same values as `buttonLg` / `buttonMd` / `buttonSm`. Prefer the Figma name in new code (`input` for a field, `iconButton` for an icon button), so each token follows its own Figma variable.
 
+### Component parts and component internals
+
+The `size/*` variables cover the **outside** of a component (a stepper is 32 tall). Since the latest Figma update, 13 **inside** sizes are variables too, in a new **"Component parts"** group on `1.4 · Sizes & spacing`:
+
+| Figma variable | Kotlin | dp |
+|---|---|---|
+| size/stepper-button | `stepperButton` | 24 |
+| size/radio-dot | `radioDot` | 9 |
+| radius/checkbox | `radiusCheckbox` | 6 |
+| size/list-tile-icon | `listTileIcon` | 38 |
+| size/option-tile | `optionTile` | 40 |
+| size/count-bubble · count-bubble-sm | `countBubble` · `countBubbleSm` | 30 · 20 |
+| size/toast-halo · toast-ring · toast-core | `toastHalo` · `toastRing` · `toastCore` | 44 · 34 · 24 |
+| size/status-step-done · status-step · status-step-current | `statusStepDone` · `statusStep` · `statusStepCurrent` | 20 · 22 · 30 |
+
+They follow the usual rule (Figma name in camelCase, `radius/checkbox` → `radiusCheckbox`), so Dev Mode chips and code match. `status-step` (22) is the **upcoming** step.
+
+The rest of the inside sizes (the 14 dp icon in the stepper, the 112 dp cart stepper, the aurora blobs) still have no variable, so Figma draws them with plain numbers. Earlier versions of docs 11–14 typed those numbers in the composable (`Modifier.size(22.dp)`). That's gone now: **every dp lives in `AppDimens`**, including one-component sizes.
+
+**Naming rule:** `<component><Part>` in camelCase, after the Figma layer name. Examples: Figma `Qty stepper` → its round slot → `stepperButton`; `Count bubble` → `countBubble`; `Toast` → halo → `toastHalo`. Search `AppDimens.toast` and you see every toast size in one place.
+
+| Group | Tokens | Figma source (measured in the file) |
+|---|---|---|
+| Icons inside atoms | `iconXxs` 12, `iconXs` 14 | badge / rating / step icons are 12; checkbox check, chip, stepper, helper icons are 14 |
+| Strokes | `strokeHairline` 1, `strokeControl` 1.6, `strokeBubble` 2.5 | toast border; checkbox & radio off border, selected option border; count bubble ring |
+| Selection (no variable) | `radio` 22, `radioOff` 20, `switchThumb` 22, `switchPadding` 3, `switchThumbOffset` 18 | `Radio/*`, `Switch/*` |
+| Quantity | `stepperWidth` 88, `cartStepper` 52, `cartStepperWidth` 112, `cartStepperButton` 32, `cartStepperPadding` 10 | `Qty stepper`, `Cart stepper` |
+| Display | `avatarSm/Md/Header/Lg` 28/36/48/50, `progressTrack` 4, `pagerIndicator*` 6/22, `stepConnector` 2, `liveSegment` 5 | `Avatar/*`, `Pager`, `Status steps`, `Live order` |
+| Tiles | `infoTile` 36, `liveOrderTile` 44, `languageBadge` 32, `stepNumber` 28, `emptyStateTile` 72 / `emptyStateIcon` 32 | `Option/English`, `Live order`, screens 02.6 and 14.x |
+| Rows | `listRow` 58, `listRowPaddingH` 14, `sheetHandleWidth` 40, `sheetHandleHeight` 4.5 | `List rows`, `Sheet header` |
+| Inputs | `searchField` 48, `otpBoxWidth` 52, `otpBoxHeight` 58 | `Search/field`, `OTP` |
+| Toast | `toastGlyph` 13, `toastAction` 32, `toastTimer` 28, spinner, shadows … | `4.4 · Toast` |
+| Molecules | `productCardWidth` 170, `productPhotoHeight` 124, `promoBanner` 164, `coupon` 96, `cartBar` 64, `checkoutBar` 66, `navCartButton` 58 … | `4.3 · Molecules` (doc 16) |
+| Aurora | `auroraCompact/Short/Tall` 260/300/520, blob positions and radii, `auroraFade` 90 | screens 02.1 / 02.2 / 02.6 (doc 13) |
+
+> **Your code already has some of these** under other names: `radio`, `switchPadding` and `iconXs` keep their names. `thumbOffsetDistance` becomes **`switchThumbOffset`** (put the caret on it, Shift+F6), so every switch size starts with `switch`.
+
+**Where may a raw `dp` still appear?** Only in three theme files: `AppDimens.kt` (sizes), `AppShadows.kt` (the Figma effect styles: offset / blur / spread, doc 05) and `AppTypography.kt` (`sp`). The leak grep in doc 15 checks this.
+
 ### One radius scale (Figma: "Radius · one scale")
 
 Figma now has **one** scale, **10 / 14 / 16 / 20 / 28 / full**, in chapter `1.4` and in the `Sizes` variables. The old conflict (Foundations 14/18/22 vs components 16/20) is gone.
@@ -192,6 +231,8 @@ object AppDimens {
     val screenHeight = 852.dp  // design frame (previews only)
 
     // Icons (Lucide, 24 grid): Figma icon/sm, md, lg, xl
+    val iconXxs = 12.dp // inside atoms: badge, rating star, step, toast ×, card arrow
+    val iconXs = 14.dp  // inside atoms: checkbox check, chip, stepper, helper, perks
     val iconSm = 16.dp
     val iconMd = 18.dp
     val icon = 20.dp   // Figma icon/lg
@@ -203,21 +244,145 @@ object AppDimens {
     val screenPadding = 20.dp
 
     // Strokes: not part of the 4 dp grid on purpose
+    val strokeHairline = 1.dp   // toast border, dark card outline, list divider, strike line
     val strokeThin = 1.2.dp
     val strokeFocus = 1.5.dp
+    val strokeControl = 1.6.dp  // checkbox / radio off border, selected option border
     val strokeSpinner = 2.4.dp
+    val strokeBubble = 2.5.dp   // white ring around count bubbles
     val focusRing = 3.dp
 
     // Accessibility
     val touchTargetMin = 48.dp
 
-    // Feature sizes: used by one feature only; move them into the feature when you touch it
-    val onboardingIllustrationHeight = 280.dp
+    // ── Component internals ────────────────────────────────────────────────
+    // Figma draws these inside one component and has no size/* variable for them.
+    // They still live here, named <component><Part>, so no composable writes a raw dp.
+
+    // Component parts: Figma variables (1.4 · Sizes & spacing → "Component parts")
+    val stepperButton = 24.dp      // size/stepper-button: round − / + / trash slot in the qty stepper
+    val radioDot = 9.dp            // size/radio-dot
+    val radiusCheckbox = 6.dp      // radius/checkbox
+    val listTileIcon = 38.dp       // size/list-tile-icon: tile in account list rows
+    val optionTile = 40.dp         // size/option-tile: tile in payment option rows
+    val countBubble = 30.dp        // size/count-bubble: "2" bubble on the cart icon
+    val countBubbleSm = 20.dp      // size/count-bubble-sm: deal count on the bottom-nav cart
+    val toastHalo = 44.dp          // size/toast-halo
+    val toastRing = 34.dp          // size/toast-ring
+    val toastCore = 24.dp          // size/toast-core
+    val statusStepDone = 20.dp     // size/status-step-done: completed step circle
+    val statusStep = 22.dp         // size/status-step: upcoming step circle
+    val statusStepCurrent = 30.dp  // size/status-step-current: active step pill height
+
+    // Selection controls (Figma 4.1 Controls, no variable)
+    val radio = 22.dp           // radio on
+    val radioOff = 20.dp        // radio off
+    val switchThumb = 22.dp
+    val switchPadding = 3.dp
+    val switchThumbOffset = 18.dp // switchWidth − switchThumb − 2 × switchPadding
+
+    // Quantity (Figma 4.1 Qty stepper · Add)
+    val stepperWidth = 88.dp       // compact stepper on product cards
+    val cartStepper = 52.dp        // cart-line stepper height
+    val cartStepperWidth = 112.dp
+    val cartStepperButton = 32.dp  // white − and brand + circles
+    val cartStepperPadding = 10.dp
+
+    // Display atoms
+    val avatarSm = 28.dp
+    val avatarMd = 36.dp
+    val avatarHeader = 48.dp       // home header
+    val avatarLg = 50.dp
+    val progressTrack = 4.dp       // sign-up progress, password strength
     val pagerIndicatorSize = 6.dp
     val pagerIndicatorSelectedWidth = 22.dp
+    val stepConnector = 2.dp
+    val liveSegment = 5.dp         // live-order progress segment height
+    val liveSegmentGap = 6.dp
+
+    // Tiles (rounded squares / circles holding one icon)
+    val infoTile = 36.dp           // auth "sent to" card, verify steps
+    val liveOrderTile = 44.dp      // live order card
+    val languageBadge = 32.dp      // "EN" / "FR" circle in language rows
+    val stepNumber = 28.dp         // numbered circle in verify-email steps
+    val emptyStateTile = 72.dp
+    val emptyStateIcon = 32.dp
+
+    // Rows
+    val listRow = 58.dp            // 38 tile + 2 × 10
+    val listRowPaddingH = 14.dp
+    val sheetHandleWidth = 40.dp
+    val sheetHandleHeight = 4.5.dp
+
+    // Inputs
+    val searchField = 48.dp        // flat search bar inside pages
+    val otpBoxWidth = 52.dp
+    val otpBoxHeight = 58.dp
+
+    // Toast (Figma 4.4)
+    val toastGlyph = 13.dp
+    val toastSpinner = 20.dp
+    val toastSpinnerStroke = 2.5.dp
+    val toastTimer = 28.dp
+    val toastTimerStroke = 2.dp
+    val toastAction = 32.dp
+    val toastActionPaddingH = 14.dp
+    val toastPaddingStart = 10.dp  // icon side; close side uses space12
+    val toastSlide = 16.dp         // enter animation distance
+    val toastSwipeThreshold = 56.dp
+    val toastCoreShadowY = 3.dp
+    val toastCoreShadowBlur = 8.dp
+    val toastActionShadowY = 4.dp
+    val toastActionShadowBlur = 10.dp
+    val toastActionShadowSpread = (-2).dp
+
+    // Molecules (Figma 4.3, doc 16)
+    val productCardWidth = 170.dp
+    val productPhotoHeight = 124.dp
+    val categoryTile = 64.dp
+    val categoryCardPhoto = 92.dp
+    val brandLogo = 62.dp
+    val brandPhoto = 54.dp
+    val promoBanner = 164.dp
+    val promoPadding = 18.dp
+    val promoPhotoWidth = 126.dp
+    val promoPhotoHeight = 140.dp
+    val promoCta = 28.dp
+    val coupon = 96.dp
+    val couponStub = 82.dp
+    val couponNotch = 16.dp
+    val couponDash = 3.dp
+    val couponDashGap = 4.dp
+    val cartBar = 64.dp
+    val checkoutBar = 66.dp
+    val cartThumb = 34.dp
+    val navBarInset = 16.dp        // bar sits 16 from the screen edges
+    val navActivePillWidth = 44.dp
+    val navActivePillHeight = 28.dp
+    val navCartButton = 58.dp
+    val navCartRing = 70.dp
+    val headerActionsWidth = 88.dp // heart + bell capsule in the home header
+
+    // Aurora header (Figma 02.1 / 02.2 / 02.6, doc 13)
+    val auroraCompact = 260.dp
+    val auroraShort = 300.dp
+    val auroraTall = 520.dp
+    val auroraFade = 90.dp
+    val auroraBlueY = 20.dp
+    val auroraBlueRadius = 230.dp
+    val auroraSkyY = 60.dp
+    val auroraSkyRadius = 190.dp
+    val auroraSunRadius = 150.dp
+    val auroraSunYShort = 250.dp
+    val auroraSunYTall = 380.dp
+    val cardHighlightRadius = 90.dp
+
+    // Feature sizes: used by one feature only; move them into the feature when you touch it
+    val onboardingIllustrationHeight = 280.dp
     val flagSize = 37.dp
     val productImageHeight = 180.dp
     val logoMark = 48.dp
+    val logoMarkLg = 56.dp         // welcome screen mark
 
     // Legacy names: kept so the app compiles during the migration. Alt+Enter on each warning.
     @Deprecated("Use space4", ReplaceWith("AppDimens.space4")) val space2Xs = 4.dp
@@ -238,12 +403,13 @@ object AppDimens {
     @Deprecated("Use space48 or space64") val size2Xl = 56.dp
     @Deprecated("Use logoMark or a feature size") val size4Xl = 80.dp
     @Deprecated("Use space64", ReplaceWith("AppDimens.space64")) val iconXxl = 64.dp
-    @Deprecated("Use iconSm (16) or icon (20)") val icon2Xs = 12.dp
+    @Deprecated("Use iconXxs", ReplaceWith("AppDimens.iconXxs")) val icon2Xs = 12.dp
+    @Deprecated("Use switchThumbOffset", ReplaceWith("AppDimens.switchThumbOffset")) val thumbOffsetDistance = 18.dp
     @Deprecated("Use controlLg", ReplaceWith("AppDimens.controlLg")) val buttonHeight = 52.dp
     @Deprecated("Use strokeThin", ReplaceWith("AppDimens.strokeThin")) val borderWidth = 1.dp
     @Deprecated("Use strokeThin", ReplaceWith("AppDimens.strokeThin")) val borderSubtleHeight = 1.dp
     @Deprecated("Use screenPadding", ReplaceWith("AppDimens.screenPadding")) val screenHorizontalPadding = 20.dp
-    @Deprecated("Checkbox radius; use radiusSm") val radiusXs = 6.dp
+    @Deprecated("Use radiusCheckbox", ReplaceWith("AppDimens.radiusCheckbox")) val radiusXs = 6.dp
     @Deprecated("Not in the Figma scale; use radiusSm") val radius3Xs = 2.dp
     @Deprecated("Not in the Figma scale; use radiusSm") val radius2Xs = 4.dp
     @Deprecated("Use radiusCard", ReplaceWith("AppDimens.radiusCard")) val radiusXl = 20.dp
@@ -336,3 +502,5 @@ The legacy aliases carry the **new** values. Old screens move to the Figma sizes
 - [ ] App compiles. Deprecation warnings are expected. Fix them screen by screen with Alt+Enter.
 - [ ] Old `core/utils/constants/AppDimens.kt` and `AppShapes.kt` are deleted once no screen imports them (doc 14).
 - [ ] No `radiusField`, `radiusXl` or `radius2Xl` in new code (only the deprecated aliases).
+- [ ] The "Component internals" block is in `AppDimens`, and `thumbOffsetDistance` is renamed to `switchThumbOffset`.
+- [ ] No component in `core/common/components` writes `N.dp` (the doc 15 grep returns nothing).

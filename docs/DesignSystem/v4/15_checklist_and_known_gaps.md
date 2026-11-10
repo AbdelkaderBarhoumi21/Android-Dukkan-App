@@ -11,13 +11,14 @@
 | 04 Color scheme | `AppColors.toColorScheme(isDark)` compiles with named arguments; sheets/dialogs use `sheet`; no dynamic color |
 | 05 Gradients / shadows | `AppGradients` (with `bottomFade`), `AppAurora` (3 blobs), `cardHighlight` + `Modifier.cardHighlight()`, `AppShadows` (with `screen`), `Modifier.appShadow` (draws the dark outline) compile; `dropShadow` resolves |
 | 06 Typography | 5 Plus Jakarta Sans + 4 Cairo `.ttf` in `res/font`; `LatinTypography`, `ArabicTypography`, `LatinTextStyles`, `ArabicTextStyles` compile |
-| 07 Dimens / shapes | old `iconSm` renamed to `icon` first; one radius scale (10/14/16/20/28/full); `navBar` 66 (`teamNavBar` 64), Figma `1.4` size tokens added (`buttonLg`…`screenHeight`, `chip` 34, `iconMd` 18); `AppShapes` (10/14/16/20/28), `AppPillShape` moved and compile |
+| 07 Dimens / shapes | "Component internals" block added (`iconXxs`, `radiusCheckbox`, `stepperButton`, `toastHalo`, `aurora*`…), `thumbOffsetDistance` → `switchThumbOffset`; old `iconSm` renamed to `icon` first; one radius scale (10/14/16/20/28/full); `navBar` 66 (`teamNavBar` 64), Figma `1.4` size tokens added (`buttonLg`…`screenHeight`, `chip` 34, `iconMd` 18); `AppShapes` (10/14/16/20/28), `AppPillShape` moved and compile |
 | 08 Theme | new `AppTheme(darkTheme, isArabic)` used in `MainActivity` and every preview; theme mode saved in DataStore; old theme files deleted |
 | 09 Icons / logo | 76 Lucide icons (incl. eye-off, user-plus, star-filled, wifi-off, search-x, mic), `AppIcons` compiles, logo, adaptive launcher icon (`3.2`), splash updated, Iconsax removed |
 | 10 Buttons | primary gradient + glow; pressed = solid `brandPressed` with no glow; disabled = field + tertiary; loading = spinner replaces trailing icon |
 | 11 Text fields | pill fields; 6 states match the doc 01 input table; disabled drawn with tokens (no alpha) |
-| 12 Selection / chips / badges | checkbox, radio, switch, chips, badges, rating (filled gold star), empty states and shimmer skeletons match |
+| 12 Selection / chips / badges | checkbox (radius 6, border 1.6), radio (dot 9), switch, chips (Outline / Dark / Brand), badges (+ Code / Live / Applied), rating + ETA, qty stepper (**trash at 1**), status steps (done = ring + check), list rows in a card, empty states and shimmer skeletons match |
 | 13 Aurora / scaffold | `AppScreenBackground` (Compact / Short / Tall) matches 02.1, 02.2 and 02.6, light and dark |
+| 16 Molecules | product card, category tile/card, brand logo, promo banner (Deal + Navy), coupon (available + applied), option rows (payment + language), live order card, cart/checkout bar, large app bar, home header, bottom nav, sheet header match `4.3 · Molecules` |
 | 14 Auth refactor | Welcome, Log in, Sign up, Verify email (02.6 / 02.7) match Figma; Log in matches 13.2 (dark) and 13.4 (Arabic) |
 
 ## 2. Build commands
@@ -43,7 +44,8 @@ grep -rn "Color(0x" app/src/main/java | grep -v "core/theme/"
 # Palette read outside the theme package
 grep -rn "AppPalette\." app/src/main/java | grep -v "core/theme/"
 
-# Hard-coded dp / sp in features and components (previews excluded by hand)
+# Hard-coded dp / sp in features and components (previews excluded by hand).
+# Only AppDimens.kt, AppShadows.kt and the typography files may contain them (doc 07).
 grep -rnE "[0-9]+(\.[0-9]+)?\.(dp|sp)\b" app/src/main/java/com/example/dukkanapp/features app/src/main/java/com/example/dukkanapp/core/common
 
 # Old theme packages still imported
@@ -130,12 +132,23 @@ Measure with any WCAG contrast checker if you change a token.
 | Dark `float`, `deal`, `screen` shadows missing | All 5 dark shadows in `1.2`; all dark surfaces add the night-700 border (doc 05) |
 | Dark aurora blob colors missing, white blob position unknown | `13.1b · Header glow · spec`: 3 blobs, dark blue-500 35 % / blue-800 45 % / amber-300 8 %; white 35 % is the **card highlight** inside gradient cards (docs 05, 13) |
 | Compose chapter mapped Caption to `bodySmall` | Chapter now maps `bodySmall` = Body/Small 13/18 (Arabic Cairo Regular 13/20) and Caption is a separate style, same as our code (doc 06) |
+| Raw sizes inside components (`22.dp` radio, `12.dp` badge icon, `44.dp` toast halo…) | All in `AppDimens` → "Component internals" (doc 07) |
+| Qty stepper had no delete state | Quantity 1 shows `trash-2` and calls `onRemove` (doc 12.7, Figma `Qty stepper`) |
+| Chips: only default / selected | + `Dark` (filter) and `Brand` ("All") (doc 12.4) |
+| Molecules (product card, banners, coupon, options, bars, bottom nav, sheet header) not documented | Doc 16 |
+| Language rows drawn 56 vs `size/option-sm` 48 (DS + onboarding 01.2) | All 48, bound, content centred |
+| Category card photo radius 15 | `radius/md` 14, bound |
+| Trash at quantity 1 only on the compact stepper | `Cart stepper` has quantity-1 (trash) and quantity-2 (minus) versions |
+| Checkbox off `border/default` vs radio off `border/strong`; both below 3 : 1 | New `border/control` (Slate500) on all unchecked checkboxes and radios (doc 03) |
+| Component-internal sizes had no variable | 13 new variables in 1.4 "Component parts" (doc 07) |
+| `borderStrong` had no Figma token | `border/strong` is official: Slate300 / Slate600 (doc 03) |
+| Wishlist heart 15 | 16 (`icon/sm`) |
 
 ### Still open
 
 | # | Figma | Code | Why / how to close |
 |---|---|---|---|
-| 1 | No semantic token for `borderStrong`, `dealSoft`, `inverse`, `onInverse`, `scrim`, `shadow` | Derived values (doc 03 table) | Components need them; values follow Figma's dark rules. Ask the designer if they want official tokens |
+| 1 | No semantic token for `dealSoft`, `inverse`, `onInverse`, `scrim`, `shadow` | Derived values (doc 03 table) | Components need them; values follow Figma's dark rules. Ask the designer if they want official tokens |
 | 3 | Figma blur values | `Modifier.dropShadow` radius = Figma blur | Compose and Figma blur may differ slightly; compare the catalog preview and tweak `blur` if needed. If `dropShadow` is unavailable, the `Modifier.shadow` fallback won't match |
 | 4 | 135° gradients | `Offset.Zero → Offset.Infinite` (corner to corner) | Equals 135° only on square shapes; on wide banners the angle is flatter. Acceptable visually |
 | 5 | Focus ring (3 px soft blue pill) | Drawn by `AppTextField` (doc 11) outside the box | Material has no focus-ring slot |
@@ -143,8 +156,7 @@ Measure with any WCAG contrast checker if you change a token.
 | 7 | Splash screen text "Shop smart. Delivered fast." | System splash shows only the mark | Put the slogan on the first Compose screen if needed |
 | 8 | Figma colors for Material widgets that don't exist in Figma (snackbar, menus, date picker) | Derived through `toColorScheme` | Review the first time you use such a widget |
 | 9 | Pager dot 22 × 6, onboarding illustration size | Feature sizes in `AppDimens` | Move into the onboarding feature when you refactor it |
-| 10 | Bottom nav selected pill is blue | Material `NavigationBar` uses `secondaryContainer` (orange tint) | Build a custom bottom bar instead of Material's |
-| 11 | Empty-state tile (72) and icon (32) sizes, skeleton band width | Local constants in doc 12 | Promote to `AppDimens` if reused |
+| 10 | Bottom nav selected pill is blue | Custom `AppBottomNav` (doc 16.9), not Material `NavigationBar` | Closed in code once doc 16 is typed |
 
 ## 7. Definition of done
 

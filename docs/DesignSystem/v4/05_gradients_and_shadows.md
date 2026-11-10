@@ -85,7 +85,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 
 /** Colors of the 3 blurred blobs behind auth and home headers. Alpha is already applied. */
 @Immutable
@@ -189,7 +188,7 @@ internal val LocalAppGradients = staticCompositionLocalOf<AppGradients> {
  *
  *     Modifier.clip(shape).background(AppTheme.gradients.deal).cardHighlight(AppTheme.gradients.cardHighlight)
  */
-fun Modifier.cardHighlight(color: Color, radius: Dp = 90.dp): Modifier = drawBehind {
+fun Modifier.cardHighlight(color: Color, radius: Dp = AppDimens.cardHighlightRadius): Modifier = drawBehind {
     val r = radius.toPx()
     val center = Offset(x = if (layoutDirection == LayoutDirection.Ltr) size.width else 0f, y = 0f)
     drawCircle(
@@ -235,6 +234,9 @@ import androidx.compose.ui.unit.dp
 /**
  * One Figma drop shadow: color already includes its alpha.
  * [outline] is an optional 1 dp border drawn with the shadow (dark-mode cards).
+ *
+ * The offset / blur / spread numbers below are Figma effect styles (`Elevation/*`).
+ * This file and `AppDimens.kt` are the only places allowed to write a raw dp (doc 07).
  */
 @Immutable
 data class AppShadow(
@@ -344,7 +346,7 @@ fun Modifier.appShadow(shadow: AppShadow, shape: Shape): Modifier {
         ),
     )
     return if (shadow.outline.isSpecified) {
-        withShadow.border(width = 1.dp, color = shadow.outline, shape = shape)
+        withShadow.border(width = AppDimens.strokeHairline, color = shadow.outline, shape = shape)
     } else {
         withShadow
     }

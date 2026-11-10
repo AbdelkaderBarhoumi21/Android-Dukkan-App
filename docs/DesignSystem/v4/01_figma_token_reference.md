@@ -100,7 +100,8 @@ Newer primitives:
 | `textSecondary` | text/secondary                     | Slate500 `#64748B`  | Slate400 `#94A3B8`               |
 | `textTertiary`  | text/tertiary                      | Slate400 `#94A3B8`  | Slate500 `#64748B`               |
 | `border`        | border/default                     | Slate200 `#E2E8F0`  | Night700 `#24314F`               |
-| `borderStrong`  | *derived* (radio off)              | Slate300            | Slate700                         |
+| `borderStrong`  | border/strong                      | Slate300 `#CBD5E1`  | Slate600 `#475569`               |
+| `borderControl` | border/control (**new**)           | Slate500 `#64748B`  | Slate500 `#64748B`               |
 | `brand`         | brand/primary                      | Blue600 `#2563EB`   | Blue400 `#6090FA`                |
 | `brandPressed`  | brand/pressed                      | Blue700 `#1D4ED8`   | Blue500 `#3B6FF6`                |
 | `brandSoft`     | brand/soft                         | Blue50 `#EFF5FF`    | Blue950 `#172554`                |
@@ -238,7 +239,9 @@ All dark **surfaces** (card, float/sheet, screen) add a 1 dp night-700 border. B
 | `navBar` / `teamNavBar` | size/nav-bar · team-nav-bar | **66** (customer) / 64 (staff) |
 | `screenPadding`                         | screen padding                                        | 20                                         |
 
-## 7. Component specs summary (docs 10–12)
+**Component internals** (no Figma variable, measured in `4.1` / `4.3` / `4.4`): `iconXxs` 12, `iconXs` 14, `strokeControl` 1.6, `strokeBubble` 2.5, `radiusCheckbox` 6, `radioDot` 9, `switchThumb` 22, `stepperButton` 24, `cartStepper` 52 × 112, `countBubble` 30, `statusStepDone` 20 / `statusStep` 22 / `statusStepCurrent` 30, `listTileIcon` 38, `optionTile` 40, toast `44 → 34 → 24 → 13`, product card 170 × 236 … Full list and names: doc 07, "Component internals".
+
+## 7. Component specs summary (docs 10–12, 16)
 
 ### Buttons (pill, `AppPillShape`)
 
@@ -289,19 +292,19 @@ pill. elevated: 52 h, `card`, shadow `float`; field: 48 h, `field`. Placeholder 
 
 | Item            | Spec                                                                                                                                                                                                                                                     |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Chip            | 34 h pill, `card`, 1.2 `border`, label 12.5 Bold `textLabel`; selected = `brandSoft` + `brand` border                                                                                                                                                    |
+| Chip            | 34 h pill, `card`, 1.2 `border`, label 12.5 Bold `textLabel`, icon 14; selected = `brandSoft` + `brand` border; **Dark** = `inverse` (filter); **Brand** = `brand` ("All")                                                                                                                                                    |
 | Badge           | 20 h pill, 10.5 Bold: −15 % (deal gradient, White), Hot deal (`deal`, White), New (`inverse`, White), 25 min / Bestseller (`brandSoft`, `brandSoftText`), Only 2 left / 4.8 (`warningSoft`, `warningText`), Free delivery (`successSoft`, `successText`) |
 | Rating star     | `star-filled` in `gold`                                                                                                                                                                                                                                  |
-| Checkbox        | 20 × 20, `radiusSm`, on = `brand`, off = `card` + 1.6 `border`                                                                                                                                                                                           |
-| Radio           | 22 on (`brand`), 20 off (`card` + 1.6 `borderStrong`)                                                                                                                                                                                                    |
+| Checkbox        | 20 × 20, radius **6** (`radiusCheckbox`), on = `brand` + 14 check, off = `card` + 1.6 `borderControl`                                                                                                                                                                                       |
+| Radio           | 22 on (`brand`, 9 `card` dot), 20 off (`card` + 1.6 `borderControl`)                                                                                                                                                                                                  |
 | Switch          | 46 × 28, on `brand`, off `border`                                                                                                                                                                                                                        |
 | OTP box         | 52 × 58, `radiusLg` 16, `card`, 1.5 `border`, digit 22 ExtraBold                                                                                                                                                                                         |
 | Pager dot       | 22 × 6 active (`brand`)                                                                                                                                                                                                                                  |
-| Qty stepper     | 88 × 32, `brand`, 13.5 ExtraBold White                                                                                                                                                                                                                   |
+| Qty stepper     | 88 × 32, `brand`, count `titleSmall` 14 ExtraBold White; 24 slots with 14 icons; **quantity 1 = trash**, ≥ 2 = minus; + slot on white 22 %. Cart line: 112 × 52 `field`, 32 circles                                                                                                                                                                                                              |
 | Add button      | 32 × 32 circle (white or `brand`) + shadow `card`                                                                                                                                                                                                        |
 | Count bubble    | 30 × 30 `brand`, 2.5 White border                                                                                                                                                                                                                        |
 | Avatar initials | 36 × 36 `brandRing` fill, 14.4 Bold `brandSoftText`                                                                                                                                                                                                      |
-| Bottom nav      | 64 h floating white bar, active tab = blue pill + bold blue label, cart total with 3 decimals ("39.900 TND")                                                                                                                                             |
+| Bottom nav      | 66 h floating white bar, active tab = 44 × 28 blue pill + `overline` blue label, raised 58 cart in a 70 ring with a 20 orange count, cart total with 3 decimals ("39.900 TND") (doc 16.9)                                                                                                                                           |
 
 ### Empty & loading (customer board 14)
 

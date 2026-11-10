@@ -3,7 +3,7 @@
 This folder turns the Figma file **Dukkan App → Design System** page into Kotlin you type by hand.
 Each doc creates or edits one or two small files. Follow the docs in order. Build after each one.
 
-> One rule: if you type a hex color, a `dp`, or an `sp` inside a feature screen, it belongs in a theme file instead.
+> One rule: if you type a hex color, a `dp`, or an `sp` inside a feature screen **or a component**, it belongs in a theme file instead. Sizes go to `AppDimens` (doc 07), even the ones only one component uses.
 
 ---
 
@@ -29,7 +29,7 @@ AppTheme { }          composition root (doc 08)
                       LocalAppShadows, LocalAppTextStyles + MaterialTheme
         │
         ▼
-Components (docs 10–14)   AppButton, AppTextField, AppCheckbox …
+Components (docs 10–16)   AppButton, AppTextField, AppCheckbox, AppProductCard …
         │                 read AppTheme.colors / MaterialTheme.typography
         ▼
 Feature screens           only call components and tokens, never hex
@@ -57,17 +57,18 @@ Both point to the same color. Prefer `AppTheme.colors` in our own components bec
 | 04 | `04_material_color_scheme.md` | `AppColorScheme.kt` (replaces `AppColors.kt` in `core/utils/constants`) |
 | 05 | `05_gradients_and_shadows.md` | `AppGradients.kt`, `AppShadows.kt` |
 | 06 | `06_typography.md` | `res/font/plus_jakarta_sans_*.ttf` + `cairo_*.ttf`, `AppTypography.kt`, `AppTextStyles.kt` (Latin + Arabic) |
-| 07 | `07_dimens_and_shapes.md` | `AppDimens.kt`, `AppShapes.kt` (moved + rewritten, one radius scale) |
+| 07 | `07_dimens_and_shapes.md` | `AppDimens.kt` (Figma `size/*` + every component-internal size), `AppShapes.kt` (one radius scale) |
 | 08 | `08_theme_and_theme_mode.md` | `AppTheme.kt` (dark + Arabic), `ThemeCatalogPreview.kt`, `features/settings` theme mode (DataStore), `MainActivity` |
 | 09 | `09_icons_and_logo.md` | `res/drawable/ic_lucide_*.xml` (76), `AppIcons.kt`, logo, adaptive launcher icon |
 | 10 | `10_buttons.md` | `AppButton` (7 variants, 3 sizes, pressed/disabled/loading), `AppSocialButton`, `AppIconButton` |
 | 11 | `11_text_fields.md` | Pill text fields, password, strength, search, OTP |
-| 12 | `12_selection_and_display.md` | Selection controls, chips, badges, prices, toasts, **empty states, skeleton shimmer** |
+| 12 | `12_selection_and_display.md` | Selection controls, chips (4 variants), badges, prices, **qty stepper with delete at 1**, status steps, toasts, list rows, empty states, skeleton shimmer |
 | 13 | `13_screen_background_and_scaffold.md` | `AppScreenBackground` (aurora), scaffold, top bar, auth header |
 | 14 | `14_auth_screens_refactor.md` | Auth screens refactor (Welcome / Log in / Sign up / **Verify email** / Forgot / All set) |
 | 15 | `15_checklist_and_known_gaps.md` | nothing (checklist, QA, gaps) |
+| 16 | `16_molecules.md` | Product card, category tile/card, brand logo, promo banner, coupon, option rows, live order card, cart/checkout bar, large app bar, home header, bottom nav, sheet header |
 
-Docs 10–14 use exactly the names defined in docs 02–09.
+Docs 10–14 and 16 use exactly the names defined in docs 02–09.
 
 **Figma version.** These docs follow the updated Figma file: one radius scale, official dark mode (`1.2`), Cairo Arabic type scale, atom states (`4.2`), Android app icon (`3.2`), email verification screens (02.6/02.7), dark & Arabic screens (13.x) and empty & loading states (14.x).
 
@@ -113,12 +114,15 @@ app/src/main/java/com/example/dukkanapp/
         ├── AppLogoMark.kt               09  AppLogo, AppLogoMark
         ├── buttons/                     10  AppButton, AppSocialButton, AppIconButton
         ├── textfield/                   11  AppTextField, AppPasswordField, AppSearchBar, AppOtpField…
-        ├── selection/                   12  checkbox, radio, switch, chip
-        ├── display/                     12  badge, price, stepper, avatar, rating, pager…
+        ├── selection/                   12  checkbox, radio, switch, chip · 16 AppOptionRow
+        ├── display/                     12  badge, price, stepper, avatar, rating, pager, status steps…
         ├── feedback/                    12  toast, AppEmptyState, AppSkeleton
         ├── banner/                      12  AppMessageBanner
-        ├── list/                        12  AppListRow
-        └── scaffold/                    13  AppScreenBackground, AppScaffold
+        ├── list/                        12  AppListGroup, AppListRow
+        ├── card/                        16  product, category, brand, promo, coupon, live order
+        ├── bar/                         16  AppCartBar, AppBottomNav
+        ├── sheet/                       16  AppSheetHandle, AppSheetHeader
+        └── scaffold/                    13  AppScreenBackground, AppScaffold · 16 AppLargeTopBar, AppHomeHeaderRow
 features/auth/presentation/components/common/   13  AppAuthHeader, AppAuthFooterLink, AppOrDivider
 features/settings/                       08  theme mode (ThemeMode, ThemeRepository, use cases, DataStore)
 app/src/main/res/
@@ -148,7 +152,7 @@ Tip: move files with Android Studio **Refactor → Move** (F6). It rewrites impo
 ## 4. The rules
 
 1. **Only `AppPalette` holds hex.** `AppPalette` is `internal object`, and every other file reads it only inside `core/theme`.
-2. **Features never write `Color(0x…)`, `12.dp` or `14.sp`.** They use `AppTheme.colors`, `AppDimens`, `MaterialTheme.typography` / `AppTheme.textStyles`.
+2. **Features and components never write `Color(0x…)`, `12.dp` or `14.sp`.** They use `AppTheme.colors`, `AppDimens`, `MaterialTheme.typography` / `AppTheme.textStyles`. A raw `dp` may only appear in `AppDimens.kt` and `AppShadows.kt` (Figma effect styles).
 3. **Widgets never branch on `isSystemInDarkTheme()`.** Light and dark are two instances of the same `AppColors` class. The theme picks one.
 4. **One name per meaning.** If Figma calls it `brand/soft`, Kotlin calls it `brandSoft`. No synonyms.
 5. **No dynamic color.** Dukkan is a brand; wallpaper colors would replace the Dukkan blue. Doc 08 removes `dynamicColor`.
@@ -165,7 +169,7 @@ Tip: move files with Android Studio **Refactor → Move** (F6). It rewrites impo
 | Field fill | `surfaceVariant = Slate100` | `field = #F1F5F9` (same value, real name) | `surface/field` |
 | Secondary | Orange700 commerce accent | `deal = #F97316` + deal gradient | Figma `accent/deal` |
 | Tertiary | Teal | `gold = #F59E0B` (ratings, points) | No teal in Figma |
-| Extended colors | `success/warning/info/sale/favorite` | `AppColors` with 31 fields named after Figma (incl. `sheet`) | One semantic layer, not two |
+| Extended colors | `success/warning/info/sale/favorite` | `AppColors` with 32 fields named after Figma (incl. `sheet`, `borderControl`) | One semantic layer, not two |
 | Gradients | none | 8 brushes (brand, button, screenTint, bottomFade, deal, gold, navy, imageScrim) + 3 aurora blobs + a card highlight | Primary buttons and headers are gradients |
 | Shadows | Material elevation | 5 colored shadows (card, float, button, deal, screen); dark cards add a 1 dp outline | Figma uses soft, tinted shadows |
 | Font | Konnect, 18 files | Plus Jakarta Sans (5 weights) + Cairo for Arabic (4 weights) | Figma type scale (Latin + Arabic) |
@@ -210,4 +214,4 @@ DataStore (THEME_MODE key) → ThemePreferenceLocalDataSource → ThemeRepositor
 
 - [ ] I read docs in order and build after each one (`./gradlew :app:assembleDebug`).
 - [ ] I know the difference between `AppPalette` (raw) and `AppColors` (meaning).
-- [ ] I know docs 10–14 depend on 02–09.
+- [ ] I know docs 10–14 and 16 depend on 02–09.

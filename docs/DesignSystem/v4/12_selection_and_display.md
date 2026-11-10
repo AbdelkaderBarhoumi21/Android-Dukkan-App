@@ -1,6 +1,6 @@
 # 12: Selection controls, badges, prices and feedback
 
-This doc covers the small atoms and molecules from Figma pages **4.1 · Atoms**, **4.3 · Molecules** and the customer board **14 · Empty & loading states**. Each section has the spec table, then the code. Type them in this order: the auth screens (doc 14) only need **12.1 Checkbox**, **12.9 Progress bar** and **12.12 Message banner**. The rest you can type when the Home, Cart and Orders features start (**12.14 Empty state** and **12.15 Skeleton** come with the first list screen).
+This doc covers the small atoms from Figma page **4.1 · Atoms**, the small molecules from **4.3 · Molecules** (status steps, toast, list rows) and the customer board **14 · Empty & loading states**. The bigger molecules (product card, banners, coupon, option rows, bars, bottom nav, app bars, sheet header) are in **doc 16**. Every size comes from `AppDimens` (doc 07). Each section has the spec table, then the code. Type them in this order: the auth screens (doc 14) only need **12.1 Checkbox**, **12.9 Progress bar** and **12.12 Message banner**. The rest you can type when the Home, Cart and Orders features start (**12.14 Empty state** and **12.15 Skeleton** come with the first list screen).
 
 **Folders (new):**
 
@@ -32,13 +32,15 @@ core/common/components/
 
 ## 12.1 Checkbox
 
-| State | Box (20 dp, radius 6) | Mark |
+| State | Box (`checkbox` 20, `radiusCheckbox` 6) | Mark |
 |---|---|---|
-| Off | `card` fill, `borderStrong` 1.5 dp | none |
-| On | `brand` fill, no border | white `check` icon 14 dp |
+| Off | `card` fill, `borderControl` `strokeControl` (1.6) | none |
+| On | `brand` fill, no border | white `check` icon `iconXs` (14), stroke 3 |
 | Disabled | 50 % alpha | as above |
 
-The label is 12.5 sp SemiBold in `textLabel`, with a gap of `space8`. The row is at least 48 dp tall.
+The label is 12.5 sp SemiBold in `textLabel`, with a gap of `space8`. The row is at least `touchTargetMin` (48) tall.
+
+> **`borderControl` (Figma `border/control`, Slate500)** is the outline of every unchecked checkbox and radio. It reaches the 3 : 1 contrast that WCAG asks for controls: 4.8 on white, 4.5 on the light background, 3.6 on the dark card, 3.2 on the dark field. `border` and `borderStrong` were too light.
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.selection
@@ -65,12 +67,54 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.utils.constants.AppIcons
 
+private val CheckboxShape = RoundedCornerShape(AppDimens.radiusCheckbox)
 
+@Composable
+fun AppCheckbox(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    label: AnnotatedString,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    val colors = AppTheme.colors
+    val fill by animateColorAsState(if (checked) colors.brand else colors.card, label = "checkboxFill")
+
+    Row(
+        modifier = modifier
+            .heightIn(min = AppDimens.touchTargetMin)
+            .alpha(if (enabled) 1f else 0.5f)
+            .toggleable(value = checked, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(AppDimens.space8),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(AppDimens.checkbox)
+                .background(fill, CheckboxShape)
+                .then(if (checked) Modifier else Modifier.border(AppDimens.strokeControl, colors.borderControl, CheckboxShape)),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (checked) {
+                Icon(
+                    painter = painterResource(AppIcons.Check),
+                    contentDescription = null,
+                    tint = colors.onBrand,
+                    modifier = Modifier.size(AppDimens.iconXs),
+                )
+            }
+        }
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+            color = colors.textLabel,
+        )
+    }
+}
 
 /** Convenience overload for a plain string label. */
 @Composable
@@ -83,14 +127,16 @@ fun AppCheckbox(
 ) = AppCheckbox(checked, onCheckedChange, AnnotatedString(label), modifier, enabled)
 ```
 
+> Your current `AppCheckBox.kt` uses `size(AppDimens.icon)`, `RoundedCornerShape(percent = 30)` and `strokeFocus` + `borderStrong`. Swap them for `checkbox`, `radiusCheckbox`, `strokeControl` + `borderControl`: the box looks the same at 20 dp, but each value now follows its Figma name.
+
 > The `AnnotatedString` overload exists for the sign-up "I agree to the **Terms** and **Privacy Policy**" row, where the two words are links (see doc 14). Tapping a link opens the page, and tapping anywhere else toggles the box.
 
 ## 12.2 Radio (used by "Selectable option": payment, language)
 
 | State | Circle | Inner dot |
 |---|---|---|
-| Off | 20 dp, `card` fill, `borderStrong` 1.5 dp | none |
-| On | 22 dp, `brand` fill | 8 dp `onBrand` |
+| Off | `radioOff` (20), `card` fill, `borderControl` `strokeControl` (1.6) | none |
+| On | `radio` (22), `brand` fill | `radioDot` (9), `card` |
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.selection
@@ -103,7 +149,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 
@@ -111,31 +156,34 @@ import com.example.dukkanapp.core.theme.AppTheme
 @Composable
 fun AppRadio(selected: Boolean, modifier: Modifier = Modifier) {
     val colors = AppTheme.colors
-    Box(modifier = modifier.size(22.dp), contentAlignment = Alignment.Center) {
+    // The slot is always 22 so the row doesn't move when the radio turns on.
+    Box(modifier = modifier.size(AppDimens.radio), contentAlignment = Alignment.Center) {
         if (selected) {
             Box(
-                modifier = Modifier.size(22.dp).background(colors.brand, CircleShape),
+                modifier = Modifier.size(AppDimens.radio).background(colors.brand, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Box(Modifier.size(AppDimens.space8).background(colors.onBrand, CircleShape))
+                Box(Modifier.size(AppDimens.radioDot).background(colors.card, CircleShape))
             }
         } else {
             Box(
                 Modifier
-                    .size(AppDimens.icon)
+                    .size(AppDimens.radioOff)
                     .background(colors.card, CircleShape)
-                    .border(AppDimens.strokeFocus, colors.borderStrong, CircleShape)
+                    .border(AppDimens.strokeControl, colors.borderControl, CircleShape)
             )
         }
     }
 }
 ```
 
-**Selectable option card** (Figma `Option/Cash on delivery (selected)`): a `card` box with **`AppPillShape`** (Figma radius table: "option → full") and a `border` 1.2 dp; when selected, `brandSoft` fill with a `brand` 1.5 dp border. The layout is a leading 36 dp `AppIconButton(Soft)`-style tile, then the title (`titleSmall`) and subtitle (`bodySmall`, `textSecondary`), then `AppRadio` at the end. Build it in the feature (Language, Checkout) using `Modifier.selectable(...)` on the card.
+> The dot is `surface/card` in Figma, not `on/primary`: in dark mode it becomes the dark card colour, so the radio reads as a ring. Your `AppRadio.kt` still writes `22.dp` twice: replace both with `AppDimens.radio`.
+
+**Selectable option rows** (payment, language) are full molecules now: see **doc 16 · `AppOptionRow`**.
 
 ## 12.3 Switch
 
-46 × 28, pill shaped. On = `brand` track, off = `border` track. The thumb is 22 dp `card` with `shadows.card`, and it slides with an animation.
+`switchWidth` × `switchHeight` (46 × 28), pill shaped. On = `brand` track, off = `border` track. The thumb is `switchThumb` (22) `card` with `shadows.card`, inset by `switchPadding` (3), and it slides by `switchThumbOffset` (18).
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.selection
@@ -154,7 +202,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
@@ -169,7 +217,7 @@ fun AppSwitch(
 ) {
     val colors = AppTheme.colors
     val track by animateColorAsState(if (checked) colors.brand else colors.border, label = "switchTrack")
-    val thumbOffset by animateDpAsState(if (checked) 18.dp else 0.dp, label = "switchThumb")
+    val thumbOffset by animateDpAsState(if (checked) AppDimens.switchThumbOffset else Dp.Hairline, label = "switchThumb")
 
     val toggle = if (onCheckedChange != null) {
         Modifier.toggleable(checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange)
@@ -180,15 +228,15 @@ fun AppSwitch(
     Box(
         modifier = modifier
             .then(toggle)
-            .size(width = 46.dp, height = 28.dp)
+            .size(width = AppDimens.switchWidth, height = AppDimens.switchHeight)
             .background(track, AppPillShape)
-            .padding(3.dp),
+            .padding(AppDimens.switchPadding),
         contentAlignment = Alignment.CenterStart,
     ) {
         Box(
             Modifier
                 .offset(x = thumbOffset)
-                .size(22.dp)
+                .size(AppDimens.switchThumb)
                 .appShadow(AppTheme.shadows.card, CircleShape)
                 .background(colors.card, CircleShape)
         )
@@ -196,22 +244,27 @@ fun AppSwitch(
 }
 ```
 
-> `offset(x = …)` follows the layout direction, so in Arabic the "on" thumb sits on the left, which is what RTL users expect.
+> `offset(x = …)` follows the layout direction, so in Arabic the "on" thumb sits on the left, which is what RTL users expect. `Dp.Hairline` is 0 dp: the "off" position.
 
 ## 12.4 Chip
 
-Height 34, pill shaped, padding `space12`, label `labelMedium` (12.5 Bold).
+Height `chip` (34), pill shaped, horizontal padding `space12`, label `labelMedium` (12.5 Bold). Optional leading icon `iconXs` (14), gap `space8`.
 
-| State | Fill | Border | Label |
-|---|---|---|---|
-| Default | `card` | `border` 1.2 dp | `textLabel` |
-| Selected | `brandSoft` | `brand` 1.2 dp | `brandSoftText` |
+Figma `4.1 · Chip` has **four** looks. Doc 12 used to have only the first two:
+
+| Variant | Figma example | Fill | Border | Label + icon | Role |
+|---|---|---|---|---|---|
+| `Outline`, not selected | "On sale" (tag icon) | `card` | `border` `strokeThin` | `textLabel` | `Role.Tab` (choice) |
+| `Outline`, selected | "On sale" / "Selected" (check icon) | `brandSoft` | `brand` `strokeThin` | `brandSoftText` | `Role.Tab` |
+| `Dark` | "Dark" + `sliders-horizontal` | `inverse` | none | `onInverse` | `Role.Button`: opens the filter sheet |
+| `Brand` | "All" | `brand` | none | `onBrand` | `Role.Tab`: the active "All" pill at the start of a category row |
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.selection
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -225,12 +278,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
+
+enum class AppChipVariant { Outline, Dark, Brand }
 
 @Composable
 fun AppChip(
@@ -239,32 +294,60 @@ fun AppChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     leadingIcon: Painter? = null,
+    variant: AppChipVariant = AppChipVariant.Outline,
 ) {
-    val colors = AppTheme.colors
-    val fill = if (selected) colors.brandSoft else colors.card
-    val stroke = if (selected) colors.brand else colors.border
-    val content = if (selected) colors.brandSoftText else colors.textLabel
+    val c = AppTheme.colors
+    val fill: Color
+    val stroke: Color?
+    val content: Color
+    when (variant) {
+        AppChipVariant.Outline -> {
+            fill = if (selected) c.brandSoft else c.card
+            stroke = if (selected) c.brand else c.border
+            content = if (selected) c.brandSoftText else c.textLabel
+        }
+        AppChipVariant.Dark -> { fill = c.inverse; stroke = null; content = c.onInverse }
+        AppChipVariant.Brand -> { fill = c.brand; stroke = null; content = c.onBrand }
+    }
+    val click = if (variant == AppChipVariant.Dark) {
+        Modifier.clickable(role = Role.Button, onClick = onClick)
+    } else {
+        Modifier.selectable(selected = selected, role = Role.Tab, onClick = onClick)
+    }
 
     Row(
         modifier = modifier
-            .height(34.dp)
+            .height(AppDimens.chip)
             .clip(AppPillShape)
             .background(fill)
-            .border(AppDimens.strokeThin, stroke, AppPillShape)
-            .selectable(selected = selected, role = Role.Tab, onClick = onClick)
+            .then(if (stroke != null) Modifier.border(AppDimens.strokeThin, stroke, AppPillShape) else Modifier)
+            .then(click)
             .padding(horizontal = AppDimens.space12),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(AppDimens.space4),
+        horizontalArrangement = Arrangement.spacedBy(AppDimens.space8),
     ) {
-        leadingIcon?.let { Icon(it, null, tint = content, modifier = Modifier.size(AppDimens.iconSm)) }
+        leadingIcon?.let { Icon(it, null, tint = content, modifier = Modifier.size(AppDimens.iconXs)) }
         Text(text, style = MaterialTheme.typography.labelMedium, color = content)
     }
 }
 ```
 
+Usage on Home / Search:
+
+```kotlin
+Row(horizontalArrangement = Arrangement.spacedBy(AppDimens.space8)) {
+    AppChip("Filters", selected = false, onClick = onOpenFilters, variant = AppChipVariant.Dark,
+        leadingIcon = painterResource(AppIcons.SlidersHorizontal))
+    AppChip("All", selected = category == null, onClick = { onCategory(null) }, variant = AppChipVariant.Brand)
+    AppChip("On sale", selected = onSale, onClick = onToggleSale, leadingIcon = painterResource(AppIcons.Tag))
+}
+```
+
+> Your `AppChip.kt` has no `variant` yet and uses `iconSm` (16) for the icon. Figma draws chip icons at 14 → `AppDimens.iconXs`.
+
 ## 12.5 Badge
 
-Height 20, pill shaped, horizontal padding `space8`, text 10.5 sp Bold.
+Height `badge` (20), pill shaped, horizontal padding `space8`, text `labelSmall` (10.5 Bold). Optional leading icon `iconXxs` (12).
 
 | Variant | Fill | Text | Example |
 |---|---|---|---|
@@ -276,6 +359,9 @@ Height 20, pill shaped, horizontal padding `space8`, text 10.5 sp Bold.
 | `LowStock` | `warningSoft` | `warningText` | Only 2 left |
 | `FreeDelivery` | `successSoft` | `successText` | Free delivery |
 | `Rating` | `warningSoft` | `warningText` | ★ 4.8 |
+| `Code` | `warningSoft` | `warningText` | WELCOME15 (coupon code) |
+| `Live` | `brandSoft` | `brandSoftText` | Live (live order card) |
+| `Applied` | `successSoft` | `successText` | ✓ Applied (coupon) |
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.display
@@ -287,6 +373,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -295,14 +382,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
 
-enum class AppBadgeVariant { Discount, Hot, New, Eta, Bestseller, LowStock, FreeDelivery, Rating }
+enum class AppBadgeVariant { Discount, Hot, New, Eta, Bestseller, LowStock, FreeDelivery, Rating, Code, Live, Applied }
 
 @Composable
 fun AppBadge(
@@ -316,21 +400,21 @@ fun AppBadge(
         AppBadgeVariant.Discount -> AppTheme.gradients.deal to c.onBrand
         AppBadgeVariant.Hot -> SolidColor(c.deal) to c.onBrand
         AppBadgeVariant.New -> SolidColor(c.inverse) to c.onInverse
-        AppBadgeVariant.Eta, AppBadgeVariant.Bestseller -> SolidColor(c.brandSoft) to c.brandSoftText
-        AppBadgeVariant.LowStock, AppBadgeVariant.Rating -> SolidColor(c.warningSoft) to c.warningText
-        AppBadgeVariant.FreeDelivery -> SolidColor(c.successSoft) to c.successText
+        AppBadgeVariant.Eta, AppBadgeVariant.Bestseller, AppBadgeVariant.Live -> SolidColor(c.brandSoft) to c.brandSoftText
+        AppBadgeVariant.LowStock, AppBadgeVariant.Rating, AppBadgeVariant.Code -> SolidColor(c.warningSoft) to c.warningText
+        AppBadgeVariant.FreeDelivery, AppBadgeVariant.Applied -> SolidColor(c.successSoft) to c.successText
     }
     val style = MaterialTheme.typography.labelSmall // Figma "Badge/*": M3/labelSmall 10.5/14 Bold
 
     Row(
         modifier = modifier
-            .height(20.dp)
+            .height(AppDimens.badge)
             .background(fill, AppPillShape)
             .padding(horizontal = AppDimens.space8),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppDimens.space2),
     ) {
-        leadingIcon?.let { Icon(it, null, tint = content, modifier = Modifier.size(12.dp)) }
+        leadingIcon?.let { Icon(it, null, tint = content, modifier = Modifier.size(AppDimens.iconXxs)) }
         Text(text, style = style, color = content, maxLines = 1)
     }
 }
@@ -403,7 +487,9 @@ fun AppPriceText(
         if (oldMillimes != null && oldMillimes > millimes) {
             Text(
                 text = formatTnd(oldMillimes),
-                style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.LineThrough),
+                // Figma product card: `Dukkan/caption` 11 SemiBold. Product details (Large): bodySmall 13.
+                style = (if (size == AppPriceSize.Large) typography.bodySmall else textStyles.caption)
+                    .copy(textDecoration = TextDecoration.LineThrough),
                 color = AppTheme.colors.textTertiary,
                 modifier = Modifier.alignByBaseline(),
             )
@@ -414,99 +500,214 @@ fun AppPriceText(
 
 ## 12.7 Quantity: add button, stepper, count bubble
 
-| Part | Spec |
-|---|---|
-| Add button (not in cart) | 32 dp circle, `card` fill, `shadows.card`, `plus` icon in `brand` |
-| Add button (in cart) | 32 dp circle, `brand` fill, white `plus` |
-| Qty stepper (card) | 88 × 32 pill, `brand` fill, `minus` · count (`titleSmall` 14 ExtraBold, `onBrand`) · `plus` |
-| Cart stepper (cart line) | 112 × 52 pill, `field` fill, count `titleMedium` 16 ExtraBold `textPrimary`, icons `textPrimary` |
-| Count bubble (on cart) | 30 dp circle, `brand` fill, 2.5 dp `card` border, `labelStrong` 12.5 ExtraBold `onBrand` |
+Figma `4.1 · Qty stepper · Add`: "Add (+) turns into a stepper when the item is in the cart." The file shows six pieces:
 
-The rule from Figma is: the **Add (+) button turns into the stepper when the item is in the cart.**
+| Part | Size | Spec |
+|---|---|---|
+| Add button | `addButton` 32 circle | `card` fill, `shadows.card`, `plus` `iconSm` (16) in `brand`, stroke 2.8 |
+| Add button, filled | `addButton` 32 circle | `brand` fill, `shadows.card`, white `plus` |
+| Qty stepper, **quantity 1** | `stepperWidth` × `stepper` (88 × 32) pill, `brand` | **`trash-2`** · `1` · `+` |
+| Qty stepper, quantity ≥ 2 | 88 × 32 pill, `brand` | `minus` · `3` · `+` |
+| Cart stepper, **quantity 1** | `cartStepperWidth` × `cartStepper` (112 × 52) pill, `field` | white 32 circle with **`trash-2`** (`textPrimary`) · `1` · `brand` 32 circle with white `+` |
+| Cart stepper, quantity ≥ 2 | 112 × 52 pill, `field` | white 32 circle with `minus` · `2` · `brand` 32 circle with white `+` |
+| Count bubble | `countBubble` 30 circle | `brand` fill, `strokeBubble` (2.5) `card` ring, `labelStrong` `onBrand` |
+
+**Inside the compact stepper** (measured on `Qty stepper`): each end is a `stepperButton` (24) slot, `space4` from the pill edge. The icons are `iconXs` (14), white, stroke 2.4 (trash / minus) and 2.6 (plus). The `+` slot has a **white circle at 22 %** behind it (`card.copy(alpha = 0.22f)`); the left slot has none. The count is `titleSmall` (14/20 ExtraBold) `onBrand`.
+
+**Inside the cart stepper:** `cartStepperPadding` (10) from the edge, two `cartStepperButton` (32) circles: `card` with `minus` in `textPrimary`, and `brand` with a white `plus`. Icons are `iconSm` (16). The count is `titleMedium` (16/22 ExtraBold) `textPrimary`.
+
+### The delete rule
+
+| Quantity | Left button | What a tap does | TalkBack |
+|---|---|---|---|
+| 0 | (no stepper: Add button) | `onIncrease` | "Add to cart" |
+| 1 | **`trash-2`** | `onRemove`: the item leaves the cart | "Remove from cart" |
+| ≥ 2 | `minus` | `onDecrease` | "Decrease quantity" |
+
+Why a separate `onRemove` instead of `onDecrease` down to 0? The ViewModel shows the Figma **"Item removed from cart · Undo"** toast (12.11) only on a remove. Going from 3 to 2 shows nothing.
+
+The rule is the same for both styles: Figma now has both `Cart stepper` versions side by side (quantity 1 with the trash in `text/primary`, quantity 2 with the minus).
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.display
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.common.components.buttons.AppIconButton
-import com.example.dukkanapp.core.common.components.buttons.AppIconButtonVariant
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.theme.appShadow
+import com.example.dukkanapp.core.utils.constants.AppIcons
 
 enum class AppStepperStyle { Compact, Large }
 
-/** Shows "+" when quantity is 0, the stepper otherwise. */
+/**
+ * Figma `Add button` → `Qty stepper` / `Cart stepper`.
+ * 0 → "+" button. 1 → trash · 1 · +. 2+ → − · n · +.
+ */
 @Composable
 fun AppQuantityControl(
     quantity: Int,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
+    onRemove: () -> Unit,
     modifier: Modifier = Modifier,
     style: AppStepperStyle = AppStepperStyle.Compact,
+    canIncrease: Boolean = true,
 ) {
-    if (quantity == 0) {
-        AppIconButton(
-            icon = painterResource(AppIcons.Plus),
-            contentDescription = stringResource(R.string.cd_add_to_cart),
-            onClick = onIncrease,
-            variant = AppIconButtonVariant.White,
-            size = 32.dp,
-            modifier = modifier,
-        )
-        return
-    }
-    val c = AppTheme.colors
-    val isLarge = style == AppStepperStyle.Large
-    val fill = if (isLarge) c.field else c.brand
-    val content = if (isLarge) c.textPrimary else c.onBrand
-    val countStyle = if (isLarge) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleSmall
-
-    Row(
-        modifier = modifier
-            .size(width = if (isLarge) 112.dp else 88.dp, height = if (isLarge) AppDimens.controlLg else 32.dp)
-            .background(fill, AppPillShape),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        IconButton(onClick = onDecrease) {
-            Icon(painterResource(AppIcons.Minus), stringResource(R.string.cd_decrease), tint = content, modifier = Modifier.size(AppDimens.iconSm))
-        }
-        Text(quantity.toString(), style = countStyle, color = content)
-        IconButton(onClick = onIncrease) {
-            Icon(painterResource(AppIcons.Plus), stringResource(R.string.cd_increase), tint = content, modifier = Modifier.size(AppDimens.iconSm))
+    // Cross-fade between "+" and the stepper, like the Figma prototype.
+    AnimatedContent(targetState = quantity == 0, label = "addToStepper", modifier = modifier) { isEmpty ->
+        if (isEmpty) {
+            AppAddButton(onClick = onIncrease, enabled = canIncrease)
+        } else {
+            AppStepper(quantity, onIncrease, onDecrease, onRemove, style, canIncrease)
         }
     }
 }
 
+/** Figma `Add button`: 32 circle. [filled] = brand fill with a white plus. */
+@Composable
+fun AppAddButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    filled: Boolean = false,
+    enabled: Boolean = true,
+) {
+    val c = AppTheme.colors
+    Box(
+        modifier = modifier
+            .size(AppDimens.addButton)
+            .appShadow(AppTheme.shadows.card, CircleShape)
+            .clip(CircleShape)
+            .background(if (filled) c.brand else c.card)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = painterResource(AppIcons.Plus),
+            contentDescription = stringResource(R.string.cd_add_to_cart),
+            tint = if (filled) c.onBrand else c.brand,
+            modifier = Modifier.size(AppDimens.iconSm),
+        )
+    }
+}
+
+@Composable
+private fun AppStepper(
+    quantity: Int,
+    onIncrease: () -> Unit,
+    onDecrease: () -> Unit,
+    onRemove: () -> Unit,
+    style: AppStepperStyle,
+    canIncrease: Boolean,
+) {
+    val c = AppTheme.colors
+    val isLarge = style == AppStepperStyle.Large
+    val isRemove = quantity == 1
+
+    // Every number comes from AppDimens: the two styles only pick different tokens.
+    val height = if (isLarge) AppDimens.cartStepper else AppDimens.stepper
+    val minWidth = if (isLarge) AppDimens.cartStepperWidth else AppDimens.stepperWidth
+    val buttonSize = if (isLarge) AppDimens.cartStepperButton else AppDimens.stepperButton
+    val iconSize = if (isLarge) AppDimens.iconSm else AppDimens.iconXs
+    val countStyle = if (isLarge) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleSmall
+
+    Row(
+        modifier = Modifier
+            .height(height)
+            .widthIn(min = minWidth)
+            .background(if (isLarge) c.field else c.brand, AppPillShape),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        StepperButton(
+            icon = if (isRemove) AppIcons.Trash2 else AppIcons.Minus,
+            contentDescription = stringResource(if (isRemove) R.string.cd_remove_from_cart else R.string.cd_decrease),
+            onClick = if (isRemove) onRemove else onDecrease,
+            circleSize = buttonSize,
+            iconSize = iconSize,
+            circle = if (isLarge) c.card else Color.Transparent,
+            tint = if (isLarge) c.textPrimary else c.onBrand,
+        )
+        Text(
+            text = quantity.toString(),
+            style = countStyle,
+            color = if (isLarge) c.textPrimary else c.onBrand,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        StepperButton(
+            icon = AppIcons.Plus,
+            contentDescription = stringResource(R.string.cd_increase),
+            onClick = onIncrease,
+            enabled = canIncrease,
+            circleSize = buttonSize,
+            iconSize = iconSize,
+            circle = if (isLarge) c.brand else c.card.copy(alpha = 0.22f),
+            tint = c.onBrand,
+        )
+    }
+}
+
+/**
+ * The touch area is a square as tall as the pill (32 or 52), so each end is easy to hit.
+ * The visible circle inside it is the Figma 24 / 32 slot.
+ */
+@Composable
+private fun StepperButton(
+    icon: Int,
+    contentDescription: String,
+    onClick: () -> Unit,
+    circleSize: Dp,
+    iconSize: Dp,
+    circle: Color,
+    tint: Color,
+    enabled: Boolean = true,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxHeight()
+            .aspectRatio(1f)
+            .clip(CircleShape)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(Modifier.size(circleSize).background(circle, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(painterResource(icon), contentDescription, tint = tint, modifier = Modifier.size(iconSize))
+        }
+    }
+}
+
+/** Figma `Count bubble`: 30 brand circle with a 2.5 white ring. */
 @Composable
 fun AppCountBubble(count: Int, modifier: Modifier = Modifier) {
     val c = AppTheme.colors
     Box(
         modifier = modifier
-            .size(30.dp)
+            .size(AppDimens.countBubble)
             .background(c.brand, CircleShape)
-            .border(2.5.dp, c.card, CircleShape),
+            .border(AppDimens.strokeBubble, c.card, CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -518,14 +719,34 @@ fun AppCountBubble(count: Int, modifier: Modifier = Modifier) {
 }
 ```
 
-> `IconButton` keeps the 48 dp touch target, but inside a 32 dp-tall pill it overlaps the edges. That is intended: the user can tap a little outside the pill.
+Check the sums: compact = 32 (button) + count + 32 ≥ `stepperWidth` (88), and large = 52 + count + 52 ≥ `cartStepperWidth` (112). `widthIn(min = …)` keeps the Figma width for 1–9 and lets "12" widen the pill instead of overlapping the buttons.
+
+**In the ViewModel (MVI):**
+
+```kotlin
+is CartIntent.Increase -> repository.setQuantity(id, current + 1)
+is CartIntent.Decrease -> repository.setQuantity(id, current - 1) // only sent when current ≥ 2
+is CartIntent.Remove -> {
+    repository.remove(id)
+    sendEffect(
+        CartEffect.ShowToast(
+            title = UiText(R.string.toast_item_removed),
+            type = AppToastType.Info,
+            subtitle = UiText.Raw(product.name),
+        ),
+    )
+}
+```
 
 ## 12.8 Avatar and rating
 
 | Part | Spec |
 |---|---|
-| Avatar | 50 / 36 / 28 dp circle. Photo, or initials on `brandRing` fill with `brandSoftText` text (Bold) |
-| Rating | `star` icon in `gold` (filled), then "4.8 (1.2k)" in `caption`, `textLabel` |
+| Avatar | `avatarLg` 50 / `avatarHeader` 48 / `avatarMd` 36 / `avatarSm` 28 circle. Photo, or initials on `brandRing` fill with `brandSoftText` text (Bold) |
+| Rating | filled `star` `iconXxs` (12) in `gold`, gap `space4`, then "4.8 (1.2k)" in `labelSmall` (10.5 Bold) `textLabel` |
+| ETA (optional, after the rating) | gap `space12`, `zap` `iconXxs` in `brand`, then "25 min" in `labelSmall` `brand` |
+
+Figma's `Rating` atom is the whole line **"★ 4.8 (1.2k)  ⚡ 25 min"**, and the product card uses it as is. So `AppRating` takes an optional `eta`.
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.display
@@ -535,7 +756,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -548,46 +771,55 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.utils.constants.AppIcons
+
+enum class AppAvatarSize(val size: Dp) {
+    Small(AppDimens.avatarSm),
+    Medium(AppDimens.avatarMd),
+    Header(AppDimens.avatarHeader),
+    Large(AppDimens.avatarLg),
+}
 
 @Composable
 fun AppAvatar(
     initials: String,
     modifier: Modifier = Modifier,
     photo: Painter? = null,
-    size: Dp = 36.dp,
+    size: AppAvatarSize = AppAvatarSize.Medium,
 ) {
     Box(
         modifier = modifier
-            .size(size)
+            .size(size.size)
             .clip(CircleShape)
             .background(AppTheme.colors.brandRing),
         contentAlignment = Alignment.Center,
     ) {
         if (photo != null) {
-            Image(photo, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(size))
+            Image(photo, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(size.size))
         } else {
             Text(initials.take(2).uppercase(), style = MaterialTheme.typography.labelLarge, color = AppTheme.colors.brandSoftText)
         }
     }
 }
 
+/** Figma `Rating`: "★ 4.8 (1.2k)" and, if given, "⚡ 25 min". */
 @Composable
-fun AppRating(value: String, count: String?, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(AppDimens.space2),
-    ) {
-        Icon(painterResource(AppIcons.StarFilled), null, tint = AppTheme.colors.gold, modifier = Modifier.size(12.dp))
-        Text(
-            text = if (count != null) "$value ($count)" else value,
-            style = MaterialTheme.typography.labelSmall,
-            color = AppTheme.colors.textLabel,
-        )
+fun AppRating(value: String, count: String?, modifier: Modifier = Modifier, eta: String? = null) {
+    val c = AppTheme.colors
+    val style = MaterialTheme.typography.labelSmall
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Icon(painterResource(AppIcons.StarFilled), null, tint = c.gold, modifier = Modifier.size(AppDimens.iconXxs))
+        Spacer(Modifier.width(AppDimens.space4))
+        Text(if (count != null) "$value ($count)" else value, style = style, color = c.textLabel)
+        if (eta != null) {
+            Spacer(Modifier.width(AppDimens.space12))
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(AppDimens.space4)) {
+                Icon(painterResource(AppIcons.Zap), null, tint = c.brand, modifier = Modifier.size(AppDimens.iconXxs))
+                Text(eta, style = style, color = c.brand)
+            }
+        }
     }
 }
 ```
@@ -598,9 +830,9 @@ fun AppRating(value: String, count: String?, modifier: Modifier = Modifier) {
 
 | Part | Spec |
 |---|---|
-| Pager dot (inactive) | 6 × 6, `border` |
-| Pager dot (active) | 22 × 6 pill, `brand`. The width animates |
-| Progress bar (sign-up "1/2") | 4 dp track, `border`, with a `brand` fill and animated progress |
+| Pager dot (inactive) | `pagerIndicatorSize` (6) circle, `border` |
+| Pager dot (active) | `pagerIndicatorSelectedWidth` × `pagerIndicatorSize` (22 × 6) pill, `brand`. The width animates |
+| Progress bar (sign-up "1/2") | `progressTrack` (4) track, `border`, with a `brand` fill and animated progress |
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.display
@@ -621,7 +853,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
@@ -631,10 +862,13 @@ fun AppPagerIndicator(pageCount: Int, currentPage: Int, modifier: Modifier = Mod
     Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(AppDimens.space4)) {
         repeat(pageCount) { index ->
             val selected = index == currentPage
-            val width by animateDpAsState(if (selected) 22.dp else 6.dp, label = "dotWidth")
+            val width by animateDpAsState(
+                if (selected) AppDimens.pagerIndicatorSelectedWidth else AppDimens.pagerIndicatorSize,
+                label = "dotWidth",
+            )
             Box(
                 Modifier
-                    .size(width = width, height = 6.dp)
+                    .size(width = width, height = AppDimens.pagerIndicatorSize)
                     .background(if (selected) AppTheme.colors.brand else AppTheme.colors.border, AppPillShape)
             )
         }
@@ -646,7 +880,7 @@ fun AppProgressBar(progress: Float, modifier: Modifier = Modifier) {
     val animated by animateFloatAsState(progress.coerceIn(0f, 1f), label = "progress")
     Box(
         modifier = modifier
-            .height(4.dp)
+            .height(AppDimens.progressTrack)
             .background(AppTheme.colors.border, AppPillShape)
             .semantics { progressBarRangeInfo = ProgressBarRangeInfo(animated, 0f..1f) },
     ) {
@@ -662,12 +896,24 @@ fun AppProgressBar(progress: Float, modifier: Modifier = Modifier) {
 
 ## 12.10 Order status steps
 
-Figma "Status steps" are the order timeline: **Placed, Packing, On the way, At door, Done**.
+Figma "Status steps" are the order timeline: **Placed, Packing, On the way, At door, Done**. Figma `4.3` shows all five positions (`Placed (current)` … `Done (current)`), and they all follow these rules:
 
-- A done step is a 20 dp `brand` circle with a white check.
-- The current step is a `brand` pill with an icon and the label (11.5 ExtraBold `onBrand`).
-- An upcoming step is a 20 dp `brandRing` circle with its icon in `brand`.
-- Connectors are 2 dp lines: `brand` if done, `border` if not.
+| Step | Shape | Fill | Icon |
+|---|---|---|---|
+| Done | `statusStepDone` (20) circle | `brandRing` | `check` `iconXxs` (12) in `brand`, stroke 3 |
+| Current | `statusStepCurrent` (30) tall pill, padding start `space8`, end `space12` | `brand` | the step's icon `iconXs` (14) `onBrand` + label `labelStrong` (12.5 ExtraBold) `onBrand`, gap `space8` |
+| Upcoming | `statusStep` (22) circle | `field` | the step's icon `iconXxs` (12) in `textTertiary`, stroke 2.2 |
+| Connector | `stepConnector` (2) line, fills the space | `brand` after a done step, `borderStrong` before an upcoming one | — |
+
+| Step | Icon |
+|---|---|
+| Placed | `Receipt` |
+| Packing | `Package` |
+| On the way | `Truck` |
+| At door | `House` |
+| Done | `Check` |
+
+> **Changed from the first version of this doc:** done steps were a solid brand circle with a white check, and upcoming steps were `brandRing` with a brand icon. Figma now draws done = `brandRing` + brand check and upcoming = `field` + grey icon, so only the current step is solid blue.
 
 The values map 1:1 to `orders/{id}.status` (see the Firebase docs).
 
@@ -688,12 +934,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.utils.constants.AppIcons
 
 data class AppStep(val label: String, val icon: Int)
 
@@ -704,35 +948,42 @@ fun AppStatusSteps(steps: List<AppStep>, currentIndex: Int, modifier: Modifier =
         steps.forEachIndexed { index, step ->
             when {
                 index < currentIndex -> Box(
-                    Modifier.size(AppDimens.icon).background(c.brand, CircleShape),
+                    Modifier.size(AppDimens.statusStepDone).background(c.brandRing, CircleShape),
                     contentAlignment = Alignment.Center,
-                ) { Icon(painterResource(AppIcons.Check), null, tint = c.onBrand, modifier = Modifier.size(12.dp)) }
+                ) { Icon(painterResource(AppIcons.Check), null, tint = c.brand, modifier = Modifier.size(AppDimens.iconXxs)) }
 
                 index == currentIndex -> Row(
-                    Modifier.height(AppDimens.icon + AppDimens.space4).background(c.brand, AppPillShape)
-                        .padding(horizontal = AppDimens.space8),
+                    Modifier
+                        .height(AppDimens.statusStepCurrent)
+                        .background(c.brand, AppPillShape)
+                        .padding(start = AppDimens.space8, end = AppDimens.space12),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(AppDimens.space4),
+                    horizontalArrangement = Arrangement.spacedBy(AppDimens.space8),
                 ) {
-                    Icon(painterResource(step.icon), null, tint = c.onBrand, modifier = Modifier.size(12.dp))
+                    Icon(painterResource(step.icon), null, tint = c.onBrand, modifier = Modifier.size(AppDimens.iconXs))
                     Text(step.label, style = AppTheme.textStyles.labelStrong, color = c.onBrand)
                 }
 
                 else -> Box(
-                    Modifier.size(AppDimens.icon).background(c.brandRing, CircleShape),
+                    Modifier.size(AppDimens.statusStep).background(c.field, CircleShape),
                     contentAlignment = Alignment.Center,
-                ) { Icon(painterResource(step.icon), null, tint = c.brand, modifier = Modifier.size(12.dp)) }
+                ) { Icon(painterResource(step.icon), null, tint = c.textTertiary, modifier = Modifier.size(AppDimens.iconXxs)) }
             }
             if (index < steps.lastIndex) {
                 Box(
-                    Modifier.weight(1f).height(2.dp).padding(horizontal = AppDimens.space2)
-                        .background(if (index < currentIndex) c.brand else c.border)
+                    Modifier
+                        .weight(1f)
+                        .padding(horizontal = AppDimens.space2)
+                        .height(AppDimens.stepConnector)
+                        .background(if (index < currentIndex) c.brand else c.borderStrong, AppPillShape)
                 )
             }
         }
     }
 }
 ```
+
+> TalkBack: give the whole row one description, for example `Modifier.semantics(mergeDescendants = true) { contentDescription = "Order status: On the way, step 3 of 5" }`, instead of reading five icons.
 
 ## 12.11 Toast (Figma `4.4 · Toast`, the "aura toast")
 
@@ -742,17 +993,17 @@ Floating feedback that confirms, warns or offers one quick action, then gets out
 
 | Part | Figma value | Our code |
 |---|---|---|
-| Container | 353 wide (screen − 2 × 20), **64 high**, `radius/card` 20, padding 10 top/bottom/icon side, 12 on the close side, gap `space/12` | `AppDimens.toast`, `radiusCard`, `space12` |
+| Container | 353 wide (screen − 2 × 20), **64 high**, `radius/card` 20, padding 10 top/bottom/icon side, 12 on the close side, gap `space/12` | `AppDimens.toast`, `radiusCard`, `toastPaddingStart`, `space12` |
 | Surface | `surface/card` + status wash: linear gradient, status colour **9 % → 0 at 62 %** (**16 %** in dark) | `card` + `shadows.toast.washAlpha` |
 | Border | 1 px, status colour at **18 %** (**24 %** in dark), inner alignment | `shadows.toast.borderAlpha` |
 | Shadow | `Elevation/Toast`, `Dark/Elevation/Toast` (3 layers, doc 05) | `shadows.toast.layers`, `topHighlight` |
-| Halo icon | 44 halo (status 10 %; **14 % in dark**) → 34 ring (status 16 %; **22 % in dark**) → 24 core (status, drop shadow 0 3 8 status 35 %, inner shadow 0 1 0 white 25 %) → 13 glyph, stroke 1.73 | `ToastHalo`, `ToastCore` |
+| Halo icon | 44 halo (status 10 %; **14 % in dark**) → 34 ring (status 16 %; **22 % in dark**) → 24 core (status, drop shadow 0 3 8 status 35 %, inner shadow 0 1 0 white 25 %) → 13 glyph, stroke 1.73 | `toastHalo` → `toastRing` → `toastCore` → `toastGlyph` |
 | Glyph colour | `on/primary` (`surface/card` in dark) | `shadows.toast.onStatus` |
-| Loading | 20 spinner in the ring, stroke 2.5, track `border/default`, arc status | `CircularProgressIndicator` |
+| Loading | 20 spinner in the ring, stroke 2.5, track `border/default`, arc status | `toastSpinner`, `toastSpinnerStroke` |
 | Title | `M3/titleSmall` 14/20 ExtraBold, `text/primary`, 1 line (RTL: `Arabic/labelLarge`) | `titleSmall` / `labelLarge` |
 | Subtitle | `M3/bodySmall` 13/18 Medium, `text/secondary`, max 2 lines (RTL: `Arabic/labelMedium`) | `bodySmall` / `labelMedium` |
-| Action | solid pill, `radius/full`, 32 high, padding 8 / 14, status colour fill, `M3/labelMedium` `on/primary`, shadow 0 4 10 −2 status 30 % | `ToastAction` |
-| Close + timer | 28 ring, stroke 2: track `text/tertiary` 25 % + status arc that drains over the duration, × 12 (stroke 1.3) `text/secondary`, 44 touch target | `ToastClose` |
+| Action | solid pill, `radius/full`, 32 high, padding 8 / 14, status colour fill, `M3/labelMedium` `on/primary`, shadow 0 4 10 −2 status 30 % | `toastAction`, `toastActionPaddingH`, `toastActionShadow*` |
+| Close + timer | 28 ring, stroke 2: track `text/tertiary` 25 % + status arc that drains over the duration, × 12 (stroke 1.3) `text/secondary`, 44 touch target | `toastTimer`, `toastTimerStroke`, `iconXxs`, `iconButton` |
 | Info / Loading | no status/info token: `brand/primary` + brand colours | `statusColor()` |
 
 Status colours follow the theme automatically:
@@ -846,9 +1097,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppDimens
@@ -911,7 +1162,7 @@ fun AppToast(
             .clip(shape)
             .background(colors.card)
             .background(washBrush)
-            .border(1.dp, status.copy(alpha = tokens.borderAlpha), shape)
+            .border(AppDimens.strokeHairline, status.copy(alpha = tokens.borderAlpha), shape)
             .then(
                 tokens.topHighlight?.let { highlight ->
                     Modifier.innerShadow(
@@ -919,13 +1170,20 @@ fun AppToast(
                         shadow = Shadow(
                             radius = highlight.blur,
                             color = highlight.color,
-                            offset = DpOffset(0.dp, highlight.offsetY),
+                            offset = DpOffset(Dp.Hairline, highlight.offsetY),
                         ),
                     )
                 } ?: Modifier,
             )
             // Padding is 10 on the icon side and 12 on the close side; start/end mirror in RTL.
-            .padding(PaddingValues(start = 10.dp, end = 12.dp, top = 10.dp, bottom = 10.dp)),
+            .padding(
+                PaddingValues(
+                    start = AppDimens.toastPaddingStart,
+                    end = AppDimens.space12,
+                    top = AppDimens.toastPaddingStart,
+                    bottom = AppDimens.toastPaddingStart,
+                ),
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppDimens.space12),
     ) {
@@ -962,24 +1220,24 @@ fun AppToast(
 private fun ToastHalo(type: AppToastType, status: Color, tokens: AppToastTokens) {
     Box(
         modifier = Modifier
-            .size(44.dp)
+            .size(AppDimens.toastHalo)
             .clip(CircleShape)
             .background(status.copy(alpha = tokens.haloAlpha)),
         contentAlignment = Alignment.Center,
     ) {
         Box(
             modifier = Modifier
-                .size(34.dp)
+                .size(AppDimens.toastRing)
                 .clip(CircleShape)
                 .background(status.copy(alpha = tokens.ringAlpha)),
             contentAlignment = Alignment.Center,
         ) {
             if (type == AppToastType.Loading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(AppDimens.toastSpinner),
                     color = status,
                     trackColor = AppTheme.colors.border,
-                    strokeWidth = 2.5.dp,
+                    strokeWidth = AppDimens.toastSpinnerStroke,
                 )
             } else {
                 ToastCore(type = type, status = status, onStatus = tokens.onStatus)
@@ -992,12 +1250,19 @@ private fun ToastHalo(type: AppToastType, status: Color, tokens: AppToastTokens)
 private fun ToastCore(type: AppToastType, status: Color, onStatus: Color) {
     Box(
         modifier = Modifier
-            .size(24.dp)
-            .appShadow(AppShadow(status.copy(alpha = 0.35f), offsetY = 3.dp, blur = 8.dp), CircleShape)
+            .size(AppDimens.toastCore)
+            .appShadow(
+                AppShadow(status.copy(alpha = 0.35f), offsetY = AppDimens.toastCoreShadowY, blur = AppDimens.toastCoreShadowBlur),
+                CircleShape,
+            )
             .background(status, CircleShape)
             .innerShadow(
                 shape = CircleShape,
-                shadow = Shadow(radius = 0.dp, color = Color.White.copy(alpha = 0.25f), offset = DpOffset(0.dp, 1.dp)),
+                shadow = Shadow(
+                    radius = Dp.Hairline,
+                    color = Color.White.copy(alpha = 0.25f),
+                    offset = DpOffset(Dp.Hairline, AppDimens.strokeHairline),
+                ),
             ),
         contentAlignment = Alignment.Center,
     ) {
@@ -1014,7 +1279,7 @@ private fun ToastCore(type: AppToastType, status: Color, onStatus: Color) {
 
 @Composable
 private fun ToastGlyphIcon(icon: Int, tint: Color) {
-    Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.size(13.dp))
+    Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.size(AppDimens.toastGlyph))
 }
 
 @Composable
@@ -1026,15 +1291,20 @@ private fun ToastGlyphText(text: String, color: Color) {
 private fun ToastAction(text: String, status: Color, onStatus: Color, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .heightIn(min = 32.dp)
+            .heightIn(min = AppDimens.toastAction)
             .appShadow(
-                AppShadow(status.copy(alpha = 0.30f), offsetY = 4.dp, blur = 10.dp, spread = (-2).dp),
+                AppShadow(
+                    status.copy(alpha = 0.30f),
+                    offsetY = AppDimens.toastActionShadowY,
+                    blur = AppDimens.toastActionShadowBlur,
+                    spread = AppDimens.toastActionShadowSpread,
+                ),
                 AppPillShape,
             )
             .clip(AppPillShape)
             .background(status)
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
+            .padding(horizontal = AppDimens.toastActionPaddingH, vertical = AppDimens.space8),
         contentAlignment = Alignment.Center,
     ) {
         Text(text = text, style = MaterialTheme.typography.labelMedium, color = onStatus)
@@ -1063,8 +1333,8 @@ private fun ToastClose(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        Canvas(Modifier.size(28.dp)) {
-            val strokePx = 2.dp.toPx()
+        Canvas(Modifier.size(AppDimens.toastTimer)) {
+            val strokePx = AppDimens.toastTimerStroke.toPx()
             val inset = strokePx / 2
             val arcSize = Size(size.width - strokePx, size.height - strokePx)
             drawCircle(color = track, radius = arcSize.width / 2, style = Stroke(strokePx))
@@ -1086,7 +1356,7 @@ private fun ToastClose(
                 painter = painterResource(AppIcons.X),
                 contentDescription = stringResource(R.string.cd_dismiss),
                 tint = colors.textSecondary,
-                modifier = Modifier.size(12.dp),
+                modifier = Modifier.size(AppDimens.iconXxs),
             )
         }
     }
@@ -1142,7 +1412,6 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -1203,7 +1472,7 @@ fun AppToastHost(
     modifier: Modifier = Modifier,
     placement: AppToastPlacement = AppToastPlacement.Top,
 ) {
-    val slidePx = with(LocalDensity.current) { 16.dp.roundToPx() }
+    val slidePx = with(LocalDensity.current) { AppDimens.toastSlide.roundToPx() }
     val reducedMotion = animationsDisabled()
 
     Box(modifier.fillMaxSize()) {
@@ -1242,7 +1511,7 @@ fun AppToastHost(
 private fun ToastWithBehaviour(toast: AppToastData, onDismiss: () -> Unit) {
     val haptics = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
-    val swipeThresholdPx = with(LocalDensity.current) { 56.dp.toPx() }
+    val swipeThresholdPx = with(LocalDensity.current) { AppDimens.toastSwipeThreshold.toPx() }
     val swipe = remember(toast.id) { Animatable(Offset.Zero, Offset.VectorConverter) }
     var isPressed by remember(toast.id) { mutableStateOf(false) }
     var progress by remember(toast.id) { mutableFloatStateOf(1f) }
@@ -1453,7 +1722,17 @@ fun AppMessageBanner(
 
 ## 12.13 List row (Account, Settings)
 
-The row is 56 dp minimum with horizontal padding `space16`. It has a leading 36 dp `field` circle with an icon in `textPrimary`, then the title (`titleSmall`) and optional subtitle (`bodySmall`, `textSecondary`). At the end there is a value (`labelMedium`, `brand`) and a `chevron-right` (`textTertiary`), or an `AppSwitch`.
+Figma `4.3 · List rows`: rows live **inside a white card** (`card`, `radiusCard`, `shadows.card`), separated by a hairline that starts under the text.
+
+| Part | Spec |
+|---|---|
+| Group card | `card`, `radiusCard`, `shadows.card`, no inner padding (each row is 58 = 10 + 38 tile + 10) |
+| Row | `listRow` (58) min height, horizontal padding `listRowPaddingH` (14), gap `space12` |
+| Leading tile | `listTileIcon` (38, Figma `size/list-tile-icon`) rounded square, `radiusMd` (14), `field` fill, icon `icon` (20) `textPrimary` |
+| Title / subtitle | `bodyStrong` (13.5 Bold) `textPrimary` / `supporting` (11.5 Medium) `textSecondary` |
+| Value (optional) | `helper` (11.5 SemiBold) `brand`, e.g. "2 active" |
+| Trailing | `chevron-right` `iconXs` (14) `textTertiary`, or an `AppSwitch` |
+| Divider | `strokeHairline`, `borderSubtle`, starts at `listRowPaddingH + listTileIcon + space12` (64) |
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.list
@@ -1463,24 +1742,49 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
-import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
+import com.example.dukkanapp.core.theme.appShadow
+import com.example.dukkanapp.core.utils.constants.AppIcons
+
+/** The white card that holds a group of rows. Put [AppListDivider] between rows. */
+@Composable
+fun AppListGroup(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    val shape = RoundedCornerShape(AppDimens.radiusCard)
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .appShadow(AppTheme.shadows.card, shape)
+            .clip(shape)
+            .background(AppTheme.colors.card),
+        content = content,
+    )
+}
+
+@Composable
+fun AppListDivider() {
+    HorizontalDivider(
+        modifier = Modifier.padding(start = AppDimens.listRowPaddingH + AppDimens.listTileIcon + AppDimens.space12),
+        thickness = AppDimens.strokeHairline,
+        color = AppTheme.colors.borderSubtle,
+    )
+}
 
 @Composable
 fun AppListRow(
@@ -1493,33 +1797,55 @@ fun AppListRow(
     trailing: (@Composable () -> Unit)? = null,
 ) {
     val c = AppTheme.colors
+    val textStyles = AppTheme.textStyles
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 56.dp)
+            .heightIn(min = AppDimens.listRow)
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(horizontal = AppDimens.space16, vertical = AppDimens.space8),
+            .padding(horizontal = AppDimens.listRowPaddingH),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppDimens.space12),
     ) {
-        Box(Modifier.size(AppDimens.controlSm).background(c.field, CircleShape), contentAlignment = Alignment.Center) {
-            Icon(icon, null, tint = c.textPrimary, modifier = Modifier.size(AppDimens.iconSm))
+        Box(
+            Modifier.size(AppDimens.listTileIcon).background(c.field, RoundedCornerShape(AppDimens.radiusMd)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(icon, null, tint = c.textPrimary, modifier = Modifier.size(AppDimens.icon))
         }
         Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleSmall, color = c.textPrimary)
-            subtitle?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = c.textSecondary) }
+            Text(title, style = textStyles.bodyStrong, color = c.textPrimary)
+            subtitle?.let { Text(it, style = textStyles.supporting, color = c.textSecondary) }
         }
-        value?.let { Text(it, style = MaterialTheme.typography.labelMedium, color = c.brand) }
+        value?.let { Text(it, style = textStyles.helper, color = c.brand) }
         if (trailing != null) {
             trailing()
         } else if (onClick != null) {
-            Icon(painterResource(AppIcons.ChevronRight), null, tint = c.textTertiary, modifier = Modifier.size(AppDimens.iconSm))
+            Icon(painterResource(AppIcons.ChevronRight), null, tint = c.textTertiary, modifier = Modifier.size(AppDimens.iconXs))
         }
     }
 }
 ```
 
+Usage (Account):
+
+```kotlin
+AppListGroup {
+    AppListRow(painterResource(AppIcons.Package), "My orders", value = "2 active", onClick = onOrders)
+    AppListDivider()
+    AppListRow(
+        icon = painterResource(AppIcons.Bell),
+        title = "Order updates",
+        subtitle = "Packing, on the way",
+        modifier = Modifier.toggleable(orderUpdates, role = Role.Switch, onValueChange = onToggle),
+        trailing = { AppSwitch(orderUpdates, onCheckedChange = null) },
+    )
+}
+```
+
 For a row with a switch, pass `trailing = { AppSwitch(checked, onCheckedChange = null) }` and make the **row** `toggleable(role = Role.Switch)` instead of `clickable`, so the whole row toggles.
+
+> **Changed from the first version of this doc:** the tile was a 36 dp `field` circle with a 16 dp icon, and the text was `titleSmall` / `bodySmall`. Figma draws a 38 dp rounded square (radius 14) with a 20 dp icon and uses `bodyStrong` / `supporting`.
 
 ## 12.14 Empty state (`AppEmptyState`)
 
@@ -1527,7 +1853,7 @@ Figma board **14 · Empty & loading states**: empty lists for orders (14.1), not
 
 | Part | Spec |
 |---|---|
-| Icon tile | 72 dp square, radius `radiusCard` (20), `brandSoft` fill, Lucide icon 32 dp in `brand` |
+| Icon tile | `emptyStateTile` (72) square, radius `radiusCard` (20), `brandSoft` fill, Lucide icon `emptyStateIcon` (32) in `brand` |
 | Gap | `space20` |
 | Title | `headlineSmall` (20/26 ExtraBold), `textPrimary`, centered |
 | Gap | `space8` |
@@ -1541,7 +1867,7 @@ Figma board **14 · Empty & loading states**: empty lists for orders (14.1), not
 | 14.2 Notifications | `Bell` | You're all caught up | Order updates and deals will appear here. | Notification settings (Ghost) |
 | 14.3 Addresses | `MapPin` | No saved addresses | Add home or work so checkout takes one tap. | Add a new address (Primary) |
 
-The tile size (72) and icon size (32) are read off the Figma frames; they belong to this component only.
+The tile size (72) and icon size (32) are read off the Figma frames: `AppDimens.emptyStateTile` and `AppDimens.emptyStateIcon`.
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.feedback
@@ -1564,7 +1890,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.common.components.buttons.AppButton
 import com.example.dukkanapp.core.theme.AppButtonVariant
 import com.example.dukkanapp.core.theme.AppDimens
@@ -1593,11 +1918,11 @@ fun AppEmptyState(
     ) {
         Box(
             modifier = Modifier
-                .size(72.dp)
+                .size(AppDimens.emptyStateTile)
                 .background(AppTheme.colors.brandSoft, RoundedCornerShape(AppDimens.radiusCard)),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(icon, contentDescription = null, tint = AppTheme.colors.brand, modifier = Modifier.size(32.dp))
+            Icon(icon, contentDescription = null, tint = AppTheme.colors.brand, modifier = Modifier.size(AppDimens.emptyStateIcon))
         }
         Spacer(Modifier.height(AppDimens.space20))
         Text(
@@ -1760,6 +2085,8 @@ The 14.4 Home skeleton is built the same way in the Home feature: a 52 dp pill (
 | `cd_add_to_cart` | Add to cart | أضف إلى السلة | Ajouter au panier |
 | `cd_increase` | Increase quantity | زيادة الكمية | Augmenter la quantité |
 | `cd_decrease` | Decrease quantity | إنقاص الكمية | Diminuer la quantité |
+| `cd_remove_from_cart` | Remove from cart | إزالة من السلة | Retirer du panier |
+| `toast_item_removed` | Item removed from cart | تمت إزالة المنتج من السلة | Article retiré du panier |
 
 ## Empty-state strings (Figma 14)
 
@@ -1779,7 +2106,7 @@ The 14.4 Home skeleton is built the same way in the Home feature: a 52 dp pill (
 
 ## Notes and rules
 
-- **Small raw sizes** (`12.dp` icons in badges and steps, `14.dp` check, `22.dp` radio, `46×28` switch, `30.dp` bubble, `32.dp` stepper) are the exact Figma sizes of *one* component, so each stays in its file. If a size appears in a second component, promote it to `AppDimens`.
+- **No raw sizes in components.** Even a size used by one component only (the 12 dp badge icon, the 22 dp radio, the 24 dp stepper slot, the 30 dp bubble) lives in `AppDimens` under "Component internals" (doc 07), named `<component><Part>`. A composable never writes `N.dp`.
 - **Checkbox, radio and switch never get their own click handler** when they sit in a labeled row. The row owns the click and the semantics.
 - **Arrows and chevrons** (`chevron-right`, `arrow-right`, `arrow-left`) must have `android:autoMirrored="true"` in their vector XML so they flip in Arabic.
 - **Money** is a `Long` in millimes all the way from Firestore to `AppPriceText`. Format only at the edge.

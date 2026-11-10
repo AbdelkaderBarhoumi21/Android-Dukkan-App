@@ -217,7 +217,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
@@ -356,7 +355,7 @@ private fun AppFieldHelper(text: String, status: AppFieldStatus, color: Color) {
                 painter = painterResource(icon),
                 contentDescription = null,
                 tint = color,
-                modifier = Modifier.size(14.dp),
+                modifier = Modifier.size(AppDimens.iconXs),
             )
         }
         Text(text = text, style = AppTheme.textStyles.helper, color = color)
@@ -364,7 +363,7 @@ private fun AppFieldHelper(text: String, status: AppFieldStatus, color: Color) {
 }
 ```
 
-> `14.dp` for the helper icon is the only raw size here. Figma draws it at 14, which is between `iconSm` (16) and nothing smaller. If you use it twice, add `iconXs = 14.dp` to `AppDimens` and replace it.
+> The helper icon is `AppDimens.iconXs` (14): Figma draws it smaller than `icon/sm`. Doc 07 lists it with the other component internals.
 
 ### ``decorationBox`
 
@@ -541,7 +540,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
@@ -586,7 +584,7 @@ fun AppPasswordStrength(password: String, modifier: Modifier = Modifier) {
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(4.dp)
+                        .height(AppDimens.progressTrack)
                         .background(
                             color = if (index < strength.segments) activeColor else colors.border,
                             shape = AppPillShape,
@@ -634,7 +632,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.common.components.buttons.AppIconButton
 import com.example.dukkanapp.core.common.components.buttons.AppIconButtonVariant
 import com.example.dukkanapp.core.utils.constants.AppIcons
@@ -664,7 +661,7 @@ fun AppSearchBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(if (isElevated) AppDimens.controlLg else 48.dp)
+            .height(if (isElevated) AppDimens.input else AppDimens.searchField)
             .then(if (isElevated) Modifier.appShadow(AppTheme.shadows.float, shape) else Modifier)
             .background(if (isElevated) colors.card else colors.field, shape)
             .padding(start = AppDimens.space20, end = AppDimens.space8),
@@ -674,7 +671,7 @@ fun AppSearchBar(
             painter = painterResource(AppIcons.Search),
             contentDescription = null,
             tint = colors.textTertiary,
-            modifier = Modifier.size(AppDimens.icon),
+            modifier = Modifier.size(AppDimens.iconMd), // Figma: 18 in both variants
         )
         Spacer(Modifier.width(AppDimens.space8))
         BasicTextField(
@@ -701,14 +698,14 @@ fun AppSearchBar(
                 contentDescription = filterContentDescription,
                 onClick = onFilterClick,
                 variant = AppIconButtonVariant.Brand,
-                size = AppDimens.controlSm,
+                size = AppDimens.iconButtonSm, // Figma home header: 36 brand circle
             )
         }
     }
 }
 ```
 
-The field-variant height (48) is the only size not in `AppDimens`. It equals `touchTargetMin`, so you may write `AppDimens.touchTargetMin` instead.
+Heights: `Search/elevated` is `AppDimens.input` (52) and `Search/field` is `AppDimens.searchField` (48). Don't use `inputSearch` (44) here: that one is the small pill on the map and in compact headers.
 
 ### `AppOtpField.kt`
 
@@ -735,8 +732,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 
@@ -771,7 +766,7 @@ fun AppOtpField(
                         }
                         Box(
                             modifier = Modifier
-                                .size(width = AppDimens.controlLg, height = 58.dp)
+                                .size(width = AppDimens.otpBoxWidth, height = AppDimens.otpBoxHeight)
                                 .background(colors.card, shape)
                                 .border(AppDimens.strokeFocus, borderColor, shape),
                             contentAlignment = Alignment.Center,

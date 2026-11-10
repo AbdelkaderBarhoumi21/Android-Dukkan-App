@@ -166,7 +166,7 @@ fun legalText(
 | y | Element | Component and tokens |
 |---|---|---|
 | 0–520 | aurora tall | `AppScaffold(background = AuroraTall)` |
-| ~150 | Dukkan mark | `AppAuthHeader(logo = Mark(56.dp))`, centered |
+| ~150 | Dukkan mark | `AppAuthHeader(logo = Mark(AppDimens.logoMarkLg))`, centered |
 | 222 | "Welcome to Dukkan" | `headlineLarge`, `textPrimary` |
 | 263 | subtitle (2 lines) | `bodySmall`, `textSecondary`, centered |
 | 322 | perks: 30 min · Cash on delivery · Easy returns | 14 dp icon `brand` + `helper` in `textLabel` |
@@ -197,7 +197,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.components.buttons.AppButton
 import com.example.dukkanapp.core.common.components.buttons.AppSocialButton
@@ -228,7 +227,7 @@ fun AuthOptionsScreenContent(
             AppAuthHeader(
                 title = stringResource(R.string.auth_welcome_title),
                 subtitle = stringResource(R.string.auth_welcome_subtitle),
-                logo = AuthHeaderLogo.Mark(size = 56.dp),
+                logo = AuthHeaderLogo.Mark(size = AppDimens.logoMarkLg),
             )
             Spacer(Modifier.height(AppDimens.space16))
             AuthPerksRow()
@@ -288,7 +287,7 @@ private fun AuthPerksRow() {
 @Composable
 private fun AuthPerk(icon: Int, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(AppDimens.space4)) {
-        Icon(painterResource(icon), null, tint = AppTheme.colors.brand, modifier = Modifier.size(14.dp))
+        Icon(painterResource(icon), null, tint = AppTheme.colors.brand, modifier = Modifier.size(AppDimens.iconXs))
         Text(text, style = AppTheme.textStyles.helper, color = AppTheme.colors.textLabel)
     }
 }
@@ -1086,8 +1085,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.dukkanapp.R
 import com.example.dukkanapp.core.common.text.asString
 import com.example.dukkanapp.core.common.components.buttons.AppButton
@@ -1196,7 +1193,7 @@ private fun SentToCard(email: String, onChange: () -> Unit) {
     ) {
         Box(
             modifier = Modifier
-                .size(36.dp)
+                .size(AppDimens.infoTile)
                 .background(colors.card, RoundedCornerShape(AppDimens.radiusSm)),
             contentAlignment = Alignment.Center,
         ) {
@@ -1245,7 +1242,7 @@ private fun StepRow(number: Int, title: String, body: String) {
     val colors = AppTheme.colors
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
-            modifier = Modifier.size(28.dp).background(colors.brandSoft, CircleShape),
+            modifier = Modifier.size(AppDimens.stepNumber).background(colors.brandSoft, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             Text(
@@ -1268,7 +1265,7 @@ private fun NotVerifiedCard() {
     AuthInfoCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
-                modifier = Modifier.size(28.dp).background(colors.errorSoft, CircleShape),
+                modifier = Modifier.size(AppDimens.stepNumber).background(colors.errorSoft, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(painterResource(AppIcons.CircleAlert), null, tint = colors.error, modifier = Modifier.size(AppDimens.iconSm))
@@ -1357,7 +1354,7 @@ private fun NotVerifiedPreview() {
 }
 ```
 
-> **Sizes read off Figma** (36 dp icon tile, 28 dp step circles, 13 / 13.5 sp titles) are used only in this file, so they stay local. If another screen needs the numbered-steps card, move `StepsCard` to `core/common/components/display/`.
+> **Sizes read off Figma** (36 dp icon tile, 28 dp step circles) are `AppDimens.infoTile` and `AppDimens.stepNumber` (doc 07, component internals); no screen writes a raw dp. If another screen needs the numbered-steps card, move `StepsCard` to `core/common/components/display/`.
 
 > **The guide's "Use another account" button** isn't in Figma 02.6/02.7. The back arrow (`BackClicked`) now does the same thing: sign out and return to Welcome.
 

@@ -78,16 +78,16 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppAurora
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 
 /** Band height and warm-blob position per aurora size (Figma 393 dp frames). */
 enum class AppScreenBackground(val bandHeight: Dp, val sunCenterY: Dp) {
-    Plain(0.dp, 0.dp),
-    AuroraCompact(260.dp, 250.dp),
-    AuroraShort(300.dp, 250.dp),
-    AuroraTall(520.dp, 380.dp),
+    Plain(Dp.Hairline, Dp.Hairline), // Hairline = 0 dp: no aurora band
+    AuroraCompact(AppDimens.auroraCompact, AppDimens.auroraSunYShort),
+    AuroraShort(AppDimens.auroraShort, AppDimens.auroraSunYShort),
+    AuroraTall(AppDimens.auroraTall, AppDimens.auroraSunYTall),
 }
 
 @Composable
@@ -109,14 +109,14 @@ private fun AppAuroraHeader(background: AppScreenBackground) {
     val gradients = AppTheme.gradients
     val aurora = gradients.aurora
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    val fadeHeight = 90.dp
+    val fadeHeight = AppDimens.auroraFade
 
     Canvas(modifier = Modifier.fillMaxWidth().height(background.bandHeight)) {
         drawRect(brush = gradients.screenTint)
 
-        drawBlob(aurora, aurora.blue, xFraction = 0.153f, y = 20.dp.toPx(), radius = 230.dp.toPx(), isRtl)
-        drawBlob(aurora, aurora.sky, xFraction = 0.916f, y = 60.dp.toPx(), radius = 190.dp.toPx(), isRtl)
-        drawBlob(aurora, aurora.sun, xFraction = 0.763f, y = background.sunCenterY.toPx(), radius = 150.dp.toPx(), isRtl)
+        drawBlob(aurora, aurora.blue, xFraction = 0.153f, y = AppDimens.auroraBlueY.toPx(), radius = AppDimens.auroraBlueRadius.toPx(), isRtl)
+        drawBlob(aurora, aurora.sky, xFraction = 0.916f, y = AppDimens.auroraSkyY.toPx(), radius = AppDimens.auroraSkyRadius.toPx(), isRtl)
+        drawBlob(aurora, aurora.sun, xFraction = 0.763f, y = background.sunCenterY.toPx(), radius = AppDimens.auroraSunRadius.toPx(), isRtl)
 
         // Melt the band into the plain background so there is no visible edge.
         val fadeTop = size.height - fadeHeight.toPx()
@@ -245,7 +245,7 @@ private fun AppTopBar(
             .statusBarsPadding()
             .padding(horizontal = AppDimens.screenPadding)
             .padding(top = AppDimens.space8)
-            .height(AppDimens.controlMd),
+            .height(AppDimens.iconButton),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -270,11 +270,12 @@ private fun AppTopBar(
         }
         if (title != null) {
             Column(
-                modifier = Modifier.align(Alignment.Center).padding(horizontal = AppDimens.controlMd + AppDimens.space12),
+                modifier = Modifier.align(Alignment.Center).padding(horizontal = AppDimens.iconButton + AppDimens.space12),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(title, style = MaterialTheme.typography.titleMedium, color = AppTheme.colors.textPrimary, textAlign = TextAlign.Center, maxLines = 1)
-                subtitle?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = AppTheme.colors.textSecondary, maxLines = 1) }
+                // Figma `App bar/Default`: M3/titleLarge 17 ExtraBold + Dukkan/supporting 11.5.
+                Text(title, style = MaterialTheme.typography.titleLarge, color = AppTheme.colors.textPrimary, textAlign = TextAlign.Center, maxLines = 1)
+                subtitle?.let { Text(it, style = AppTheme.textStyles.supporting, color = AppTheme.colors.textSecondary, maxLines = 1) }
             }
         }
     }

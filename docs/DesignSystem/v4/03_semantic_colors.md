@@ -30,7 +30,9 @@ Light values: `1.1 · Colour & effects → Semantic tokens · light`. Dark value
 | `textLabel` | text/label (**new**) | Slate700 `#334155` | Slate300 `#CBD5E1` | checkbox labels, chip labels, trust row |
 | `textSecondary` | text/secondary | Slate500 `#64748B` | Slate400 `#94A3B8` | subtitles, body copy |
 | `textTertiary` | text/tertiary | Slate400 `#94A3B8` | Slate500 `#64748B` | placeholders, "or", hints, idle icons, disabled text |
-| `border` | border/default | Slate200 `#E2E8F0` | Night700 `#24314F` | outline buttons, chips, cards, checkbox off, switch off, dark card outline |
+| `border` | border/default | Slate200 `#E2E8F0` | Night700 `#24314F` | outline buttons, chips, cards, switch off, dark card outline |
+| `borderStrong` | border/strong | Slate300 `#CBD5E1` | Slate600 `#475569` | stronger dividers and outlines (no longer used by checkbox / radio) |
+| `borderControl` | border/control (**new**) | Slate500 `#64748B` | Slate500 `#64748B` | unchecked checkbox and radio outline: ≥ 3 : 1 on white (4.8), background (4.5), dark card (3.6), dark field (3.2) |
 | `brand` | brand/primary | Blue600 `#2563EB` | Blue400 `#6090FA` | links, selected, focus border, checkbox on |
 | `brandPressed` | brand/pressed | Blue700 `#1D4ED8` | Blue500 `#3B6FF6` | pressed fill |
 | `brandSoft` | brand/soft | Blue50 `#EFF5FF` | Blue950 `#172554` | tonal button, selected chip, info badge |
@@ -68,7 +70,6 @@ These fields exist in our code because components need them, but Figma has no se
 
 | Field | Light | Dark | Why this value |
 |---|---|---|---|
-| `borderStrong` | Slate300 | Slate700 | Radio off ring. Dark: one step lighter than `border` (Night700) so it stays visible |
 | `dealSoft` | Orange100 | Orange950 | Deal tint. Both are Figma primitives, but there is no semantic token |
 | `inverse` | Slate900 | Slate100 | Dark button, toast, "New" badge. Flips to light in dark mode |
 | `onInverse` | White | Slate900 | Text on `inverse` |
@@ -114,6 +115,7 @@ data class AppColors(
     // Lines
     val border: Color,
     val borderStrong: Color,
+    val borderControl: Color,   // Figma border/control: unchecked checkbox / radio outline
 
     // Brand
     val brand: Color,
@@ -169,6 +171,7 @@ internal val LightAppColors = AppColors(
 
     border = AppPalette.Slate200,
     borderStrong = AppPalette.Slate300,
+    borderControl = AppPalette.Slate500,
 
     brand = AppPalette.Blue600,
     brandPressed = AppPalette.Blue700,
@@ -219,7 +222,8 @@ internal val DarkAppColors = AppColors(
     textLabel = AppPalette.Slate300,
 
     border = AppPalette.Night700,
-    borderStrong = AppPalette.Slate700, // derived
+    borderStrong = AppPalette.Slate600,
+    borderControl = AppPalette.Slate500,
 
     brand = AppPalette.Blue400,
     brandPressed = AppPalette.Blue500,
