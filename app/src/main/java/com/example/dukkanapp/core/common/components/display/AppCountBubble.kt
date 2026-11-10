@@ -9,7 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
@@ -17,9 +17,9 @@ fun AppCountBubble(count: Int, modifier: Modifier = Modifier) {
     val c = AppTheme.colors
     Box(
         modifier = modifier
-            .size(30.dp)
+            .size(AppDimens.countBubble)
             .background(c.brand, CircleShape)
-            .border(2.5.dp, c.card, CircleShape),
+            .border(AppDimens.strokeBubble, c.card, CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Text(
