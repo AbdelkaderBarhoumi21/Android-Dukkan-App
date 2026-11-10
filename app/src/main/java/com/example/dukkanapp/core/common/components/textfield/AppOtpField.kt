@@ -54,7 +54,7 @@ fun AppOtpField(
                         Box(
                             modifier = Modifier
                                 .size(
-                                    width = AppDimens.controlLg, height = AppDimens.buttonSlide
+                                    width = AppDimens.otpBoxWidth, height = AppDimens.otpBoxHeight
                                 )
                                 .background(colors.card, shape)
                                 .border(

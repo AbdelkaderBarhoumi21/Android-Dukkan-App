@@ -68,7 +68,7 @@ fun AppPasswordStrength(
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(AppDimens.space4)
+                        .height(AppDimens.progressTrack)
                         .background(
                             if (index < strength.segments) activeColor else colors.border,
                             shape = AppPillShape

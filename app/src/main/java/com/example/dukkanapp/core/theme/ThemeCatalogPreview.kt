@@ -56,7 +56,7 @@ private fun AppColors.asNamedList(): List<Pair<String, Color>> = listOf(
     "background" to background, "card" to card, "field" to field, "sheet" to sheet,
     "textPrimary" to textPrimary, "textSecondary" to textSecondary,
     "textTertiary" to textTertiary, "textLabel" to textLabel,
-    "border" to border, "borderStrong" to borderStrong,
+    "border" to border, "borderStrong" to borderStrong, "borderControl" to borderControl,
     "brand" to brand, "brandPressed" to brandPressed, "brandSoft" to brandSoft,
     "brandSoftText" to brandSoftText, "brandRing" to brandRing, "onBrand" to onBrand,
     "success" to success, "successText" to successText, "successSoft" to successSoft,

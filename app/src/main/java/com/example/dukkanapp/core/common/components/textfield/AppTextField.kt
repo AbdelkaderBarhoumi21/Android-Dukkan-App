@@ -84,7 +84,7 @@ fun AppTextField(
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(AppDimens.controlLg)
+                .height(AppDimens.input)
                 .drawBehind {
                     if (fieldColors.showRing) {
                         val ring = AppDimens.focusRing.toPx()

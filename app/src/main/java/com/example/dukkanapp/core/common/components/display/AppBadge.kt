@@ -20,7 +20,7 @@ import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
 
-enum class AppBadgeVariant { Discount, Hot, New, Eta, Bestseller, LowStock, FreeDelivery, Rating }
+enum class AppBadgeVariant { Discount, Hot, New, Eta, Bestseller, LowStock, FreeDelivery, Rating, Code, Live, Applied }
 
 @Composable
 fun AppBadge(
@@ -34,9 +34,9 @@ fun AppBadge(
         AppBadgeVariant.Discount -> AppTheme.gradients.deal to c.onBrand
         AppBadgeVariant.Hot -> SolidColor(c.deal) to c.onBrand
         AppBadgeVariant.New -> SolidColor(c.inverse) to c.onInverse
-        AppBadgeVariant.Eta, AppBadgeVariant.Bestseller -> SolidColor(c.brandSoft) to c.brandSoftText
-        AppBadgeVariant.LowStock, AppBadgeVariant.Rating -> SolidColor(c.warningSoft) to c.warningText
-        AppBadgeVariant.FreeDelivery -> SolidColor(c.successSoft) to c.successText
+        AppBadgeVariant.Eta, AppBadgeVariant.Bestseller, AppBadgeVariant.Live -> SolidColor(c.brandSoft) to c.brandSoftText
+        AppBadgeVariant.LowStock, AppBadgeVariant.Rating, AppBadgeVariant.Code -> SolidColor(c.warningSoft) to c.warningText
+        AppBadgeVariant.FreeDelivery, AppBadgeVariant.Applied -> SolidColor(c.successSoft) to c.successText
     }
     // Figma "Badge/*": M3/labelSmall 10.5/14 Bold
     val style = MaterialTheme.typography.labelSmall
@@ -56,7 +56,7 @@ fun AppBadge(
                 it,
                 null,
                 tint = content,
-                modifier = Modifier.size(AppDimens.space12)
+                modifier = Modifier.size(AppDimens.iconXxs)
             )
         }
         Text(text, style = style, color = content, maxLines = 1)

@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 
@@ -16,24 +15,27 @@ import com.example.dukkanapp.core.theme.AppTheme
 @Composable
 fun AppRadio(selected: Boolean, modifier: Modifier = Modifier) {
     val colors = AppTheme.colors
-    Box(modifier = modifier.size(22.dp), contentAlignment = Alignment.Center) {
+    // The slot is always 22 so the row doesn't move when the radio turns on.
+    Box(modifier = modifier.size(AppDimens.radio), contentAlignment = Alignment.Center) {
         if (selected) {
             Box(
                 modifier = Modifier
-                    .size(22.dp)
+                    .size(AppDimens.radio)
                     .background(colors.brand, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Box(Modifier
-                    .size(AppDimens.space8)
-                    .background(colors.onBrand, CircleShape))
+                Box(
+                    Modifier
+                        .size(AppDimens.radioDot)
+                        .background(colors.card, CircleShape)
+                )
             }
         } else {
             Box(
                 Modifier
-                    .size(AppDimens.icon)
+                    .size(AppDimens.radioOff)
                     .background(colors.card, CircleShape)
-                    .border(AppDimens.strokeFocus, colors.borderStrong, CircleShape)
+                    .border(AppDimens.strokeControl, colors.borderControl, CircleShape)
             )
         }
     }

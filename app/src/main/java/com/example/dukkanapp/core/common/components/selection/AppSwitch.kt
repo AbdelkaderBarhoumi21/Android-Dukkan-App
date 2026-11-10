@@ -14,7 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
@@ -33,7 +33,7 @@ fun AppSwitch(
         label = "switchTrack"
     )
     val thumbOffset by animateDpAsState(
-        if (checked) AppDimens.thumbOffsetDistance else 0.dp,
+        if (checked) AppDimens.switchThumbOffset else Dp.Hairline,
         label = "switchThumbOffset"
     )
 
@@ -62,7 +62,7 @@ fun AppSwitch(
         Box(
             modifier = Modifier
                 .offset(x = thumbOffset)
-                .size(AppDimens.radio)
+                .size(AppDimens.switchThumb)
                 .appShadow(
                     AppTheme.shadows.card,
                     CircleShape

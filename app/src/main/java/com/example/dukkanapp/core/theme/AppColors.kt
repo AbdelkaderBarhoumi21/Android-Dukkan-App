@@ -26,6 +26,7 @@ data class AppColors(
     // Lines
     val border: Color,
     val borderStrong: Color,
+    val borderControl: Color, // Figma border/control: unchecked checkbox / radio outline
 
     // Brand
     val brand: Color,
@@ -81,6 +82,7 @@ internal val LightAppColors = AppColors(
 
     border = AppPalette.Slate200,
     borderStrong = AppPalette.Slate300,
+    borderControl = AppPalette.Slate500,
 
     brand = AppPalette.Blue600,
     brandPressed = AppPalette.Blue700,
@@ -131,7 +133,8 @@ internal val DarkAppColors = AppColors(
     textLabel = AppPalette.Slate300,
 
     border = AppPalette.Night700,
-    borderStrong = AppPalette.Slate700, // derived
+    borderStrong = AppPalette.Slate600,
+    borderControl = AppPalette.Slate500,
 
     brand = AppPalette.Blue400,
     brandPressed = AppPalette.Blue500,

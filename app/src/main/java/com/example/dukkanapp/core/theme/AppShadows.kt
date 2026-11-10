@@ -130,7 +130,7 @@ fun Modifier.appShadow(shadow: AppShadow, shape: Shape): Modifier {
         ),
     )
     return if (shadow.outline.isSpecified) {
-        withShadow.border(width = 1.dp, color = shadow.outline, shape = shape)
+        withShadow.border(width = AppDimens.strokeHairline, color = shadow.outline, shape = shape)
     } else {
         withShadow
     }

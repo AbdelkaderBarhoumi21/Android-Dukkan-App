@@ -53,13 +53,14 @@ fun AppSearchBar(
         modifier = modifier
             .fillMaxWidth()
             .height(
-                if (isElevated) AppDimens.controlLg else AppDimens.space48
+                if (isElevated) AppDimens.input else AppDimens.searchField
             )
             .then(
                 if (isElevated) Modifier.appShadow(AppTheme.shadows.float, shape) else Modifier
             )
             .background(
-                if (isElevated) colors.card else colors.field
+                if (isElevated) colors.card else colors.field,
+                shape,
             )
             .padding(
                 start = AppDimens.space20, end = AppDimens.space8
@@ -70,7 +71,7 @@ fun AppSearchBar(
             painter = painterResource(AppIcons.Search),
             contentDescription = null,
             tint = colors.textTertiary,
-            modifier = Modifier.size(AppDimens.icon)
+            modifier = Modifier.size(AppDimens.iconMd) // Figma: 18 in both variants
         )
         Spacer(Modifier.width(AppDimens.space8))
         BasicTextField(
@@ -107,7 +108,7 @@ fun AppSearchBar(
                 contentDescription = filterContentDescription,
                 onClick = onFilterClick,
                 variant = AppIconButtonVariant.Brand,
-                size = AppDimens.controlSm
+                size = AppDimens.iconButtonSm
             )
         }
     }

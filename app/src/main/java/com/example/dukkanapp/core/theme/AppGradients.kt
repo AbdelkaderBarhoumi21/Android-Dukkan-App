@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 
 /** Colors of the 3 blurred blobs behind auth and home headers. Alpha is already applied. */
 @Immutable
@@ -113,7 +112,7 @@ internal val LocalAppGradients = staticCompositionLocalOf<AppGradients> {
  *
  *     Modifier.clip(shape).background(AppTheme.gradients.deal).cardHighlight(AppTheme.gradients.cardHighlight)
  */
-fun Modifier.cardHighlight(color: Color, radius: Dp = 90.dp): Modifier = drawBehind {
+fun Modifier.cardHighlight(color: Color, radius: Dp = AppDimens.cardHighlightRadius): Modifier = drawBehind {
     val r = radius.toPx()
     val center = Offset(x = if (layoutDirection == LayoutDirection.Ltr) size.width else 0f, y = 0f)
     drawCircle(

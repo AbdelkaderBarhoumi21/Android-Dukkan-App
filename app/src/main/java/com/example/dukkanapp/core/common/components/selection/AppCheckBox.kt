@@ -26,7 +26,7 @@ import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.core.utils.constants.AppIcons
 
-private val CheckboxShape = RoundedCornerShape(percent = 30)
+private val CheckboxShape = RoundedCornerShape(AppDimens.radiusCheckbox)
 
 @Composable
 fun AppCheckbox(
@@ -57,11 +57,11 @@ fun AppCheckbox(
     ) {
         Box(
             modifier = Modifier
-                .size(AppDimens.icon)
+                .size(AppDimens.checkbox)
                 .background(fill, CheckboxShape)
                 .then(
                     if (checked) Modifier
-                    else Modifier.border(AppDimens.strokeFocus, colors.borderStrong, CheckboxShape)
+                    else Modifier.border(AppDimens.strokeControl, colors.borderControl, CheckboxShape)
                 ),
             contentAlignment = Alignment.Center,
         ) {
