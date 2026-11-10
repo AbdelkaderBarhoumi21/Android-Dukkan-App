@@ -335,7 +335,7 @@ AuthOptionsScreenContent(
 | ~120 | mark 48 | `AppAuthHeader(logo = Mark(AppDimens.logoMark))` |
 | 175 / 211 | "Welcome back" / subtitle | centered |
 | 254 → 276 | Email label → 52 dp field (focused in Figma, with a clear "x") | `AppTextField` |
-| 346 → 368 | Password | `AppPasswordField` |
+| 346 → 368 | Password | `AppPasswordTextField` |
 | 439 | Keep me logged in · Forgot password? | `AppCheckbox` + `AppButton(Ghost, Small)` |
 | 484 | Log in → | `AppButton(Primary)` + trailing `arrow-right` |
 | 566 | "or continue with" | `AppOrDivider` |
@@ -393,7 +393,7 @@ import com.example.dukkanapp.core.common.components.banner.AppMessageBanner
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.selection.AppCheckbox
 import com.example.dukkanapp.core.common.components.textfield.AppFieldStatus
-import com.example.dukkanapp.core.common.components.textfield.AppPasswordField
+import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppTextField
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.utils.constants.AppIcons
@@ -460,7 +460,7 @@ fun LoginScreenContent(
                 },
             )
             Spacer(Modifier.height(AppDimens.space16))
-            AppPasswordField(
+            AppPasswordTextField(
                 value = state.password,
                 onValueChange = { onIntent(LoginIntent.PasswordChanged(it)) },
                 label = stringResource(R.string.label_password),
@@ -562,7 +562,7 @@ What disappeared compared with today:
 | 190 / 225 | "Create your account" / "It's free and takes less than a minute." | |
 | 266 | Full name (`user-round`) | `AppTextField` |
 | 356 | Email (`mail`), green + "Looks good" when valid | `AppTextField`, Success |
-| 466 | Password + strength bar + "Strong · 8+ characters, a number and a symbol" | `AppPasswordField` + `AppPasswordStrength` |
+| 466 | Password + strength bar + "Strong · 8+ characters, a number and a symbol" | `AppPasswordTextField` + `AppPasswordStrength` |
 | 603 | ☑ I agree to the **Terms** and **Privacy Policy** (required) | `AppCheckbox(AnnotatedString)` |
 | 635 | ☐ Send me deals by email | `AppCheckbox` |
 | 688 | Create account → | `AppButton(Primary)` |
@@ -765,7 +765,7 @@ import com.example.dukkanapp.core.common.components.banner.AppMessageBanner
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
 import com.example.dukkanapp.core.common.components.selection.AppCheckbox
 import com.example.dukkanapp.core.common.components.textfield.AppFieldStatus
-import com.example.dukkanapp.core.common.components.textfield.AppPasswordField
+import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
 import com.example.dukkanapp.core.common.components.textfield.AppPasswordStrength
 import com.example.dukkanapp.core.common.components.textfield.AppTextField
 import com.example.dukkanapp.core.theme.AppDimens
@@ -851,7 +851,7 @@ fun SignUpScreenContent(
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
             )
             Spacer(Modifier.height(AppDimens.space16))
-            AppPasswordField(
+            AppPasswordTextField(
                 value = state.password,
                 onValueChange = { onIntent(SignUpIntent.PasswordChanged(it)) },
                 label = stringResource(R.string.label_password),

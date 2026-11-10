@@ -1,10 +1,10 @@
-# 11: Text fields (`AppTextField`, `AppPasswordField`, `AppPasswordStrength`, `AppSearchBar`, `AppOtpField`)
+# 11: Text fields (`AppTextField`, `AppPasswordTextField`, `AppPasswordStrength`, `AppSearchBar`, `AppOtpField`)
 
 **Files (new):**
 
 - `core/common/components/textfield/AppFieldStatus.kt`
 - `core/common/components/textfield/AppTextField.kt`
-- `core/common/components/textfield/AppPasswordField.kt`
+- `core/common/components/textfield/AppPasswordTextField.kt`
 - `core/common/components/textfield/AppPasswordStrength.kt`
 - `core/common/components/textfield/AppSearchBar.kt`
 - `core/common/components/textfield/AppOtpField.kt`
@@ -27,7 +27,7 @@ Figma's field (`Input/Email`) is **not** a Material outlined field:
 
 So we build on `BasicTextField` plus `decorationBox`. `BasicTextField` gives us the editing engine (cursor, selection, IME, autofill) and nothing else. We draw the rest from tokens.
 
-- **Single responsibility:** `appFieldColors()` maps (status, focused) to colors. `AppTextField` lays out the label, box and helper. `AppPasswordField`, `AppSearchBar` and `AppOtpField` compose or specialise it.
+- **Single responsibility:** `appFieldColors()` maps (status, focused) to colors. `AppTextField` lays out the label, box and helper. `AppPasswordTextField`, `AppSearchBar` and `AppOtpField` compose or specialise it.
 - **Composition over inheritance:** the password field *wraps* `AppTextField` and only adds the eye toggle.
 - **Stateless (MVI friendly):** the value comes in, `onValueChange` goes out. The ViewModel owns the text, exactly like today.
 
@@ -444,7 +444,7 @@ En résumé
 * `decorationBox` = « dessine l'habillage autour du champ ».
 * `innerTextField` = « le vrai champ de saisie, que tu poses où tu veux, une seule fois ».
 
-### AppPasswordField.kt`
+### AppPasswordTextField.kt`
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.textfield
@@ -472,7 +472,7 @@ import com.example.dukkanapp.core.utils.constants.AppIcons
 import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
-fun AppPasswordField(
+fun AppPasswordTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,

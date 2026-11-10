@@ -699,6 +699,8 @@ private fun StepperButton(
     }
 }
 
+// ── AppCountBubble.kt (its own file in display/) ──
+
 /** Figma `Count bubble`: 30 brand circle with a 2.5 white ring. */
 @Composable
 fun AppCountBubble(count: Int, modifier: Modifier = Modifier) {
