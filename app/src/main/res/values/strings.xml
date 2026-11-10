@@ -14,6 +14,10 @@
     <string name="cd_show_password">Show password</string>
     <string name="cd_loading">Loading</string>
     <string name="cd_hide_password">Hide password</string>
+    <string name="cd_add_to_cart">Add to cart</string>
+    <string name="cd_increase">Increase quantity</string>
+    <string name="cd_decrease">Decrease quantity</string>
+    <string name="cd_remove_from_cart">Remove from cart</string>
 
     <!-- Language selection -->
     <string name="language_selection_title">Choose the language</string>

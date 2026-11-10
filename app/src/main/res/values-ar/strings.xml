@@ -14,6 +14,10 @@
     <string name="cd_show_password">إظهار كلمة المرور</string>
     <string name="cd_loading">جارٍ التحميل</string>
     <string name="cd_hide_password">إخفاء كلمة المرور</string>
+    <string name="cd_add_to_cart">أضف إلى السلة</string>
+    <string name="cd_increase">زيادة الكمية</string>
+    <string name="cd_decrease">إنقاص الكمية</string>
+    <string name="cd_remove_from_cart">إزالة من السلة</string>
 
     <!-- Language selection -->
     <string name="language_selection_title">اختر اللغة</string>
