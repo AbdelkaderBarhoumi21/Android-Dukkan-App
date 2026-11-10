@@ -1,3 +1,5 @@
+package com.example.dukkanapp.core.common.components.textfield
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -33,8 +35,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.VisualTransformation
-import com.example.dukkanapp.core.common.components.textfield.AppFieldStatus
-import com.example.dukkanapp.core.common.components.textfield.appFieldColors
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppPillShape
 import com.example.dukkanapp.core.theme.AppTheme
