@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 
+/** Figma `Count bubble`: 30 brand circle with a 2.5 white ring. */
 @Composable
 fun AppCountBubble(count: Int, modifier: Modifier = Modifier) {
     val c = AppTheme.colors
