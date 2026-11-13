@@ -2077,7 +2077,112 @@ fun ProductCardSkeleton(modifier: Modifier = Modifier) {
 The 14.4 Home skeleton is built the same way in the Home feature: a 52 dp pill (search), a row of 6 category circles, a 160 dp `radiusCard` banner, then two `ProductCardSkeleton`s.
 
 > `composed { }` is used because the modifier reads composition locals and runs an animation. For a learning project it's the clearest form. If you later want maximum performance, the same logic can move to a `Modifier.Node`.
+AppSkeletonBox: a grey placeholder that shimmers
+The code is in doc 12, section 12.15. It's only in the docs so far. No .kt file uses it yet.
 
+What it is
+A skeleton is a grey block shown while data loads. It takes the shape of the real content that will appear. A light band sweeps across it to show that something is happening.
+
+
+Loading...                       Loaded
+┌──────────────┐                 ┌──────────────┐
+│ ░░░░░░░░░░░░ │  ← photo        │  [ product   │
+│ ░░░░░░░░░░░░ │                 │    photo ]   │
+└──────────────┘                 └──────────────┘
+ ▒▒▒▒▒▒          ← brand          Nike
+ ▒▒▒▒▒▒▒▒▒▒▒▒    ← name           Air Max 90
+ ▒▒▒▒▒▒▒         ← price          $120
+The code is two pieces
+
+@Composable
+fun AppSkeletonBox(shape: Shape, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .clip(shape)                          // 2. cut to the shape
+            .background(AppTheme.colors.skeleton) // 3. paint it grey
+            .shimmer(),                           // 4. add the moving light
+    )
+}
+AppSkeletonBox is an empty Box with three modifiers, applied in this order:
+
+modifier: size and position from the caller (fillMaxWidth(), height(...)).
+.clip(shape): cuts the box into a rounded rectangle, a pill or a circle.
+.background(...): fills it with the grey skeleton color. Because clip came first, the grey stays inside the shape.
+.shimmer(): draws the moving highlight on top.
+Order matters here. The doc says "Put shimmer AFTER clip + background so the highlight stays inside the shape". If shimmer came before clip, the light would spill outside the rounded corners.
+
+The parameters
+Parameter	Type	Role
+shape	Shape	The outline of the content being imitated. Photo: RoundedCornerShape(AppDimens.radiusLg). Text line: AppPillShape. Avatar: CircleShape.
+modifier	Modifier = Modifier	The size. A box with no size has nothing to draw, so you always pass one: Modifier.fillMaxWidth().height(16.dp).
+shape has no default because every placeholder needs a deliberate shape. modifier has the default Modifier, which is the usual Compose convention.
+
+How .shimmer() works
+It is a custom Modifier extension, in this order:
+
+
+fun Modifier.shimmer(): Modifier = composed {
+    if (animationsDisabled()) return@composed this   // (a)
+    val highlight = AppTheme.colors.skeletonHighlight // (b)
+    val isRtl = ...                                   // (c)
+    val progress by rememberInfiniteTransition()...   // (d)
+    drawWithContent { ... }                           // (e)
+}
+(a) Reduced motion: if the user turned animations off in Android settings, return the modifier unchanged. The block stays plain grey with no movement.
+(b) Highlight color: taken from the theme, so it works in light and dark.
+(c) RTL: in Arabic the sweep goes right → left.
+(d) The clock: rememberInfiniteTransition + animateFloat makes a number progress that goes 0 → 1 in 1.2 s, then restarts, forever (RepeatMode.Restart, LinearEasing for a constant speed).
+(e) The drawing: drawWithContent runs on every frame:
+
+drawContent()                       // draw the grey box first
+val band   = size.width * 0.6f      // the light band is 60% of the width
+val travel = -band + (size.width + band * 2) * progress
+travel moves the band from fully off the left edge (progress = 0) to fully off the right edge (progress = 1).
+
+
+progress 0.0   [band]░░░░░░░░░░░░░░░░░░     (off-screen, left)
+progress 0.3   ░░░░[ band ]░░░░░░░░░░░░
+progress 0.6   ░░░░░░░░░░░░[ band ]░░░░
+progress 1.0   ░░░░░░░░░░░░░░░░░░[band]     (off-screen, right)
+Then Brush.linearGradient(Transparent → highlight → Transparent) draws the band. Both ends are transparent, so the edges fade out softly.
+
+composed { } is used because the modifier needs composition state (AppTheme, remember, an animation). A plain modifier chain can't do that.
+
+Example: how we use it
+
+@Composable
+fun ProductCardSkeleton(modifier: Modifier = Modifier) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(AppDimens.space8)) {
+        AppSkeletonBox(RoundedCornerShape(AppDimens.radiusLg),
+            Modifier.fillMaxWidth().aspectRatio(1f))                    // photo: square
+        AppSkeletonBox(AppPillShape, Modifier.fillMaxWidth(0.4f).height(AppDimens.space12)) // brand: short
+        AppSkeletonBox(AppPillShape, Modifier.fillMaxWidth(0.8f).height(AppDimens.space16)) // name: long
+        AppSkeletonBox(AppPillShape, Modifier.fillMaxWidth(0.5f).height(AppDimens.space16)) // price: medium
+    }
+}
+The widths 0.4, 0.8 and 0.5 make the lines uneven like real text, so the screen looks natural while loading.
+
+Then in a screen, you pick the UI from the state:
+
+
+when (state) {
+    is Loading -> LazyVerticalGrid(...) { items(6) { ProductCardSkeleton() } }
+    is Error   -> AppMessageBanner(... Retry ...)
+    is Success -> ProductGrid(state.products)
+}
+The whole flow
+
+Screen state = Loading
+      ↓
+ProductCardSkeleton → 4 × AppSkeletonBox(shape, size)
+      ↓
+each box: clip(shape) → background(grey) → shimmer()
+      ↓
+shimmer: progress goes 0→1 every 1.2 s
+      ↓
+drawWithContent: grey box + a light band moving across it
+      ↓
+data arrives → state = Success → skeleton is replaced by the real content
 ---
 
 ## New content-description strings
