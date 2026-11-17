@@ -1,6 +1,107 @@
 # 13: Screen background, scaffold and auth header
 
 **Files:**
+How the aurora background works (simple version)
+The big picture
+Think of the screen as layers of paper stacked on top of each other:
+
+
+Layer 3:  your screen content (buttons, text)
+Layer 2:  AppAuroraHeader   <- the colorful glow at the top
+Layer 1:  plain background color
+Step by step flow
+Step 1: A screen calls AppScaffold
+
+
+AppScaffold(background = AppScreenBackground.AuroraShort) { ... }
+The screen only picks a name: Plain, AuroraCompact, AuroraShort, or AuroraTall. It never draws anything itself.
+
+Step 2: AppScaffold calls AppScreenBackgroundBox
+This is a Box, which stacks things on top of each other. It does 3 things:
+
+Paints the full screen with the plain background color.
+If the choice is not Plain, it draws AppAuroraHeader.
+Then it draws your screen content on top.
+Step 3: AppAuroraHeader draws the glow
+It uses a Canvas. The height of the glow comes from the enum: tall is 520 dp, short is 300 dp, compact is 260 dp.
+
+What is Canvas?
+A Canvas is a blank drawing board. Normal Compose gives you ready-made things like Text and Button. A Canvas lets you draw your own shapes: circles, rectangles, gradients.
+
+
+Canvas(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+    // draw here
+}
+The board is as wide as the screen and 300 dp tall. Inside the { } you get a DrawScope. It has the drawing tools (drawRect, drawCircle) and size, which is the board's width and height.
+
+What is drawRect?
+It paints a rectangle. Here it fills the whole board with the screenTint gradient (light blue fading to a pale color):
+
+
+drawRect(brush = gradients.screenTint)
+A brush is just "how to paint": a solid color or a gradient.
+
+This is the base of the glow.
+
+What is drawBlob?
+It's a helper function written by the doc, not part of Compose. It draws one soft, fuzzy circle (a "blob") of color.
+
+
+drawCircle(
+    brush = aurora.blob(color, center, radius),
+    radius = radius,
+    center = center,
+)
+center is where the circle sits.
+radius is how big it is.
+aurora.blob(...) makes a radial gradient: the color is strong in the middle and fades to transparent at the edge. That's why it looks soft instead of like a hard circle.
+The header draws 3 blobs:
+
+Blob	Where	Color
+blue	top left	blue
+sky	top right	light blue
+sun	lower in the band	warm yellow
+Together with the tint band, they create the "aurora" look.
+
+Why xFraction, and what about RTL?
+
+val x = size.width * (if (isRtl) 1f - xFraction else xFraction)
+xFraction = 0.153 means "15% from the left". It's a fraction, so it works on any screen width (phone or tablet).
+For Arabic (right-to-left), 1 - 0.153 = 0.847, so the blob flips to the right side. That mirrors the layout.
+Why .toPx()?
+Compose has two units:
+
+dp is a density-independent size. 20 dp looks about the same physical size on every phone.
+px is real screen pixels.
+Inside a Canvas, drawing functions work in pixels. drawCircle(radius = ...) wants pixels, not dp. So you convert:
+
+
+AppDimens.auroraBlueRadius.toPx()   // dp -> px
+Example: 230 dp is about 230 px on a normal phone, but about 690 px on a high-density phone (3x). Without .toPx() the glow would look tiny on dense screens.
+
+Rule: design in dp, draw in px, convert with toPx().
+
+The bottom fade (last step)
+The band has a hard bottom edge, which looks ugly. So at the end the code draws a fade from transparent to the background color over the last 90 dp:
+
+
+val fadeTop = size.height - fadeHeight.toPx()   // where the fade starts
+translate(top = fadeTop) {                      // move the pen down to there
+    drawRect(brush = gradients.bottomFade, size = Size(size.width, fadeHeight.toPx()))
+}
+translate moves the drawing origin down, so the rectangle is drawn at the bottom of the band.
+The rectangle is exactly 90 dp tall, so the gradient is squeezed into just that strip.
+Result: the glow melts into the background with no visible edge.
+Order of drawing (matters!)
+Later drawing goes on top of earlier drawing:
+
+drawRect(screenTint): base tint
+blue blob
+sky blob
+sun blob
+bottom fade: covers the lower edge
+One-line summary
+The screen picks a name, AppScreenBackgroundBox stacks a plain color plus AppAuroraHeader, and AppAuroraHeader uses a Canvas to draw a tint rectangle, 3 soft circles (blobs) and a bottom fade. All sizes are converted from dp to px, because Canvas draws in pixels.
 
 | File                                                                | Status                                                                        |
 | ------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
