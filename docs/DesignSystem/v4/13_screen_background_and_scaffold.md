@@ -410,6 +410,147 @@ Figma uses three header looks:
 | 02.3 Sign up, 02.4 Forgot, 02.6/02.7 Verify email | 48 dp **tile** (`radiusMd` 14, Figma "icon tile → md"; `gradients.brand`) with a white Lucide icon (`user-plus`, `lock`, `mail`) | `headlineLarge`                      | start  |
 
 The subtitle is always `bodySmall` (13/18 Medium) in `textSecondary`. The gap is `space8` between title and subtitle, and `space24` between the logo and the title. Every auth title in Figma is now **24 ExtraBold** = `headlineLarge` (Cairo Bold 24/36 in Arabic, Figma 13.4).
+# `AppAuthHeader` explained simply
+
+## What is it?
+
+A reusable **top section for auth screens** (Welcome, Log in, Sign up...). It always has 3 parts, stacked vertically:
+
+```
+[ Logo ]
+   ↓ 24 dp gap
+[ Title ]
+   ↓ 8 dp gap
+[ Subtitle ]
+```
+
+The only thing that changes between screens is **which logo** and **how it's aligned**.
+
+## The 2 logo types: `AuthHeaderLogo`
+
+```kotlin
+sealed interface AuthHeaderLogo {
+    data class Mark(val size: Dp) : AuthHeaderLogo   // the Dukkan awning, no background
+    data class Tile(val icon: Int) : AuthHeaderLogo  // blue square with a white icon
+}
+```
+
+A `sealed interface` means "the logo can be **only one of these two**". The screen picks one.
+
+## How it looks
+
+### Variant 1: `Mark` (Welcome, Log in), centered
+
+```
+        ┌─────────┐
+        │  🏪     │   <- Dukkan mark (56 dp Welcome, 48 dp Log in)
+        └─────────┘
+
+      Welcome back          <- title, centered
+  Log in to continue        <- subtitle, centered
+```
+
+### Variant 2: `Tile` (Sign up, Forgot password, Verify email), start-aligned
+
+```
+  ┌────────┐
+  │   👤   │      <- 48 dp blue gradient tile + white icon
+  └────────┘
+
+  Create account            <- title, left-aligned (right in Arabic)
+  Join Dukkan in a minute   <- subtitle, same alignment
+```
+
+The icon changes per screen: `user-plus` for sign up, `lock` for forgot password, `mail` for verify email.
+
+## The flow inside the code
+
+**Step 1: Decide alignment**
+
+```kotlin
+centered: Boolean = logo is AuthHeaderLogo.Mark
+```
+
+The default is smart. If the logo is a `Mark`, center everything. If it's a `Tile`, align to the start. You can still override it.
+
+```kotlin
+val align = if (centered) Alignment.CenterHorizontally else Alignment.Start
+val textAlign = if (centered) TextAlign.Center else TextAlign.Start
+```
+
+- `align` positions the **children** (logo, texts) inside the Column.
+- `textAlign` positions the **text lines** inside each Text.
+
+**Step 2: Draw the logo (`when`)**
+
+```kotlin
+when (logo) {
+    is AuthHeaderLogo.Mark -> AppLogoMark(Modifier.size(logo.size))
+    is AuthHeaderLogo.Tile -> Box(...) { Icon(...) }
+}
+```
+
+- `Mark`: reuse the existing `AppLogoMark`, so there's one source for the brand logo.
+- `Tile`: build a `Box` with a gradient background and rounded corners, and put a white icon in the center.
+
+```kotlin
+Box(
+    modifier = Modifier
+        .size(AppDimens.logoMark)                                   // 48 dp square
+        .background(AppTheme.gradients.brand, RoundedCornerShape(AppDimens.radiusMd)),  // gradient + rounded
+    contentAlignment = Alignment.Center,                            // icon in the middle
+)
+```
+
+**Step 3: Gap, then title**
+
+```kotlin
+Spacer(Modifier.height(AppDimens.space24))
+Text(title, style = headlineLarge, modifier = Modifier.semantics { heading() })
+```
+
+`heading()` tells TalkBack "this is a heading", so it reads "Welcome back, heading".
+
+**Step 4: Gap, then subtitle**
+
+```kotlin
+Spacer(Modifier.height(AppDimens.space8))
+Text(subtitle, style = bodySmall, color = textSecondary)
+```
+
+Smaller and grayer than the title, so the title stands out.
+
+## How a screen uses it
+
+```kotlin
+// Log in
+AppAuthHeader(
+    title = "Welcome back",
+    subtitle = "Log in to continue",
+    logo = AuthHeaderLogo.Mark(AppDimens.logoMark),
+)
+
+// Sign up
+AppAuthHeader(
+    title = "Create account",
+    subtitle = "Join Dukkan in a minute",
+    logo = AuthHeaderLogo.Tile(AppIcons.UserPlus),
+)
+```
+
+## Summary table
+
+|Screen|Logo|Alignment|
+|---|---|---|
+|Welcome|`Mark(56dp)`|center|
+|Log in|`Mark(48dp)`|center|
+|Sign up / Forgot / Verify email|`Tile(icon)`|start|
+
+> One component, two logo choices, and the alignment follows the logo type automatically.
+
+## Small thing to watch
+
+The doc's code calls `AppLogoMark(modifier = Modifier.size(logo.size))`, but later the doc says the real signature is `AppLogoMark(modifier, size)` and to pass `size = logo.size`. Check your actual `AppLogoMark` in doc 09 and use whichever matches.
 
 ```kotlin
 package com.example.dukkanapp.features.auth.presentation.components.common
