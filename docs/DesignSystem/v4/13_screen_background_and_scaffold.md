@@ -2,13 +2,13 @@
 
 **Files:**
 
-| File | Status |
-|---|---|
-| `core/common/components/scaffold/AppScreenBackground.kt` | new |
-| `core/common/components/scaffold/AppScaffold.kt` | new, replaces `core/common/components/scaffold/AppScaffold.kt` |
-| `features/auth/presentation/components/common/AppAuthHeader.kt` | moved and rewritten from `core/common/components/header/AppAuthHeader.kt` |
+| File                                                                | Status                                                                        |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `core/common/components/scaffold/AppScreenBackground.kt`            | new                                                                           |
+| `core/common/components/scaffold/AppScaffold.kt`                    | new, replaces `core/common/components/scaffold/AppScaffold.kt`                |
+| `features/auth/presentation/components/common/AppAuthHeader.kt`     | moved and rewritten from `core/common/components/header/AppAuthHeader.kt`     |
 | `features/auth/presentation/components/common/AppAuthFooterLink.kt` | moved and rewritten from `core/common/components/footer/AppAuthFooterLink.kt` |
-| `features/auth/presentation/components/common/AppOrDivider.kt` | new, replaces `core/common/components/dividers/AppDivider.kt` on auth screens |
+| `features/auth/presentation/components/common/AppOrDivider.kt`      | new, replaces `core/common/components/dividers/AppDivider.kt` on auth screens |
 
 > **Why move the header and footer into `features/auth`?** Only auth screens use them. `core/` is for things *every* feature may use. Keeping auth-only UI in the auth feature follows the dependency rule from the project structure guide: features depend on core, never the other way. `AppAccountRecoveryHeader` and `AppAccountRecoveryFooter` become the same `AppAuthHeader` with a tile icon (see below), so delete them after doc 14.
 
@@ -18,12 +18,12 @@
 
 Every Customer-app screen in Figma sits on one of three backgrounds:
 
-| Background | Where in Figma | What it is |
-|---|---|---|
-| **Aurora tall** | 02.1 Welcome, 02.5 All set, 01.x Onboarding, 04.1 Home header | `background` plus a 520 dp `screenTint` band plus soft color blobs |
-| **Aurora short** | 02.2 Log in, 02.4 Forgot password | the same, with a 300 dp band and the sun blob higher up |
-| **Aurora compact** | 02.6 Verify your email, 02.7 Not verified yet | the same as short, with a 260 dp band |
-| **Plain** | 02.3 Sign up, Cart, Checkout, Account | `background` only (`#F7F9FB` light, `#0B1220` dark) |
+| Background         | Where in Figma                                                | What it is                                                         |
+| ------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------ |
+| **Aurora tall**    | 02.1 Welcome, 02.5 All set, 01.x Onboarding, 04.1 Home header | `background` plus a 520 dp `screenTint` band plus soft color blobs |
+| **Aurora short**   | 02.2 Log in, 02.4 Forgot password                             | the same, with a 300 dp band and the sun blob higher up            |
+| **Aurora compact** | 02.6 Verify your email, 02.7 Not verified yet                 | the same as short, with a 260 dp band                              |
+| **Plain**          | 02.3 Sign up, Cart, Checkout, Account                         | `background` only (`#F7F9FB` light, `#0B1220` dark)                |
 
 Today each screen paints `colorScheme.background` through `AppScaffold`. We keep that one entry point, `AppScaffold(background = …)`, so a screen chooses the background by name and never draws blobs itself.
 
@@ -35,14 +35,14 @@ Today each screen paints `colorScheme.background` through `AppScaffold`. We keep
 
 Positions are the blob's bounding square (top-left x, top-left y, size). In code we use the **center** and radius, with x as a fraction of the width so it scales on tablets.
 
-| Layer | Token | Tall (Welcome, Home) | Short (Log in) | Compact (Verify email) |
-|---|---|---|---|---|
-| Base | `background` | full screen | full screen | full screen |
-| Tint band | `gradients.screenTint` (azure-100 → slate-50; dark: blue-950 → night-950) | height 520 | height 300 | height 260 |
-| Blob blue | `aurora.blue` (light azure-300 62 %, dark blue-500 35 % → 0 %, radial) | center (0.153 w, 20), r 230 | same | same |
-| Blob sky | `aurora.sky` (light azure-200 55 %, dark blue-800 45 %) | center (0.916 w, 60), r 190 | same | same |
-| Blob warm (`sun`) | `aurora.sun` (light amber-200 42 %, dark amber-300 8 %) | center (0.763 w, 380), r 150 | center (0.763 w, 250), r 150 | same as short |
-| Bottom fade | `gradients.bottomFade` | last 90 dp of the band | last 90 dp | last 90 dp |
+| Layer             | Token                                                                     | Tall (Welcome, Home)         | Short (Log in)               | Compact (Verify email) |
+| ----------------- | ------------------------------------------------------------------------- | ---------------------------- | ---------------------------- | ---------------------- |
+| Base              | `background`                                                              | full screen                  | full screen                  | full screen            |
+| Tint band         | `gradients.screenTint` (azure-100 → slate-50; dark: blue-950 → night-950) | height 520                   | height 300                   | height 260             |
+| Blob blue         | `aurora.blue` (light azure-300 62 %, dark blue-500 35 % → 0 %, radial)    | center (0.153 w, 20), r 230  | same                         | same                   |
+| Blob sky          | `aurora.sky` (light azure-200 55 %, dark blue-800 45 %)                   | center (0.916 w, 60), r 190  | same                         | same                   |
+| Blob warm (`sun`) | `aurora.sun` (light amber-200 42 %, dark amber-300 8 %)                   | center (0.763 w, 380), r 150 | center (0.763 w, 250), r 150 | same as short          |
+| Bottom fade       | `gradients.bottomFade`                                                    | last 90 dp of the band       | last 90 dp                   | last 90 dp             |
 
 There are **exactly 3 blobs**, in light and dark, at the same positions (Figma `13.1b · Header glow · spec`: blue c (60, 20) r 230, sky c (360, 60) r 190, warm c (300, 250) r 150, in screen px of the 393 × 852 frame).
 
@@ -153,13 +153,13 @@ private fun DrawScope.drawBlob(
 
 What changes from today's `AppScaffold`:
 
-| Today | New |
-|---|---|
-| `containerColor = colorScheme.background` | transparent, drawn over `AppScreenBackgroundBox` |
+| Today                                            | New                                                                                                                                            |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `containerColor = colorScheme.background`        | transparent, drawn over `AppScreenBackgroundBox`                                                                                               |
 | Material `TopAppBar` with a grey circle back box | a plain row: `AppIconButton(White)` 44 dp with `shadows.card`, at `screenPadding` from the edge and `space8` below the status bar (Figma y 58) |
-| `title` always uses `titleLarge` | optional centered title (`titleMedium`) plus subtitle (`bodySmall`) for app bars like "Checkout · 4 items" |
-| no step slot | `topBarActions` slot: the "1/2" progress on sign up, "Help" on order details |
-| default insets | `contentWindowInsets = WindowInsets.safeDrawing`, so content stays clear of the status bar, navigation bar **and** keyboard |
+| `title` always uses `titleLarge`                 | optional centered title (`titleMedium`) plus subtitle (`bodySmall`) for app bars like "Checkout · 4 items"                                     |
+| no step slot                                     | `topBarActions` slot: the "1/2" progress on sign up, "Help" on order details                                                                   |
+| default insets                                   | `contentWindowInsets = WindowInsets.safeDrawing`, so content stays clear of the status bar, navigation bar **and** keyboard                    |
 
 ```kotlin
 package com.example.dukkanapp.core.common.components.scaffold
@@ -302,11 +302,11 @@ AppScaffold(background = AppScreenBackground.AuroraShort, onNavigateBack = ...) 
 
 Figma uses three header looks:
 
-| Screen | Logo | Title | Align |
-|---|---|---|---|
-| 02.1 Welcome | Dukkan **mark**, 56 dp, brand gradient (no tile) | "Welcome to Dukkan", `headlineLarge` | center |
-| 02.2 Log in | Dukkan **mark**, 48 dp | "Welcome back", `headlineLarge` | center |
-| 02.3 Sign up, 02.4 Forgot, 02.6/02.7 Verify email | 48 dp **tile** (`radiusMd` 14, Figma "icon tile → md"; `gradients.brand`) with a white Lucide icon (`user-plus`, `lock`, `mail`) | `headlineLarge` | start |
+| Screen                                            | Logo                                                                                                                             | Title                                | Align  |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------ |
+| 02.1 Welcome                                      | Dukkan **mark**, 56 dp, brand gradient (no tile)                                                                                 | "Welcome to Dukkan", `headlineLarge` | center |
+| 02.2 Log in                                       | Dukkan **mark**, 48 dp                                                                                                           | "Welcome back", `headlineLarge`      | center |
+| 02.3 Sign up, 02.4 Forgot, 02.6/02.7 Verify email | 48 dp **tile** (`radiusMd` 14, Figma "icon tile → md"; `gradients.brand`) with a white Lucide icon (`user-plus`, `lock`, `mail`) | `headlineLarge`                      | start  |
 
 The subtitle is always `bodySmall` (13/18 Medium) in `textSecondary`. The gap is `space8` between title and subtitle, and `space24` between the logo and the title. Every auth title in Figma is now **24 ExtraBold** = `headlineLarge` (Cairo Bold 24/36 in Arabic, Figma 13.4).
 
@@ -490,6 +490,269 @@ fun AppOrDivider(text: String, modifier: Modifier = Modifier, showLines: Boolean
 - **Dark mode:** the white back button uses `shadows.card`, which in dark mode also draws the 1 dp night-700 outline (doc 05). Nothing to do in this file. Figma `13.2 · Log in · dark` is the reference.
 
 ---
+
+
+
+Screen background, scaffold and auth components
+-----------------------------------------------
+
+### What is “Aurora”?
+
+It’s named after the aurora borealis (northern lights). In this design it means **soft, blurry, colored glows at the top of the screen**, like light bleeding through fog. It’s a visual style from the Figma design, not an Android or Compose feature.
+
+An aurora header is built from 4 layers, painted bottom to top:
+    ┌─────────────────────────────┐
+    │ ◉ blue blob      ◉ sky blob │  ← 2 radial glows (top-left, top-right)
+    │                             │
+    │              ◉ sun blob     │  ← warm yellow glow, lower down
+    │ ░░░░░░░░ bottomFade ░░░░░░░ │  ← last 90 dp fades into the background
+    ├─────────────────────────────┤
+    │   plain background color    │  ← the rest of the screen
+    └─────────────────────────────┘
+       (the whole top area has the screenTint gradient behind the blobs)
+
+| Layer       | What it is                                                                                |
+| ----------- | ----------------------------------------------------------------------------------------- |
+| Base        | Plain `background` color (`#F7F9FB` light, `#0B1220` dark)                                |
+| Tint band   | A vertical gradient (`screenTint`) over the top 260 to 520 dp                             |
+| 3 blobs     | Radial gradients: blue, sky, and warm “sun”. Each fades from a color to transparent       |
+| Bottom fade | A gradient over the last 90 dp so the band melts into the background with no visible edge |
+
+There are three sizes, and screens pick one by name:
+
+| Name            | Band height | Used on                                   |
+| --------------- | ----------- | ----------------------------------------- |
+| `AuroraTall`    | 520 dp      | Welcome, All set, Onboarding, Home header |
+| `AuroraShort`   | 300 dp      | Log in, Forgot password                   |
+| `AuroraCompact` | 260 dp      | Verify your email                         |
+| `Plain`         | none        | Sign up, Cart, Checkout, Account          |
+
+The colors are not written in this file. They come from the theme tokens (`AppTheme.gradients`). Dark mode is handled there too, so the code never checks `isSystemInDarkTheme()`.
+
+* * *
+
+### 1. `AppScreenBackground.kt`
+
+It holds two things.
+
+#### a) The enum
+
+kotlin
+    enum class AppScreenBackground(val bandHeight: Dp, val sunCenterY: Dp) {
+        Plain(Dp.Hairline, Dp.Hairline),
+        AuroraCompact(AppDimens.auroraCompact, AppDimens.auroraSunYShort),
+        AuroraShort(AppDimens.auroraShort, AppDimens.auroraSunYShort),
+        AuroraTall(AppDimens.auroraTall, AppDimens.auroraSunYTall),
+    }
+
+Each entry carries the only two values that change between variants: the **band height** and the **Y position of the yellow blob**. The blue and sky blobs are identical everywhere. A screen just says `AuroraShort` and never draws anything itself.
+
+#### b) `AppScreenBackgroundBox`
+
+kotlin
+    Box(modifier = modifier.fillMaxSize().background(AppTheme.colors.background)) {
+        if (background != AppScreenBackground.Plain) {
+            AppAuroraHeader(background)   // drawn first = behind
+        }
+        content()                          // drawn after = on top
+    }
+
+A `Box` stacks its children. The aurora is drawn first and the screen content on top. Its `content: @Composable BoxScope.() -> Unit` uses the same scope pattern as your `ColumnScope` question: the caller can use `Modifier.align(...)` inside it.
+
+#### c) `AppAuroraHeader` (private) and `drawBlob`
+
+This is the actual drawing, on a `Canvas`:
+
+kotlin
+    Canvas(modifier = Modifier.fillMaxWidth().height(background.bandHeight)) {
+        drawRect(brush = gradients.screenTint)          // 1. tint band
+        drawBlob(... aurora.blue ...)                   // 2. three glows
+        drawBlob(... aurora.sky ...)
+        drawBlob(... aurora.sun ...)
+        translate(top = fadeTop) {                      // 3. bottom fade
+            drawRect(brush = gradients.bottomFade, size = Size(size.width, fadeHeight.toPx()))
+        }
+    }
+
+`drawBlob` computes the position and draws a circle with a radial gradient:
+
+kotlin
+    val x = size.width * (if (isRtl) 1f - xFraction else xFraction)
+    drawCircle(brush = aurora.blob(color, center, radius), radius = radius, center = center)
+
+Three details matter here:
+
+| Detail                                                | Why                                                                                                                                                                                   |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `xFraction` (0.153, 0.916, 0.763) instead of fixed dp | The glows scale with screen width, so tablets still look right                                                                                                                        |
+| `1f - xFraction` when RTL                             | In Arabic the layout mirrors, so the blue glow moves to the top-right, behind the mirrored back button                                                                                |
+| `translate(top = fadeTop)` for the fade               | `bottomFade` has no explicit start/end, so it stretches over whatever rect it paints. Translating to the fade zone and drawing exactly 90 dp makes the gradient cover only that strip |
+
+* * *
+
+### `AppScaffold.kt` (the piece that uses the background)
+
+You didn’t list it, but the other files depend on it.
+
+kotlin
+    AppScreenBackgroundBox(background = background, modifier = modifier) {
+        Scaffold(containerColor = Color.Transparent, contentWindowInsets = WindowInsets.safeDrawing, ...)
+    }
+
+* The Material `Scaffold` is set to **transparent**, so the aurora behind it stays visible.
+* `safeDrawing` insets make the `padding` you receive include status bar, nav bar and keyboard. That’s why you must always apply `.padding(padding)`.
+* The custom `AppTopBar` replaces Material’s `TopAppBar` with a white round back button, an optional centered title and subtitle, and an `actions` slot.
+* `topBarActions: @Composable RowScope.() -> Unit` is again the scope pattern: inside the slot you can use `Modifier.weight(1f)`.
+* Edge-to-edge (`enableEdgeToEdge()`) is required so the aurora also paints under the status bar.
+
+Usage:
+
+kotlin
+    AppScaffold(background = AppScreenBackground.AuroraShort, onNavigateBack = { ... }) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding)) { ... }
+    }
+
+* * *
+
+### 2. `AppAuthHeader.kt`
+
+It’s the block at the top of auth screens: **logo, then title, then subtitle**.
+
+#### The sealed interface
+
+kotlin
+    sealed interface AuthHeaderLogo {
+        data class Mark(val size: Dp) : AuthHeaderLogo   // the brand logo, no background
+        data class Tile(val icon: Int) : AuthHeaderLogo  // 48 dp gradient square with a white icon
+    }
+
+A `sealed interface` lists every allowed logo type. Inside, `when (logo)` must cover both cases, and the compiler checks it.
+
+#### The three looks in Figma
+
+| Screen                                 | `logo`                                          | Alignment                        |
+| -------------------------------------- | ----------------------------------------------- | -------------------------------- |
+| Welcome (56 dp), Log in (48 dp)        | `Mark(size)`                                    | centered                         |
+| Sign up, Forgot password, Verify email | `Tile(icon)` with `user-plus`, `lock` or `mail` | start (left, or right in Arabic) |
+
+#### The key line
+
+kotlin
+    centered: Boolean = logo is AuthHeaderLogo.Mark
+
+The default alignment follows the logo type: a Mark means centered, a Tile means start-aligned. You can still override it.
+
+#### The layout
+
+kotlin
+    Column(horizontalAlignment = align) {
+        // logo: Mark or Tile
+        Spacer(24 dp)
+        Text(title, headlineLarge, semantics { heading() })
+        Spacer(8 dp)
+        Text(subtitle, bodySmall, textSecondary)
+    }
+
+`semantics { heading() }` tells TalkBack that the title is a heading, so it reads “Welcome back, heading”.
+
+Usage:
+
+kotlin
+    AppAuthHeader(
+        title = "Welcome back",
+        subtitle = "Log in to continue",
+        logo = AuthHeaderLogo.Mark(AppDimens.logoMark),
+    )
+
+    AppAuthHeader(
+        title = "Create account",
+        subtitle = "It takes a minute",
+        logo = AuthHeaderLogo.Tile(AppIcons.UserPlus),
+    )
+
+* * *
+
+### 3. `AppAuthFooterLink.kt`
+
+It’s the bottom line **“Already have an account? Log in”**.
+
+kotlin
+    Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+        Text(promptText, bodySmall, textSecondary)        // "Already have an account?"
+        AppButton(text = actionText, onClick = onActionClick,
+                  variant = AppButtonVariant.Ghost, size = AppButtonSize.Small)   // "Log in"
+    }
+
+The two parts are separate parameters (`promptText`, `actionText`), so each language translates them independently. The action is a **Ghost `AppButton`** (text only, brand color) instead of a clickable `Text`.
+
+|                    | Old footer                             | New footer         |
+| ------------------ | -------------------------------------- | ------------------ |
+| Implementation     | `clickable(indication = null)` on text | Ghost `AppButton`  |
+| Ripple feedback    | No                                     | Yes                |
+| Touch area         | Tiny (just the text)                   | Proper button size |
+| Accessibility role | None                                   | `Role.Button`      |
+
+Usage:
+
+kotlin
+    AppAuthFooterLink(
+        promptText = "Already have an account?",
+        actionText = "Log in",
+        onActionClick = onLoginClick,
+    )
+
+* * *
+
+### 4. `AppOrDivider.kt`
+
+It’s the **“or”** or **“or continue with”** separator between the main button and social login buttons.
+
+kotlin
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)) {
+        if (showLines) HorizontalDivider(Modifier.weight(1f), ...)
+        Text(text, labelMedium SemiBold, textTertiary)
+        if (showLines) HorizontalDivider(Modifier.weight(1f), ...)
+    }
+
+| `showLines`                    | Result                                                                                        |
+| ------------------------------ | --------------------------------------------------------------------------------------------- |
+| `false` (default, as in Figma) | `or` (centered text only)                                                                     |
+| `true`                         | `──────── or ────────` (a line on each side, each taking `weight(1f)` of the remaining space) |
+
+The `weight(1f)` works because the code is inside a `Row`, so it uses `RowScope`.
+
+It replaces the generic `AppDivider` on auth screens because it’s specialized (text plus optional lines) and only auth uses it.
+
+kotlin
+    AppOrDivider(text = "or continue with")
+    AppOrDivider(text = "or", showLines = true)
+
+* * *
+
+### How it all fits together on one screen
+
+kotlin
+    AppScaffold(
+        background = AppScreenBackground.AuroraShort,     // picks the aurora
+        onNavigateBack = onBack,
+    ) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())
+            .padding(horizontal = AppDimens.screenPadding)) {
+
+            AppAuthHeader(title = "Welcome back", subtitle = "...", logo = AuthHeaderLogo.Mark(AppDimens.logoMark))
+            // ... fields + main button ...
+            AppOrDivider(text = "or continue with")
+            // ... social buttons ...
+            AppAuthFooterLink(promptText = "New here?", actionText = "Sign up", onActionClick = onSignUp)
+        }
+    }
+
+### Why the files are placed where they are
+
+| File                                                 | Folder                            | Reason                       |
+| ---------------------------------------------------- | --------------------------------- | ---------------------------- |
+| `AppScreenBackground`, `AppScaffold`                 | `core/common/components/scaffold` | Every feature uses them      |
+| `AppAuthHeader`, `AppAuthFooterLink`, `AppOrDivider` | `features/auth/.../common`        |  |
 
 ## Check
 
