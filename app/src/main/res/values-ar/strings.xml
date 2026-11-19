@@ -10,6 +10,7 @@
 
     <!-- Content descriptions -->
     <string name="cd_back">رجوع</string>
+    <string name="cd_dismiss">إغلاق</string>
     <string name="cd_pager_indicator">الصفحة %1$d من %2$d</string>
     <string name="cd_show_password">إظهار كلمة المرور</string>
     <string name="cd_loading">جارٍ التحميل</string>
