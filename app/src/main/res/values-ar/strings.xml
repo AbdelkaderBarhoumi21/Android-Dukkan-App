@@ -41,6 +41,9 @@
     <string name="auth_already_have_account">لديك حساب بالفعل؟</string>
 
     <!-- Auth options -->
+    <string name="auth_terms">الشروط</string>
+    <string name="auth_privacy">سياسة الخصوصية</string>
+    <string name="auth_legal_consent">بالمتابعة، فإنك توافق على %1$s و%2$s</string>
     <string name="auth_options_title">أهلاً بعودتك</string>
     <string name="auth_options_subtitle">سجّل الدخول للوصول إلى حسابك ومواصلة التسوق</string>
     <string name="auth_options_or_continue_with">أو تابع باستخدام</string>

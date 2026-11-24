@@ -41,6 +41,9 @@
     <string name="auth_already_have_account">Already have an account?</string>
 
     <!-- Auth options -->
+    <string name="auth_terms">Terms</string>
+    <string name="auth_privacy">Privacy Policy</string>
+    <string name="auth_legal_consent">By continuing you accept the %1$s and %2$s</string>
     <string name="auth_options_title">Welcome Back</string>
     <string name="auth_options_subtitle">Please sign in to access your account and resume shopping</string>
     <string name="auth_options_or_continue_with">Or continue with</string>
