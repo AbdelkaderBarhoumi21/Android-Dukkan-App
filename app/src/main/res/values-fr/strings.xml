@@ -44,6 +44,15 @@
     <string name="auth_terms">Conditions</string>
     <string name="auth_privacy">Politique de confidentialité</string>
     <string name="auth_legal_consent">En continuant, vous acceptez les %1$s et la %2$s</string>
+    <string name="auth_welcome_title">Bienvenue sur Dukkan</string>
+    <string name="auth_welcome_subtitle">Mode, high-tech, beauté et maison — des boutiques près de chez vous, livrés rapidement.</string>
+    <string name="auth_perk_fast">30 min</string>
+    <string name="auth_perk_cash">Paiement à la livraison</string>
+    <string name="auth_perk_returns">Retours faciles</string>
+    <string name="auth_welcome_google">Continuer avec Google</string>
+    <string name="auth_welcome_facebook">Continuer avec Facebook</string>
+    <string name="auth_welcome_email">Continuer avec l\'e-mail</string>
+    <string name="auth_welcome_or">ou</string>
     <string name="auth_options_title">Bon retour</string>
     <string name="auth_options_subtitle">Connectez-vous pour accéder à votre compte et reprendre vos achats</string>
     <string name="auth_options_or_continue_with">Ou continuer avec</string>

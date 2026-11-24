@@ -44,6 +44,15 @@
     <string name="auth_terms">الشروط</string>
     <string name="auth_privacy">سياسة الخصوصية</string>
     <string name="auth_legal_consent">بالمتابعة، فإنك توافق على %1$s و%2$s</string>
+    <string name="auth_welcome_title">مرحبًا بك في دكان</string>
+    <string name="auth_welcome_subtitle">أزياء، تقنية، جمال ومنزل — من متاجر قريبة منك، يصلك بسرعة.</string>
+    <string name="auth_perk_fast">30 دقيقة</string>
+    <string name="auth_perk_cash">الدفع عند الاستلام</string>
+    <string name="auth_perk_returns">إرجاع سهل</string>
+    <string name="auth_welcome_google">المتابعة عبر Google</string>
+    <string name="auth_welcome_facebook">المتابعة عبر Facebook</string>
+    <string name="auth_welcome_email">المتابعة بالبريد الإلكتروني</string>
+    <string name="auth_welcome_or">أو</string>
     <string name="auth_options_title">أهلاً بعودتك</string>
     <string name="auth_options_subtitle">سجّل الدخول للوصول إلى حسابك ومواصلة التسوق</string>
     <string name="auth_options_or_continue_with">أو تابع باستخدام</string>

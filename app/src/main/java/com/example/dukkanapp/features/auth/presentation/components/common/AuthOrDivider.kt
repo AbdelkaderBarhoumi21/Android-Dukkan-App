@@ -14,7 +14,7 @@ import com.example.dukkanapp.core.theme.AppDimens
 import com.example.dukkanapp.core.theme.AppTheme
 
 @Composable
-fun AppOrDivider(
+fun AuthOrDivider(
     text: String,
     modifier: Modifier = Modifier,
     showLines: Boolean = false
