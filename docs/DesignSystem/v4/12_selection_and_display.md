@@ -1055,7 +1055,120 @@ Status colours follow the theme automatically:
 | Info | Reset link sent | Check your inbox | — |
 | Loading | Placing your order… | 765.300 TND · cash on delivery | — |
 | Loading | Uploading photo… | 2 of 3 · 1.2 MB | Cancel |
+# `Brush.horizontalGradient(0.38f to Color.Transparent, 1f to wash)`
 
+## What is a `Brush`?
+
+A `Brush` is **"how to paint"**. It's like choosing your paint before you color something.
+
+- `SolidColor(red)` paints one flat color.
+- A gradient brush paints a color that **changes smoothly** across the area.
+
+You give the brush to `.background(brush)` or `drawRect(brush = ...)`.
+
+## What is `horizontalGradient`?
+
+A gradient that changes **from left to right** (horizontal direction).
+
+```
+left ───────────────────────────► right
+color A  →  blends smoothly  →  color B
+```
+
+(`verticalGradient` would go top to bottom.)
+
+## What are `0.38f` and `1f`?
+
+They are **positions** along the width. They are fractions from `0` to `1`:
+
+|Number|Meaning|
+|---|---|
+|`0f`|the very **left** edge (0%)|
+|`0.38f`|**38%** of the way across|
+|`0.5f`|the middle|
+|`1f`|the very **right** edge (100%)|
+
+Each line is `position to color`:
+
+```kotlin
+0.38f to Color.Transparent   // at 38% of the width: the color is transparent (invisible)
+1f    to wash                // at 100% (right edge): the color is `wash` (status color at ~9%)
+```
+
+## The picture (Arabic / RTL toast)
+
+```
+Toast width:
+0%        38%                          100%
+|---------|----------------------------|
+ empty     fades in ................... wash color
+ (transparent)  ───────────────►  (status color)
+
+Left side                              Right side
+(nothing)                              (soft tint)
+```
+
+- From **0% to 38%**: the brush stays **transparent**. Before the first position, it keeps the first color.
+- From **38% to 100%**: it **blends smoothly** from transparent to the `wash` color.
+
+So the toast has a soft colored glow on the **right** side that fades out toward the left.
+
+## Why this is for RTL
+
+The toast code has two versions:
+
+```kotlin
+val washBrush = if (isRtl) {
+    Brush.horizontalGradient(0.38f to Color.Transparent, 1f to wash)  // Arabic
+} else {
+    Brush.horizontalGradient(0f to wash, 0.62f to Color.Transparent)  // English
+}
+```
+
+**English (LTR):** the icon is on the **left**, so the glow starts at the left.
+
+```
+0%                    62%                 100%
+|---------------------|-------------------|
+wash color ──fades──► transparent ......... transparent
+(glow behind the icon)
+```
+
+**Arabic (RTL):** the icon is on the **right**, so the glow is **mirrored**.
+
+```
+0%                 38%                    100%
+|------------------|----------------------|
+transparent ....... transparent ──fades──► wash color
+                                          (glow behind the icon)
+```
+
+Look at the numbers: `0.62` in English becomes `1 - 0.62 = 0.38` in Arabic. It is the same gradient flipped.
+
+## The goal
+
+The soft wash is a **hint of the status color** behind the icon. Green tint for Success, red for Error. It fades out before it reaches the text, so the text stays easy to read.
+
+## What is `wash`?
+
+```kotlin
+val wash = status.copy(alpha = tokens.washAlpha)
+```
+
+It's the status color (green, red...) made **very see-through**: 9% opaque in light mode, 16% in dark mode. A gentle tint, not a strong color.
+
+## Summary
+
+|Piece|Meaning|
+|---|---|
+|`Brush`|How to paint (flat color or gradient)|
+|`horizontalGradient`|Color changes from left to right|
+|`0.38f`|A point 38% across the width|
+|`1f`|The right edge (100%)|
+|`Color.Transparent`|Invisible color|
+|`wash`|Status color at low opacity|
+
+> "Stay invisible until 38% across, then fade smoothly into the tint color at the right edge."
 ### Code: `AppToast.kt`
 
 ```kotlin
