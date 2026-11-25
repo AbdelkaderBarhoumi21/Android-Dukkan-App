@@ -33,4 +33,4 @@ inline fun <T> guardLocalException(block: () -> T): T = try {
 }
 
 fun <T> Flow<T>.guardLocalException(): Flow<T> =
-    catch { e -> throw if (e is CancellationException) e else AppLocalExceptionMapper.map(e) }
+    catch { e -> throw e as? CancellationException ?: AppFirebaseExceptionMapper.map(e) }

@@ -5,6 +5,10 @@ sealed interface LoginIntent {
     data class PasswordChanged(val password: String) : LoginIntent
     data class RememberMeChanged(val checked: Boolean) : LoginIntent
     data object LoginClicked : LoginIntent
+
+    data object GoogleClicked : LoginIntent
+    
+    data object FacebookClicked : LoginIntent
     data object ForgotPasswordClicked : LoginIntent
     data object SignUpClicked : LoginIntent
     data object BackClicked : LoginIntent
