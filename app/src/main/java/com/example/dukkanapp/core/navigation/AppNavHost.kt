@@ -57,18 +57,13 @@ fun AppNavHost(startDestination: AppRoute) {
         // Auth options screen
         composable<AppRoute.AuthOptionsScreen> {
             AuthOptionsScreen(
-                onEmailClick = {
-                    navController.navigate(AppRoute.SignUpScreen)
+                onNavigateToSignUp = {
+                    navController.navigate(AppRoute.SignUpScreen) { launchSingleTop = true }
                 },
-
-                onGoogleClick = {},
-                onAppleClick = {},
-                onAlreadyHaveAccountClick = {
-                    navController.navigate(AppRoute.LoginScreen)
-                }
-
+                onNavigateToLogin = {
+                    navController.navigate(AppRoute.LoginScreen) { launchSingleTop = true }
+                },
             )
-
         }
         // Home screen
         composable<AppRoute.HomeScreen> {
