@@ -26,10 +26,12 @@ object AuthFormValidator {
     fun validateExistingPassword(password: String): ValidationError? =
         if (password.isEmpty()) ValidationError.PasswordEmpty else null
 
-    fun validateConfirmPassword(password: String, confirmPassword: String): ValidationError? =
-        when {
-            confirmPassword.isEmpty() -> ValidationError.ConfirmPasswordEmpty
-            password != confirmPassword -> ValidationError.PasswordsMismatch
-            else -> null
-        }
+    fun validateFullName(fullName: String): ValidationError? =
+        if (fullName.isBlank()) ValidationError.FullNameEmpty else null
+
+    fun validateTermsAccepted(
+        accepted: Boolean
+    ): ValidationError? =
+        if (accepted) null else ValidationError.TermsNotAccepted
+
 }

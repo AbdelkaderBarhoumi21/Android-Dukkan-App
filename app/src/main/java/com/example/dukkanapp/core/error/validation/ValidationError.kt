@@ -7,4 +7,7 @@ sealed interface ValidationError {
     data class PasswordTooShort(val minLength: Int) : ValidationError
     data object ConfirmPasswordEmpty : ValidationError
     data object PasswordsMismatch : ValidationError
+
+    data object FullNameEmpty : ValidationError
+    data object TermsNotAccepted : ValidationError
 }
