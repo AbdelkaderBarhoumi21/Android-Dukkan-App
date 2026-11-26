@@ -714,23 +714,85 @@ Delete `liveMismatchError` (Decision 2). Use the `onSuccess`/`onFailure` helpers
 
 **Use case and data changes (auth guide files) for Decision 4:**
 
-| File | Change |
-|---|---|
-| `SignUpWithEmailUseCase` | add `fullName: String` and `marketingOptIn: Boolean` parameters |
-| `AuthRepository.signUp(...)` / `AuthRemoteDataSource` | after `createUserWithEmailAndPassword`, call `user.updateProfile(userProfileChangeRequest { displayName = fullName }).await()` so `AuthUser.displayName` is set |
-| `UserRepository.syncProfile(...)` / `toNewUserDto(...)` | write `displayName = fullName` and `marketingNotificationsEnabled = marketingOptIn` on **create only** (the transaction already only creates once) |
-| Firestore rules | no change: both fields are already in the `hasOnly` list |
+| File                                                    | Change                                                                                                                                                          |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SignUpWithEmailUseCase`                                | add `fullName: String` and `marketingOptIn: Boolean` parameters                                                                                                 |
+| `AuthRepository.signUp(...)` / `AuthRemoteDataSource`   | after `createUserWithEmailAndPassword`, call `user.updateProfile(userProfileChangeRequest { displayName = fullName }).await()` so `AuthUser.displayName` is set |
+| `UserRepository.syncProfile(...)` / `toNewUserDto(...)` | write `displayName = fullName` and `marketingNotificationsEnabled = marketingOptIn` on **create only** (the transaction already only creates once)              |
+| Firestore rules                                         | no change: both fields are already in the `hasOnly` list                                                                                                        |
 
 ### Screen effect handling (`SignUpScreen.kt`)
-
 ```kotlin
-val uriHandler = LocalUriHandler.current
+val uriHandler = LocalUriHandler.current   // androidx.compose.ui.platform.LocalUriHandler
+
 AppCollectEffect(viewModel.effect) { effect ->
     when (effect) {
+        is SignUpEffect.NavigateToEmailVerification ->
+            onNavigateToEmailVerification(effect.emailJustSent)
+        SignUpEffect.NavigateToLogin -> onNavigateToLogin()
+        SignUpEffect.NavigateBack -> onNavigationBack()
         is SignUpEffect.OpenUrl -> uriHandler.openUri(effect.url)
-        // ...existing navigation effects
     }
 }
+```
+Your [SignUpScreen.kt](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/features/auth/presentation/screens/SignUpScreen.kt) now expects `onNavigateToEmailVerification`, so the nav host has to pass it. There are three changes.
+
+## 1. [AppRoute.kt](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/core/navigation/AppRoute.kt): add the route
+
+Put this inside the `sealed interface AppRoute`:
+
+```kotlin
+@Serializable
+data class EmailVerificationScreen(val emailJustSent: Boolean = false) : AppRoute
+```
+
+## 2. [AppNavHost.kt](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/core/navigation/AppNavHost.kt): update Sign up
+
+In `composable<AppRoute.SignUpScreen>`, replace the `onNavigateToHome` line:
+
+```kotlin
+onNavigateToEmailVerification = { emailJustSent ->
+    navController.navigateAsRoot(AppRoute.EmailVerificationScreen(emailJustSent))
+},
+```
+
+Add the new destination below it. It's empty for now, like your Home screen, because I found no verification screen yet:
+
+```kotlin
+composable<AppRoute.EmailVerificationScreen> {
+    // TODO: EmailVerificationScreen
+}
+```
+
+## 3. [AppNavHost.kt](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/core/navigation/AppNavHost.kt): add the helper
+
+At the bottom of the file, replace `navigateToHome` with:
+
+```kotlin
+/** [route] becomes the only screen: "back" exits the app. */
+private fun NavController.navigateAsRoot(route: AppRoute) {
+    navigate(route) {
+        popUpTo(graph.id) { inclusive = true }
+    }
+}
+
+private fun NavController.navigateToHome() = navigateAsRoot(AppRoute.HomeScreen)
+```
+
+Keep `navigateToHome`, since Login still uses it.
+
+**Why `navigateAsRoot`?** The account is already created, so pressing back shouldn't return to the sign-up form.
+
+## Fix this too: the names don't match
+
+Your effect declares `isJustEmail`, but [SignUpViewModel.kt:94](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/features/auth/presentation/logic/signup/SignUpViewModel.kt#L94) passes `emailJustSent = true`, so it won't compile. I'd rename it in [SignUpEffect.kt](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/features/auth/presentation/logic/signup/SignUpEffect.kt):
+
+```kotlin
+data class NavigateToEmailVerification(val emailJustSent: Boolean) : SignUpEffect
+```
+
+Then in `SignUpScreen.kt`, use `effect.emailJustSent`.
+
 ```
 
 ### `SignUpScreenContent.kt` (rewrite)
