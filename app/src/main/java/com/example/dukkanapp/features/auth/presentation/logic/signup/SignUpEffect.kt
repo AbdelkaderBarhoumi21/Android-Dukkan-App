@@ -4,4 +4,6 @@ sealed interface SignUpEffect {
     data object NavigateToHome : SignUpEffect
     data object NavigateToLogin : SignUpEffect
     data object NavigateBack : SignUpEffect
+
+    data class OpenUrl(val url: String) : SignUpEffect
 }
