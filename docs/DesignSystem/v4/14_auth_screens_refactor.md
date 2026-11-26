@@ -10,12 +10,29 @@ It changes only the **presentation layer** plus a few validation additions. The 
 
 ---
 
+## Contents
+
+- [0. Decisions](#0-decisions-to-confirm-before-typing)
+- [1. Refactor order](#1-refactor-order)
+- [2. Shared auth pieces](#2-shared-auth-pieces)
+- [3. Welcome](#3-welcome-figma-021-our-authoptionsscreen)
+- [4. Log in](#4-log-in-figma-022)
+- [5. Sign up](#5-sign-up-figma-023)
+- [6. Forgot password](#6-forgot-password-figma-024)
+- [7. Email verification](#7-email-verification-figma-026--027-sign-up-step-22)
+- [8. All set](#8-all-set-figma-025-new-screen)
+- [9. Strings](#9-strings)
+- [10. Delete the old code](#10-delete-the-old-code-last-step)
+- [Check](#check)
+
+---
+
 ## 0. Decisions to confirm before typing
 
 | # | Figma says | Current code / auth guide | Recommendation |
 |---|---|---|---|
 | 1 | Welcome offers **Google + Facebook** + email | **Google + Apple** + email | **Decided: follow Figma, Google + Facebook.** Apple is dropped (delete `ic_apple.xml` and the Apple strings). Both social logins stay **TODO** (as in the auth guide). Facebook needs a Meta developer app and the Facebook SDK. |
-| 2 | Sign up has **no Confirm password** field. It shows an eye toggle plus a strength meter | `confirmPassword` + `validateConfirmPassword` | Follow Figma. The eye toggle removes typos, and fewer fields means more sign-ups. Delete the confirm-password state, intent and validator (listed in §4). |
+| 2 | Sign up has **no Confirm password** field. It shows an eye toggle plus a strength meter | `confirmPassword` + `validateConfirmPassword` | Follow Figma. The eye toggle removes typos, and fewer fields means more sign-ups. Delete the confirm-password state, intent and validator (listed in §5). |
 | 3 | Sign up has **no "Keep me logged in"** | `SignUpUiState.rememberMe` | New accounts are remembered (`rememberMe = true` sent to the use case). Only Log in shows the checkbox. |
 | 4 | Sign up adds **Full name**, **Terms (required)** and **"Send me deals by email"** | not present | Add them. The full name becomes `displayName` (Auth profile and `users/{uid}`). The opt-in becomes `users/{uid}.marketingNotificationsEnabled`. |
 | 5 | Sign up shows **"1/2"** | the flow is Sign up, then Email verification | Step 1 = Sign up, step 2 = Email verification. After verification, show **All set** once, then Home. |
@@ -172,7 +189,7 @@ fun legalText(
 | 322 | perks: 30 min · Cash on delivery · Easy returns | 14 dp icon `brand` + `helper` in `textLabel` |
 | 446 | Continue with Google | `AppSocialButton`, full width |
 | 510 | Continue with Facebook | `AppSocialButton`, gap `space12` **(Decision 1)** |
-| 582 | "or" | `AppOrDivider`, gap `space16` above and below |
+| 582 | "or" | `AuthOrDivider`, gap `space16` above and below |
 | 618 | Continue with email | `AppButton(Primary)`, leading `mail` |
 | 689 | terms notice | `caption`, `textSecondary`, links `brand` |
 | 777 | Already have an account? **Log in** | `AppAuthFooterLink` |
@@ -187,6 +204,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -207,7 +225,7 @@ import com.example.dukkanapp.core.common.components.scaffold.AppScreenBackground
 import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthFooterLink
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthHeader
-import com.example.dukkanapp.features.auth.presentation.components.common.AppOrDivider
+import com.example.dukkanapp.features.auth.presentation.components.common.AuthOrDivider
 import com.example.dukkanapp.features.auth.presentation.components.common.AuthFormColumn
 import com.example.dukkanapp.features.auth.presentation.components.common.AuthHeaderLogo
 import com.example.dukkanapp.features.auth.presentation.components.common.legalText
@@ -248,7 +266,7 @@ fun AuthOptionsScreenContent(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(AppDimens.space16))
-            AppOrDivider(text = stringResource(R.string.auth_or))
+            AuthOrDivider(text = stringResource(R.string.auth_or))
             Spacer(Modifier.height(AppDimens.space16))
             AppButton(
                 text = stringResource(R.string.auth_continue_email),
@@ -301,8 +319,6 @@ private fun AuthOptionsPreview() {
 }
 ```
 
-Add `import androidx.compose.foundation.layout.heightIn`.
-
 ### `AuthOptionsScreen.kt` changes
 
 - Rename `onAppleClick` to `onFacebookClick` (still a `// TODO: Facebook sign-in`).
@@ -338,7 +354,7 @@ AuthOptionsScreenContent(
 | 346 → 368 | Password | `AppPasswordTextField` |
 | 439 | Keep me logged in · Forgot password? | `AppCheckbox` + `AppButton(Ghost, Small)` |
 | 484 | Log in → | `AppButton(Primary)` + trailing `arrow-right` |
-| 566 | "or continue with" | `AppOrDivider` |
+| 566 | "or continue with" | `AuthOrDivider` |
 | 600 | Google · Facebook (170 × 52 each, gap 13) | two `AppSocialButton` with `weight(1f)` |
 | 777 | New to Dukkan? **Create account** | `AppAuthFooterLink` |
 
@@ -401,7 +417,7 @@ import com.example.dukkanapp.core.common.components.scaffold.AppScreenBackground
 import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthFooterLink
 import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthHeader
-import com.example.dukkanapp.features.auth.presentation.components.common.AppOrDivider
+import com.example.dukkanapp.features.auth.presentation.components.common.AuthOrDivider
 import com.example.dukkanapp.features.auth.presentation.components.common.AuthFormColumn
 import com.example.dukkanapp.features.auth.presentation.components.common.AuthHeaderLogo
 import com.example.dukkanapp.features.auth.presentation.logic.login.LoginIntent
@@ -505,7 +521,7 @@ fun LoginScreenContent(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(AppDimens.space24))
-            AppOrDivider(text = stringResource(R.string.auth_or_continue_with))
+            AuthOrDivider(text = stringResource(R.string.auth_or_continue_with))
             Spacer(Modifier.height(AppDimens.space16))
             Row(horizontalArrangement = Arrangement.spacedBy(AppDimens.space12)) {
                 AppSocialButton(
@@ -643,13 +659,35 @@ sealed interface SignUpIntent {
 }
 ```
 
-### `SignUpEffect.kt`: add
+### `SignUpEffect.kt` (rewrite)
+
+`NavigateToHome` is gone: a new account must verify its email first.
 
 ```kotlin
-data class OpenUrl(val url: String) : SignUpEffect
+package com.example.dukkanapp.features.auth.presentation.logic.signup
+
+sealed interface SignUpEffect {
+    data class NavigateToEmailVerification(val emailJustSent: Boolean) : SignUpEffect
+    data object NavigateToLogin : SignUpEffect
+    data object NavigateBack : SignUpEffect
+    data class OpenUrl(val url: String) : SignUpEffect
+}
 ```
 
 ### `SignUpViewModel.kt`: the changed parts
+
+Inject the use case (create it first, see the table below):
+
+```kotlin
+@HiltViewModel
+class SignUpViewModel @Inject constructor(
+    private val signUpWithEmail: SignUpWithEmailUseCase,
+) : AppViewModel<SignUpUiState, SignUpIntent, SignUpEffect>(
+    initialState = SignUpUiState()
+)
+```
+
+Then the logic:
 
 ```kotlin
 override fun onIntent(intent: SignUpIntent) {
@@ -721,78 +759,75 @@ Delete `liveMismatchError` (Decision 2). Use the `onSuccess`/`onFailure` helpers
 | `UserRepository.syncProfile(...)` / `toNewUserDto(...)` | write `displayName = fullName` and `marketingNotificationsEnabled = marketingOptIn` on **create only** (the transaction already only creates once)              |
 | Firestore rules                                         | no change: both fields are already in the `hasOnly` list                                                                                                        |
 
-### Screen effect handling (`SignUpScreen.kt`)
-```kotlin
-val uriHandler = LocalUriHandler.current   // androidx.compose.ui.platform.LocalUriHandler
+### `SignUpScreen.kt`
 
-AppCollectEffect(viewModel.effect) { effect ->
-    when (effect) {
-        is SignUpEffect.NavigateToEmailVerification ->
-            onNavigateToEmailVerification(effect.emailJustSent)
-        SignUpEffect.NavigateToLogin -> onNavigateToLogin()
-        SignUpEffect.NavigateBack -> onNavigationBack()
-        is SignUpEffect.OpenUrl -> uriHandler.openUri(effect.url)
+```kotlin
+@Composable
+fun SignUpScreen(
+    onNavigationBack: () -> Unit,
+    onNavigateToEmailVerification: (emailJustSent: Boolean) -> Unit,
+    onNavigateToLogin: () -> Unit,
+    viewModel: SignUpViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val uriHandler = LocalUriHandler.current   // androidx.compose.ui.platform.LocalUriHandler
+
+    AppCollectEffect(viewModel.effect) { effect ->
+        when (effect) {
+            is SignUpEffect.NavigateToEmailVerification ->
+                onNavigateToEmailVerification(effect.emailJustSent)
+            SignUpEffect.NavigateToLogin -> onNavigateToLogin()
+            SignUpEffect.NavigateBack -> onNavigationBack()
+            is SignUpEffect.OpenUrl -> uriHandler.openUri(effect.url)
+        }
     }
+
+    SignUpScreenContent(state = state, onIntent = viewModel::onIntent)
 }
 ```
-Your [SignUpScreen.kt](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/features/auth/presentation/screens/SignUpScreen.kt) now expects `onNavigateToEmailVerification`, so the nav host has to pass it. There are three changes.
 
-## 1. [AppRoute.kt](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/core/navigation/AppRoute.kt): add the route
+### Navigation
 
-Put this inside the `sealed interface AppRoute`:
+**`AppRoute.kt`:** add the route inside `sealed interface AppRoute`.
 
 ```kotlin
 @Serializable
 data class EmailVerificationScreen(val emailJustSent: Boolean = false) : AppRoute
 ```
 
-## 2. [AppNavHost.kt](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/core/navigation/AppNavHost.kt): update Sign up
+`emailJustSent = true` means an email was sent a moment ago, so Resend starts in its 60 s cooldown.
 
-In `composable<AppRoute.SignUpScreen>`, replace the `onNavigateToHome` line:
-
-```kotlin
-onNavigateToEmailVerification = { emailJustSent ->
-    navController.navigateAsRoot(AppRoute.EmailVerificationScreen(emailJustSent))
-},
-```
-
-Add the new destination below it. It's empty for now, like your Home screen, because I found no verification screen yet:
+**`AppNavHost.kt`:** update Sign up and add the new destination.
 
 ```kotlin
+composable<AppRoute.SignUpScreen> {
+    SignUpScreen(
+        onNavigationBack = { navController.popBackStack() },
+        onNavigateToLogin = {
+            navController.navigate(AppRoute.LoginScreen) {
+                popUpTo(AppRoute.SignUpScreen) { inclusive = true }
+                launchSingleTop = true
+            }
+        },
+        onNavigateToEmailVerification = { emailJustSent ->
+            navController.navigateAsRoot(AppRoute.EmailVerificationScreen(emailJustSent))
+        },
+    )
+}
 composable<AppRoute.EmailVerificationScreen> {
-    // TODO: EmailVerificationScreen
+    // TODO: EmailVerificationScreen (§7)
 }
 ```
 
-## 3. [AppNavHost.kt](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/core/navigation/AppNavHost.kt): add the helper
-
-At the bottom of the file, replace `navigateToHome` with:
+**`AppNavHost.kt`:** one helper replaces `navigateToHome`. Login calls `navigateAsRoot(AppRoute.HomeScreen)`.
 
 ```kotlin
-/** [route] becomes the only screen: "back" exits the app. */
+/** [route] becomes the only screen: "back" exits the app instead of returning to the auth forms. */
 private fun NavController.navigateAsRoot(route: AppRoute) {
     navigate(route) {
         popUpTo(graph.id) { inclusive = true }
     }
 }
-
-private fun NavController.navigateToHome() = navigateAsRoot(AppRoute.HomeScreen)
-```
-
-Keep `navigateToHome`, since Login still uses it.
-
-**Why `navigateAsRoot`?** The account is already created, so pressing back shouldn't return to the sign-up form.
-
-## Fix this too: the names don't match
-
-Your effect declares `isJustEmail`, but [SignUpViewModel.kt:94](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/features/auth/presentation/logic/signup/SignUpViewModel.kt#L94) passes `emailJustSent = true`, so it won't compile. I'd rename it in [SignUpEffect.kt](vscode-webview://0l5tskjsq63miat81m73jrtfldu1tf7hta3gcfrf132rk35c7849/features/auth/presentation/logic/signup/SignUpEffect.kt):
-
-```kotlin
-data class NavigateToEmailVerification(val emailJustSent: Boolean) : SignUpEffect
-```
-
-Then in `SignUpScreen.kt`, use `effect.emailJustSent`.
-
 ```
 
 ### `SignUpScreenContent.kt` (rewrite)
@@ -1115,6 +1150,36 @@ private fun signOutAndLeave(toSignUp: Boolean = false) {
 In `EmailVerificationScreen.kt`, handle `NavigateToSignUp` with a new `onNavigateToSignUp` callback, and in `AppNavHost` pass `navController.navigateAsRoot(AppRoute.SignUpScreen)`.
 
 When verification succeeds, navigate to **All set** (§8) instead of Home, but only for a brand-new account (`emailJustSent == true`). A user who signed up long ago and is only verifying now goes straight to Home.
+
+`EmailVerificationEffect.kt`: add
+
+```kotlin
+data class NavigateToAllSet(val firstName: String) : EmailVerificationEffect
+```
+
+`EmailVerificationViewModel.kt`: keep the route argument and the first name, then pick the effect.
+
+```kotlin
+// class body: replaces the toRoute() call inside init
+private val emailJustSent =
+    savedStateHandle.toRoute<AppRoute.EmailVerificationScreen>().emailJustSent
+private val firstName =
+    getCurrentUser()?.displayName.orEmpty().substringBefore(" ")
+
+init {
+    if (emailJustSent) startResendCooldown()
+}
+
+// checkVerification: replace the "isVerified -> ..." line
+isVerified -> sendEffect(
+    if (emailJustSent) EmailVerificationEffect.NavigateToAllSet(firstName)
+    else EmailVerificationEffect.NavigateToHome
+)
+```
+
+In `EmailVerificationScreen.kt`, handle `NavigateToAllSet` with an `onNavigateToAllSet: (String) -> Unit` callback. In `AppNavHost`, pass `navController.navigateAsRoot(AppRoute.AllSetScreen(firstName))`.
+
+> **Back arrow on Sign up after "Change":** `navigateAsRoot` leaves Sign up as the only screen, so `popBackStack()` has nowhere to go. Navigate to Welcome instead when there is no previous screen.
 
 ### `EmailVerificationScreenContent.kt` (rewrite)
 
@@ -1502,6 +1567,10 @@ private fun NotVerifiedPreview() {
 | `all_set_unlocked` *(new)* | Unlocked | مفعّل | Débloqué |
 | `action_add_address` *(new)* | Add my delivery address | أضف عنوان التوصيل | Ajouter mon adresse |
 | `action_start_shopping` *(new)* | Start shopping | ابدأ التسوق | Commencer mes achats |
+| `action_log_in` | Log in | تسجيل الدخول | Se connecter |
+| `auth_already_have_account` | Already have an account? | لديك حساب بالفعل؟ | Vous avez déjà un compte ? |
+| `auth_email_placeholder` | Email address | البريد الإلكتروني | Adresse e-mail |
+| `auth_password_placeholder` | Password | كلمة المرور | Mot de passe |
 | `cd_clear_text` *(new)* | Clear text | مسح النص | Effacer le texte |
 | `verify_title` *(new)* | Verify your email | تحقّق من بريدك الإلكتروني | Vérifiez votre e-mail |
 | `verify_subtitle` *(new)* | We sent a verification link to your inbox. | أرسلنا رابط التحقق إلى بريدك الوارد. | Nous avons envoyé un lien de vérification dans votre boîte. |
@@ -1530,25 +1599,25 @@ private fun NotVerifiedPreview() {
 Run this first. Every hit is a screen you still have to migrate (Language and Onboarding use some of these too):
 
 ```bash
-grep -rnE "AppPrimaryButton|AppTextButton|AppTextFiled|AppPasswordTextField|AuthButton|AppCheckBox|AppDivider|AppAccountRecovery|core\.common\.components\.(header|footer|scaffold|banner|pager)|iconsax" app/src/main/java
+grep -rnE "AppPrimaryButton|AppTextButton|AppTextFiled|AuthButton|AuthOptionsSection|AppAccountRecovery|core\.common\.components\.(header|footer|checkbox|dividers|pager\.AppPagerIndicator)|iconsax" app/src/main/java
 ```
 
 When it returns nothing, delete:
 
 ```
-core/common/components/buttons/            (AppPrimaryButton, AppTextButton)
-core/common/components/TextField/          (AppTextField with the typo, AppPasswordTextField)
-core/common/components/checkbox/           (AppCheckBox)
+core/common/components/buttons/AppPrimaryButton.kt
+core/common/components/buttons/AppTextButton.kt
+core/common/components/checkbox/           (old AppCheckBox; the new one is in selection/)
 core/common/components/dividers/           (AppDivider)
 core/common/components/header/             (AppAuthHeader, AppAccountRecoveryHeader)
 core/common/components/footer/             (AppAuthFooterLink, AppAccountRecoveryFooter)
-core/common/components/scaffold/           (old AppScaffold)
-core/common/components/banner/             (old AppMessageBanner)
 core/common/components/pager/AppPagerIndicator.kt
 features/auth/presentation/components/authoptions/AuthButton.kt
 features/auth/presentation/components/authoptions/AuthOptionsSection.kt
 res/drawable/ic_app_logo.xml, ic_email.xml, ic_apple.xml (if Decision 1 = Facebook)
 ```
+
+> **Keep** `buttons/`, `textfield/`, `scaffold/`, `banner/` and `pager/AppHorizontalPager.kt`: the new components live there.
 
 Then remove the Iconsax dependency (`iconsax` in `libs.versions.toml` and `implementation(libs.iconsax.compose)` in `app/build.gradle.kts`). Lucide `AppIcons` replace it, which means one icon family across the app, as Figma requires.
 
