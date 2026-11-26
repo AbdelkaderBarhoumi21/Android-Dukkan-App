@@ -72,7 +72,7 @@ fun AppNavHost(startDestination: AppRoute) {
         composable<AppRoute.LoginScreen> {
             LoginScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToHome = { navController.navigateToHome() },
+                onNavigateToHome = { navController.navigateAsRoot(AppRoute.HomeScreen) },
                 onNavigateToSignUp = {
                     navController.navigate(AppRoute.SignUpScreen) {
                         popUpTo(AppRoute.LoginScreen) { inclusive = true }
@@ -85,15 +85,19 @@ fun AppNavHost(startDestination: AppRoute) {
 
         composable<AppRoute.SignUpScreen> {
             SignUpScreen(
-                onNavigationBack = { navController.popBackStack() },
-                onNavigateToHome = { navController.navigateToHome() },
-                onNavigateToLogin = {
-                    navController.navigate(AppRoute.LoginScreen) {
-                        popUpTo(AppRoute.SignUpScreen) { inclusive = true }
-                        launchSingleTop = true
-                    }
+                onNavigationBack = {
+                    navController.popBackStack()
                 },
+                onNavigateToLogin = {
+                    navController.navigate(AppRoute.LoginScreen)
+                },
+                onNavigateToEmailVerification = { emailJustSent ->
+                    navController.navigateAsRoot(AppRoute.EmailVerificationScreen(emailJustSent))
+                }
             )
+        }
+        composable<AppRoute.EmailVerificationScreen> {
+            // TODO: EmailVerificationScreen
         }
         composable<AppRoute.ForgetPasswordScreen> {
             ForgetPasswordScreen(
@@ -117,9 +121,20 @@ fun AppNavHost(startDestination: AppRoute) {
 
 }
 
-/** Home becomes the only screen: "back" from Home exits the app instead of returning to Login. */
-private fun NavController.navigateToHome() {
-    navigate(AppRoute.HomeScreen) {
+
+private fun NavController.test(route: AppRoute) {
+    navigate(
+        route
+    ) {
+        popUpTo(graph.id) {
+            inclusive = true
+        }
+    }
+}
+
+/** [route] becomes the only screen: "back" exits the app instead of returning to the auth forms. */
+private fun NavController.navigateAsRoot(route: AppRoute) {
+    navigate(route) {
         popUpTo(graph.id) { inclusive = true }
     }
 }

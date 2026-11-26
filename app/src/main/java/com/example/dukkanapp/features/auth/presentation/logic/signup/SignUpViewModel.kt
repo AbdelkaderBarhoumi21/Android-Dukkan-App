@@ -2,9 +2,8 @@ package com.example.dukkanapp.features.auth.presentation.logic.signup
 
 import androidx.lifecycle.viewModelScope
 import com.example.dukkanapp.core.common.mvi.AppViewModel
-import com.example.dukkanapp.core.common.text.AppUiText
 import com.example.dukkanapp.core.error.ui.toUiText
-import com.example.dukkanapp.core.error.validation.ValidationError
+import com.example.dukkanapp.core.utils.constants.AppLinks
 import com.example.dukkanapp.features.auth.domain.validation.AuthFormValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -17,34 +16,42 @@ class SignUpViewModel @Inject constructor() :
     ) {
     override fun onIntent(intent: SignUpIntent) {
         when (intent) {
+            is SignUpIntent.FullNameChanged -> setState {
+                copy(
+                    fullName = intent.fullName,
+                    fullNameError = null
+                )
+            }
+
             is SignUpIntent.EmailChanged -> setState {
                 copy(
                     email = intent.email,
-                    emailError = null
+                    emailError = null,
+                    generalError = null
                 )
             }
 
             is SignUpIntent.PasswordChanged -> setState {
                 copy(
                     password = intent.password,
-                    passwordError = null,
-                    confirmPasswordError = liveMismatchError(intent.password, confirmPassword)
+                    passwordError = null
                 )
             }
 
-            is SignUpIntent.ConfirmPasswordChanged -> setState {
+            is SignUpIntent.AcceptTermsChanged -> setState {
                 copy(
-                    confirmPassword = intent.confirmPassword,
-                    confirmPasswordError = liveMismatchError(password, intent.confirmPassword)
+                    acceptedTerms = intent.checked,
+                    termsError = null
                 )
             }
 
-            is SignUpIntent.RememberMeChanged -> setState { copy(rememberMe = intent.checked) }
+            is SignUpIntent.MarketingOptInChanged -> setState { copy(marketingOptIn = intent.checked) }
 
+            SignUpIntent.TermsClicked -> sendEffect(SignUpEffect.OpenUrl(AppLinks.TERMS))
+            SignUpIntent.PrivacyClicked -> sendEffect(SignUpEffect.OpenUrl(AppLinks.PRIVACY))
             SignUpIntent.SignUpClicked -> onSignUpClicked()
             SignUpIntent.LoginClicked -> sendEffect(SignUpEffect.NavigateToLogin)
             SignUpIntent.BackClicked -> sendEffect(SignUpEffect.NavigateBack)
-
 
         }
     }
@@ -53,41 +60,39 @@ class SignUpViewModel @Inject constructor() :
         val current = currentState
         if (current.isLoading) return
 
-        // Values
+        val fullName = current.fullName.trim()
         val email = current.email.trim()
-        // Passwords are never trimmed: a space is a valid password character.
         val password = current.password
-        val confirmPassword = current.confirmPassword
 
-        // Errors
+        val fullNameError = AuthFormValidator.validateFullName(fullName)
         val emailError = AuthFormValidator.validateEmail(email)
         val passwordError = AuthFormValidator.validateNewPassword(password)
-        val confirmPasswordError =
-            AuthFormValidator.validateConfirmPassword(password, confirmPassword)
+        val termsError = AuthFormValidator.validateTermsAccepted(current.acceptedTerms)
 
-        if (emailError != null || passwordError != null || confirmPasswordError != null) {
+        if (listOf(fullNameError, emailError, passwordError, termsError).any { it != null }) {
             setState {
                 copy(
+                    fullNameError = fullNameError?.toUiText(),
                     emailError = emailError?.toUiText(),
                     passwordError = passwordError?.toUiText(),
-                    confirmPasswordError = confirmPasswordError?.toUiText()
+                    termsError = termsError?.toUiText(),
                 )
             }
             return
         }
 
-        setState { copy(isLoading = true) }
+        setState { copy(isLoading = true, generalError = null) }
         viewModelScope.launch {
-            // TODO : Add Firebase auth
+            // Auth guide's SignUpWithEmailUseCase, extended (see below).
+            signUpWithEmail(
+                email = email,
+                password = password,
+                fullName = fullName,
+                marketingOptIn = current.marketingOptIn,
+                rememberMe = true, // (Decision 3)
+            )
+                .onSuccess { sendEffect(SignUpEffect.NavigateToEmailVerification(emailJustSent = true)) }
+                .onFailure { failure -> setState { copy(generalError = failure.toUiText()) } }
             setState { copy(isLoading = false) }
-            sendEffect(SignUpEffect.NavigateToHome)
         }
     }
-
-    private fun liveMismatchError(password: String, confirmPassword: String): AppUiText? =
-        if (confirmPassword.isNotEmpty() && password != confirmPassword) {
-            ValidationError.PasswordsMismatch.toUiText()
-        } else {
-            null
-        }
-}

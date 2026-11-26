@@ -17,14 +17,17 @@ sealed interface AppRoute {
 
     @Serializable
 
-    data object LoginScreen
+    data object LoginScreen : AppRoute
 
     @Serializable
-    data object SignUpScreen
+    data object SignUpScreen : AppRoute
 
     @Serializable
-    data object ForgetPasswordScreen
+    data class EmailVerificationScreen(val emailJustSent: Boolean = false) : AppRoute
 
     @Serializable
-    data object ResetPasswordScreen
+    data object ForgetPasswordScreen : AppRoute
+
+    @Serializable
+    data object ResetPasswordScreen : AppRoute
 }
