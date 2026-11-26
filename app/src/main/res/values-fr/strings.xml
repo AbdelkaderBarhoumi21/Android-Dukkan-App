@@ -82,12 +82,62 @@
     <string name="forgetpassword_send_reset_link">Envoyer le lien de réinitialisation</string>
     <string name="forgetpassword_back_to_login">Retour à la connexion</string>
 
+    <!-- Forgot password (Figma 02.4) -->
+    <string name="forgot_title">Réinitialiser le mot de passe</string>
+    <string name="forgot_subtitle">Nous vous enverrons un lien sécurisé pour en définir un nouveau.</string>
+    <string name="forgot_send_link">Envoyer le lien</string>
+    <string name="forgot_sent_title">Consultez votre boîte de réception</string>
+    <string name="forgot_sent_body">Lien envoyé à %1$s</string>
+    <string name="forgot_sent_expiry">Il expire dans 1 heure.</string>
+    <string name="forgot_toast_sent">Lien de réinitialisation envoyé</string>
+    <string name="action_open_email_app">Ouvrir l’app e-mail</string>
+    <string name="resend_prompt">Pas reçu&#160;?</string>
+    <string name="resend_in">Renvoyer dans %1$s</string>
+    <string name="action_resend">Renvoyer</string>
+
     <!-- Sign up -->
     <string name="signup_title">Créez votre compte</string>
-    <string name="signup_subtitle">Rejoignez Dukkan pour profiter des meilleures offres et d\'un paiement plus rapide.</string>
+    <string name="signup_subtitle">C\'est gratuit et ça prend moins d\'une minute.</string>
     <string name="signup_confirm_password_placeholder">Confirmer le mot de passe</string>
     <string name="signup_button">Créer un compte</string>
     <string name="signup_loading">Création du compte…</string>
+    <string name="signup_step">%1$d/%2$d</string>
+    <string name="label_full_name">Nom complet</string>
+    <string name="placeholder_full_name">Votre nom complet</string>
+    <string name="helper_email_ok">Parfait</string>
+    <string name="signup_accept_terms">J’accepte les %1$s et la %2$s</string>
+    <string name="signup_marketing_opt_in">Recevoir les offres par e-mail</string>
+    <string name="signup_create_account">Créer un compte</string>
+    <string name="error_full_name_empty">Saisissez votre nom complet</string>
+    <string name="error_terms_not_accepted">Veuillez accepter les conditions pour continuer</string>
+
+    <!-- Email verification (Figma 02.6 / 02.7) -->
+    <string name="verify_title">Vérifiez votre e-mail</string>
+    <string name="verify_subtitle">Nous avons envoyé un lien de vérification dans votre boîte.</string>
+    <string name="verify_sent_to">Envoyé à</string>
+    <string name="action_change">Modifier</string>
+    <string name="verify_step1_title">Ouvrez l’e-mail de Dukkan</string>
+    <string name="verify_step1_body">Objet&#160;: « Vérifiez votre compte Dukkan »</string>
+    <string name="verify_step2_title">Appuyez sur « Vérifier mon e-mail »</string>
+    <string name="verify_step2_body">Le lien est valable 24 heures</string>
+    <string name="verify_step3_title">Revenez et appuyez sur J’ai vérifié</string>
+    <string name="verify_step3_body">Nous vous emmènerons à l’accueil</string>
+    <string name="verify_i_have_verified">J’ai vérifié</string>
+    <string name="verify_not_verified_title">Votre e-mail n’est pas encore vérifié</string>
+    <string name="verify_not_verified_body">Ouvrez le lien envoyé, puis appuyez sur J’ai vérifié.</string>
+    <string name="verify_help_title">Vous ne le trouvez pas&#160;?</string>
+    <string name="verify_help_spam">Vérifiez les spams ou promotions, ou cherchez « Dukkan ».</string>
+    <string name="verify_help_expiry">Les liens expirent après 24 heures.</string>
+    <string name="verify_resend_link">Renvoyer le lien</string>
+
+    <!-- All set (Figma 02.5) -->
+    <string name="all_set_title">Tout est prêt, %1$s&#160;!</string>
+    <string name="all_set_body">Votre compte est prêt. Voici un petit cadeau de bienvenue pour commencer.</string>
+    <string name="all_set_gift_title">3 livraisons offertes</string>
+    <string name="all_set_gift_subtitle" formatted="false">Plus 15&#160;% de remise avec WELCOME15</string>
+    <string name="all_set_unlocked">Débloqué</string>
+    <string name="action_add_address">Ajouter mon adresse</string>
+    <string name="action_start_shopping">Commencer mes achats</string>
 
     <!-- Validation (ValidationError.toUiText) -->
     <string name="validation_email_empty">Veuillez saisir votre e-mail</string>
@@ -122,5 +172,5 @@
     <string name="password_strength_fair">Moyen</string>
     <string name="password_strength_good">Bon</string>
     <string name="password_strength_strong">Fort</string>
-    <string name="password_strength_format">Force du mot de passe : %1$s</string>
+    <string name="password_strength_format">%1$s · 8 caractères min., un chiffre et un symbole</string>
 </resources>

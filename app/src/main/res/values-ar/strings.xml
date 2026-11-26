@@ -82,12 +82,62 @@
     <string name="forgetpassword_send_reset_link">إرسال رابط إعادة التعيين</string>
     <string name="forgetpassword_back_to_login">العودة لتسجيل الدخول</string>
 
+    <!-- Forgot password (Figma 02.4) -->
+    <string name="forgot_title">إعادة تعيين كلمة المرور</string>
+    <string name="forgot_subtitle">سنرسل لك رابطًا آمنًا لتعيين كلمة مرور جديدة.</string>
+    <string name="forgot_send_link">إرسال رابط إعادة التعيين</string>
+    <string name="forgot_sent_title">تحقق من بريدك الوارد</string>
+    <string name="forgot_sent_body">تم إرسال الرابط إلى %1$s</string>
+    <string name="forgot_sent_expiry">تنتهي صلاحيته خلال ساعة واحدة.</string>
+    <string name="forgot_toast_sent">تم إرسال رابط إعادة التعيين</string>
+    <string name="action_open_email_app">فتح تطبيق البريد</string>
+    <string name="resend_prompt">لم يصلك؟</string>
+    <string name="resend_in">إعادة الإرسال خلال %1$s</string>
+    <string name="action_resend">إعادة الإرسال</string>
+
     <!-- Sign up -->
     <string name="signup_title">أنشئ حسابك</string>
-    <string name="signup_subtitle">انضم إلى دكان لتكتشف أفضل العروض وتستمتع بتجربة دفع أسرع.</string>
+    <string name="signup_subtitle">مجاني ولا يستغرق أكثر من دقيقة.</string>
     <string name="signup_confirm_password_placeholder">تأكيد كلمة المرور</string>
     <string name="signup_button">إنشاء حساب</string>
     <string name="signup_loading">جارٍ إنشاء الحساب…</string>
+    <string name="signup_step">%1$d/%2$d</string>
+    <string name="label_full_name">الاسم الكامل</string>
+    <string name="placeholder_full_name">اسمك الكامل</string>
+    <string name="helper_email_ok">يبدو جيدًا</string>
+    <string name="signup_accept_terms">أوافق على %1$s و%2$s</string>
+    <string name="signup_marketing_opt_in">أرسل لي العروض عبر البريد الإلكتروني</string>
+    <string name="signup_create_account">إنشاء حساب</string>
+    <string name="error_full_name_empty">أدخل اسمك الكامل</string>
+    <string name="error_terms_not_accepted">يرجى قبول الشروط للمتابعة</string>
+
+    <!-- Email verification (Figma 02.6 / 02.7) -->
+    <string name="verify_title">تحقّق من بريدك الإلكتروني</string>
+    <string name="verify_subtitle">أرسلنا رابط التحقق إلى بريدك الوارد.</string>
+    <string name="verify_sent_to">أُرسل إلى</string>
+    <string name="action_change">تغيير</string>
+    <string name="verify_step1_title">افتح الرسالة من دكّان</string>
+    <string name="verify_step1_body">الموضوع: «تحقّق من حسابك في دكّان»</string>
+    <string name="verify_step2_title">اضغط «تحقّق من بريدي»</string>
+    <string name="verify_step2_body">الرابط صالح لمدة 24 ساعة</string>
+    <string name="verify_step3_title">عُد واضغط «تحقّقت»</string>
+    <string name="verify_step3_body">سننقلك إلى الصفحة الرئيسية</string>
+    <string name="verify_i_have_verified">تحقّقت</string>
+    <string name="verify_not_verified_title">لم يتم التحقق من بريدك بعد</string>
+    <string name="verify_not_verified_body">افتح الرابط الذي أرسلناه ثم اضغط «تحقّقت».</string>
+    <string name="verify_help_title">لم تجده؟</string>
+    <string name="verify_help_spam">تحقّق من البريد العشوائي أو العروض، أو ابحث عن «Dukkan».</string>
+    <string name="verify_help_expiry">تنتهي صلاحية الروابط بعد 24 ساعة.</string>
+    <string name="verify_resend_link">إعادة إرسال الرابط</string>
+
+    <!-- All set (Figma 02.5) -->
+    <string name="all_set_title">كل شيء جاهز يا %1$s!</string>
+    <string name="all_set_body">حسابك جاهز. إليك هدية ترحيب صغيرة لتبدأ.</string>
+    <string name="all_set_gift_title">3 توصيلات مجانية</string>
+    <string name="all_set_gift_subtitle" formatted="false">بالإضافة إلى خصم 15% مع WELCOME15</string>
+    <string name="all_set_unlocked">مفعّل</string>
+    <string name="action_add_address">أضف عنوان التوصيل</string>
+    <string name="action_start_shopping">ابدأ التسوق</string>
 
     <!-- Validation (ValidationError.toUiText) -->
     <string name="validation_email_empty">يرجى إدخال بريدك الإلكتروني</string>
@@ -122,5 +172,5 @@
     <string name="password_strength_fair">مقبولة</string>
     <string name="password_strength_good">جيدة</string>
     <string name="password_strength_strong">قوية</string>
-    <string name="password_strength_format">قوة كلمة المرور: %1$s</string>
+    <string name="password_strength_format">%1$s · 8 أحرف على الأقل، رقم ورمز</string>
 </resources>

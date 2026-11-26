@@ -82,12 +82,62 @@
     <string name="forgetpassword_send_reset_link">Send Reset Link</string>
     <string name="forgetpassword_back_to_login">Back to Login</string>
 
+    <!-- Forgot password (Figma 02.4) -->
+    <string name="forgot_title">Reset your password</string>
+    <string name="forgot_subtitle">We’ll email you a secure link to set a new one.</string>
+    <string name="forgot_send_link">Send reset link</string>
+    <string name="forgot_sent_title">Check your inbox</string>
+    <string name="forgot_sent_body">Link sent to %1$s</string>
+    <string name="forgot_sent_expiry">It expires in 1 hour.</string>
+    <string name="forgot_toast_sent">Reset link sent</string>
+    <string name="action_open_email_app">Open email app</string>
+    <string name="resend_prompt">Didn’t get it?</string>
+    <string name="resend_in">Resend in %1$s</string>
+    <string name="action_resend">Resend</string>
+
     <!-- Sign up -->
     <string name="signup_title">Create your account</string>
-    <string name="signup_subtitle">Join Dukkan to discover great deals and enjoy a faster checkout.</string>
+    <string name="signup_subtitle">It\'s free and takes less than a minute.</string>
     <string name="signup_confirm_password_placeholder">Confirm password</string>
     <string name="signup_button">Create account</string>
     <string name="signup_loading">Creating account…</string>
+    <string name="signup_step">%1$d/%2$d</string>
+    <string name="label_full_name">Full name</string>
+    <string name="placeholder_full_name">Your full name</string>
+    <string name="helper_email_ok">Looks good</string>
+    <string name="signup_accept_terms">I agree to the %1$s and %2$s</string>
+    <string name="signup_marketing_opt_in">Send me deals by email</string>
+    <string name="signup_create_account">Create account</string>
+    <string name="error_full_name_empty">Enter your full name</string>
+    <string name="error_terms_not_accepted">Please accept the Terms to continue</string>
+
+    <!-- Email verification (Figma 02.6 / 02.7) -->
+    <string name="verify_title">Verify your email</string>
+    <string name="verify_subtitle">We sent a verification link to your inbox.</string>
+    <string name="verify_sent_to">Sent to</string>
+    <string name="action_change">Change</string>
+    <string name="verify_step1_title">Open the email from Dukkan</string>
+    <string name="verify_step1_body">Subject: “Verify your Dukkan account”</string>
+    <string name="verify_step2_title">Tap “Verify my email”</string>
+    <string name="verify_step2_body">The link works for 24 hours</string>
+    <string name="verify_step3_title">Come back and tap I’ve verified</string>
+    <string name="verify_step3_body">We’ll take you to Home</string>
+    <string name="verify_i_have_verified">I’ve verified</string>
+    <string name="verify_not_verified_title">Your email isn’t verified yet</string>
+    <string name="verify_not_verified_body">Open the link we sent, then tap I’ve verified.</string>
+    <string name="verify_help_title">Can’t find it?</string>
+    <string name="verify_help_spam">Check Spam or Promotions, or search “Dukkan”.</string>
+    <string name="verify_help_expiry">Links expire after 24 hours.</string>
+    <string name="verify_resend_link">Resend link</string>
+
+    <!-- All set (Figma 02.5) -->
+    <string name="all_set_title">You’re all set, %1$s!</string>
+    <string name="all_set_body">Your account is ready. Here’s a little welcome gift to get you started.</string>
+    <string name="all_set_gift_title">3 free deliveries</string>
+    <string name="all_set_gift_subtitle" formatted="false">Plus 15% off with WELCOME15</string>
+    <string name="all_set_unlocked">Unlocked</string>
+    <string name="action_add_address">Add my delivery address</string>
+    <string name="action_start_shopping">Start shopping</string>
 
     <!-- Validation (ValidationError.toUiText) -->
     <string name="validation_email_empty">Please enter your email</string>
@@ -122,5 +172,5 @@
     <string name="password_strength_fair">Fair</string>
     <string name="password_strength_good">Good</string>
     <string name="password_strength_strong">Strong</string>
-    <string name="password_strength_format">Password strength: %1$s</string>
+    <string name="password_strength_format">%1$s · 8+ characters, a number and a symbol</string>
 </resources>
