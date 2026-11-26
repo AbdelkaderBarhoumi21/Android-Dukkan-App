@@ -13,7 +13,7 @@ import com.example.dukkanapp.features.auth.presentation.logic.signup.SignUpViewM
 @Composable
 fun SignUpScreen(
     onNavigationBack: () -> Unit,
-    onNavigateToEmailVerification: (Boolean) -> Unit,
+    onNavigateToEmailVerification: (emailJustSent: Boolean) -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: SignUpViewModel = hiltViewModel(),
 ) {
