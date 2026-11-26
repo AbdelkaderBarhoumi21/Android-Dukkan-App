@@ -5,7 +5,7 @@
     <string name="action_continue">Continue</string>
     <string name="action_next">Next</string>
     <string name="action_get_started">Get Started</string>
-    <string name="action_log_in">Log In</string>
+    <string name="action_log_in">Log in</string>
     <string name="divider_or">OR</string>
 
     <!-- Content descriptions -->
@@ -15,6 +15,7 @@
     <string name="cd_show_password">Show password</string>
     <string name="cd_loading">Loading</string>
     <string name="cd_hide_password">Hide password</string>
+    <string name="cd_clear_text">Clear text</string>
     <string name="cd_add_to_cart">Add to cart</string>
     <string name="cd_increase">Increase quantity</string>
     <string name="cd_decrease">Decrease quantity</string>
@@ -39,6 +40,11 @@
     <string name="auth_email_placeholder">Email address</string>
     <string name="auth_password_placeholder">Password</string>
     <string name="auth_already_have_account">Already have an account?</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="auth_or_continue_with">or continue with</string>
+    <string name="auth_google">Google</string>
+    <string name="auth_facebook">Facebook</string>
 
     <!-- Auth options -->
     <string name="auth_terms">Terms</string>
@@ -62,13 +68,13 @@
     <string name="auth_options_guest">Continue as guest</string>
 
     <!-- Login -->
-    <string name="login_title">Let\'s get shopping</string>
-    <string name="login_subtitle">Your favorites, new arrivals and exclusive deals are waiting for you.</string>
-    <string name="login_remember_me">Remember me</string>
+    <string name="login_title">Welcome back</string>
+    <string name="login_subtitle">Log in to track orders and see your coupons.</string>
+    <string name="login_remember_me">Keep me logged in</string>
     <string name="login_forgot_password">Forgot password?</string>
     <string name="login_loading">Logging in…</string>
-    <string name="login_no_account">Don\'t have an account?</string>
-    <string name="login_sign_up">Sign up</string>
+    <string name="login_no_account">New to Dukkan?</string>
+    <string name="login_sign_up">Create account</string>
 
     <!-- Forget password -->
     <string name="forgetpassword_title">Forgot Your Password?</string>

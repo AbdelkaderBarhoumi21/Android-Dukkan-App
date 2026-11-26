@@ -1,136 +1,100 @@
 package com.example.dukkanapp.features.auth.presentation.components.login
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import AppMessageBanner
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.dukkanapp.R
-import com.example.dukkanapp.core.common.components.buttons.AppPrimaryButton
-import com.example.dukkanapp.core.common.components.buttons.AppTextButton
-import com.example.dukkanapp.core.common.components.checkbox.AppCheckBox
-import com.example.dukkanapp.core.common.components.dividers.AppDivider
-import com.example.dukkanapp.core.common.components.footer.AppAuthFooterLink
-import com.example.dukkanapp.core.common.components.header.AppAuthHeader
 import com.example.dukkanapp.core.common.components.scaffold.AppScaffold
-import com.example.dukkanapp.core.common.components.textfield.AppPasswordTextField
-import com.example.dukkanapp.core.common.components.textfield.AppTextFiled
+import com.example.dukkanapp.core.common.components.scaffold.AppScreenBackground
+import com.example.dukkanapp.core.common.components.textfield.AppFieldStatus
+import com.example.dukkanapp.core.common.components.textfield.AppTextField
 import com.example.dukkanapp.core.common.text.asString
+import com.example.dukkanapp.core.theme.AppDimens
+import com.example.dukkanapp.core.theme.AppTheme
 import com.example.dukkanapp.core.utils.constants.AppIcons
-import com.example.dukkanapp.core.utils.extension.clearFocusOnTap
+import com.example.dukkanapp.features.auth.presentation.components.common.AppAuthHeader
+import com.example.dukkanapp.features.auth.presentation.components.common.AuthFormColumn
+import com.example.dukkanapp.features.auth.presentation.components.common.AuthHeaderLogo
 import com.example.dukkanapp.features.auth.presentation.logic.login.LoginIntent
 import com.example.dukkanapp.features.auth.presentation.logic.login.LoginUiState
 
 @Composable
 fun LoginScreenContent(
     state: LoginUiState,
-    onIntent: (LoginIntent) -> Unit
+    onIntent: (LoginIntent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-
     AppScaffold(
-        onNavigateBack = {
+        background = AppScreenBackground.AuroraShort,
+        onNavigationBack = {
             onIntent(LoginIntent.BackClicked)
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .clearFocusOnTap()
-                .padding(padding)
-                .padding(horizontal = AppDimens.size2Xs)
+        AuthFormColumn(
+            padding = padding
         ) {
+            Spacer(Modifier.height(AppDimens.space8))
             AppAuthHeader(
                 title = stringResource(R.string.login_title),
-                subTitle = stringResource(R.string.login_subtitle),
+                subtitle = stringResource(R.string.login_subtitle),
+                logo = AuthHeaderLogo.Mark(size = AppDimens.space32)
             )
-            Spacer(Modifier.height(AppDimens.sizeMd))
-            AppTextFiled(
-                value = state.email,
-                onValueChange = { onIntent(LoginIntent.EmailChanged(it)) },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(AppIcons.Mail),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(AppDimens.iconSm)
-                    )
-                },
-                placeHolder = stringResource(R.string.auth_email_placeholder),
-                errorText = state.emailError?.asString(),
-                isSuccess = state.isValidEmail,
-                keyboardType = KeyboardType.Email,
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            Spacer(Modifier.height(AppDimens.space24))
+            state.generalError?.let { error ->
+                AppMessageBanner(
+                    message = error.asString()
                 )
-            )
-            Spacer(Modifier.height(AppDimens.sizeXs))
-            AppPasswordTextField(
-                value = state.password,
-                onValueChange = { onIntent(LoginIntent.PasswordChanged(it)) },
-                placeHolder = stringResource(R.string.auth_password_placeholder),
-                errorText = state.passwordError?.asString(),
-                isSuccess = state.isValidPassword,
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(AppIcons.Lock),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(AppDimens.iconSm)
-                    )
-                }, keyboardActions = KeyboardActions(
-                    onDone = {
-                        focusManager.clearFocus()
-                        onIntent(LoginIntent.LoginClicked)
-                    }
-                )
-            )
-            Spacer(Modifier.height(AppDimens.spaceSm))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                AppCheckBox(
-                    checked = state.rememberMe,
-                    onCheckChanged = { onIntent(LoginIntent.RememberMeChanged(it)) },
-                    label = stringResource(R.string.login_remember_me),
-                )
-                AppTextButton(
-                    onClick = { onIntent(LoginIntent.ForgotPasswordClicked) },
-                    text = stringResource(R.string.login_forgot_password),
-                )
+                Spacer(Modifier.height(AppDimens.space16))
             }
-            Spacer(Modifier.height(AppDimens.size3Xs))
-            AppPrimaryButton(
-                onClick = { onIntent(LoginIntent.LoginClicked) },
-                text = stringResource(R.string.action_log_in),
+            AppTextField(
+                value = state.email,
+                onValueChange = {
+                    onIntent(LoginIntent.EmailChanged(it))
+                },
+                label = stringResource(R.string.label_email),
+                placeholder = stringResource(R.string.auth_email_placeholder),
+                leadingIcon = painterResource(AppIcons.Mail),
+                helperText = state.emailError?.asString(),
+                // Login never shows green: no Success status here.
+                status = if (state.emailError != null) AppFieldStatus.Error else AppFieldStatus.Default,
+                enabled = !state.isLoading,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                ),
+                trailingIcon = if (state.email.isNotEmpty()) {
+                    {
+                        IconButton(onClick = { onIntent(LoginIntent.EmailChanged("")) }) {
+                            Icon(
+                                painter = painterResource(AppIcons.X),
+                                contentDescription = stringResource(R.string.cd_clear_text),
+                                tint = AppTheme.colors.textTertiary,
+                                modifier = Modifier.size(AppDimens.iconSm),
+                            )
+                        }
+                    }
+                } else {
+                    null
+                },
             )
-            Spacer(Modifier.height(AppDimens.size3Xs))
-            AppDivider()
-            Spacer(Modifier.height(AppDimens.size5Xs))
-            AppAuthFooterLink(
-                promptText = stringResource(R.string.login_no_account),
-                actionText = stringResource(R.string.login_sign_up),
-                onActionClick = { onIntent(LoginIntent.SignUpClicked) }
-            )
+            Spacer(Modifier.height(AppDimens.space16))
         }
     }
-
-
 }

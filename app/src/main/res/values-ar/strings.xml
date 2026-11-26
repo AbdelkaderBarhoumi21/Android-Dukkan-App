@@ -15,6 +15,7 @@
     <string name="cd_show_password">إظهار كلمة المرور</string>
     <string name="cd_loading">جارٍ التحميل</string>
     <string name="cd_hide_password">إخفاء كلمة المرور</string>
+    <string name="cd_clear_text">مسح النص</string>
     <string name="cd_add_to_cart">أضف إلى السلة</string>
     <string name="cd_increase">زيادة الكمية</string>
     <string name="cd_decrease">إنقاص الكمية</string>
@@ -39,6 +40,11 @@
     <string name="auth_email_placeholder">البريد الإلكتروني</string>
     <string name="auth_password_placeholder">كلمة المرور</string>
     <string name="auth_already_have_account">لديك حساب بالفعل؟</string>
+    <string name="label_email">البريد الإلكتروني</string>
+    <string name="label_password">كلمة المرور</string>
+    <string name="auth_or_continue_with">أو تابع باستخدام</string>
+    <string name="auth_google">Google</string>
+    <string name="auth_facebook">Facebook</string>
 
     <!-- Auth options -->
     <string name="auth_terms">الشروط</string>
@@ -62,13 +68,13 @@
     <string name="auth_options_guest">المتابعة كضيف</string>
 
     <!-- Login -->
-    <string name="login_title">لنبدأ التسوق</string>
-    <string name="login_subtitle">مفضلاتك ووصولاتك الجديدة وعروضك الحصرية بانتظارك.</string>
-    <string name="login_remember_me">تذكّرني</string>
+    <string name="login_title">مرحبًا بعودتك</string>
+    <string name="login_subtitle">سجّل الدخول لتتبع طلباتك ورؤية قسائمك.</string>
+    <string name="login_remember_me">ابقَ متصلًا</string>
     <string name="login_forgot_password">نسيت كلمة المرور؟</string>
     <string name="login_loading">جارٍ تسجيل الدخول…</string>
-    <string name="login_no_account">ليس لديك حساب؟</string>
-    <string name="login_sign_up">أنشئ حساباً</string>
+    <string name="login_no_account">جديد في دكّان؟</string>
+    <string name="login_sign_up">إنشاء حساب</string>
 
     <!-- Forget password -->
     <string name="forgetpassword_title">هل نسيت كلمة المرور؟</string>
