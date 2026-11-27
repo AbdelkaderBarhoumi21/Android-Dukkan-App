@@ -1060,6 +1060,26 @@ is ForgetPasswordEffect.OpenEmailApp -> {
 }
 ```
 
+When the screen sends the `OpenEmailApp` effect, this code tries to open the user's email app.
+
+**Step by step:**
+
+1. **`is ForgetPasswordEffect.OpenEmailApp ->`** The ViewModel sent the "open email app" event, probably when the user tapped a button like "Open email app" after asking for a password reset link.
+    
+2. **`Intent(Intent.ACTION_MAIN)`** This creates a request to Android that says "launch an app's main screen."
+    
+3. **`.addCategory(Intent.CATEGORY_APP_EMAIL)`** This says which kind of app to launch: an email app, such as Gmail or Outlook.
+    
+4. **`.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)`** The email app opens as its own separate app instead of inside your app. Android also needs this flag when `context` isn't an Activity.
+    
+5. **`context.startActivity(intent)`** This asks Android to actually open the app.
+    
+6. **`try { ... } catch (_: ActivityNotFoundException)`** If the phone has no email app, Android throws an error, and without this `catch` your app would crash. Here the error is caught and ignored, so nothing happens and the app keeps running.
+    
+
+**In one sentence:** open the user's email app so they can check their inbox for the reset link, and don't crash if there's no email app.
+
+**Note:** The comment in the `catch` says it should "show the info banner", but the block is empty, so it doesn't show anything yet. If you want a banner, you need to add the code that shows it, for example by updating the state or showing a message.
 `AppAccountRecoveryHeader` and `AppAccountRecoveryFooter` are replaced by `AppAuthHeader(Tile(Lock))` and `AppAuthFooterLink`.
 
 ---
