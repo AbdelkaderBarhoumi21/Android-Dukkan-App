@@ -1148,9 +1148,77 @@ data class EmailVerificationUiState(
 }
 ```
 
+Each field holds one piece of information the screen uses to decide what to show:
+
+- **`email`**: the address the link was sent to. The screen shows it in the "Sent to" card.
+    
+- **`isChecking`**: `true` while the app asks Firebase "is this email verified now?" after the user taps "I've verified". While it's `true`, that button shows a loading spinner.
+    
+- **`isResending`**: `true` while the app is sending a new verification email. It stops the user from tapping "Resend" twice.
+    
+- **`isSigningOut`**: `true` while the app signs the user out, after "Back", "Change" or "Use a different account". It makes sure the sign-out only runs once if the user taps several times.
+    
+- **`resendCooldownSeconds`**: the countdown before "Resend" works again (60, 59, 58 … 0). While it's above 0 the screen shows "Resend in 0:45". At 0 it shows "Resend link". This stops users from spamming emails, which Firebase would block anyway.
+    
+- **`isNotVerified`**: `true` when the user tapped "I've verified" but hasn't clicked the link yet. The screen then shows the red "Your email isn't verified yet" card (Figma 02.7). It goes back to `false` when they tap "Resend".
+    
+- **`message`**: a short message banner, or `null` for no banner. It's used for:
+    
+    - success: "Email sent again" (`isError = false`)
+    - errors: no internet, no email app, and similar (`isError = true`)
+
+**In one sentence:** the state says what to display (email, countdown, which card), what is loading (checking, resending, signing out) and what message to show.
 #### `EmailVerificationIntent.kt`
 
 **File:** `features/auth/presentation/logic/emailverification/EmailVerificationIntent.kt`
+`   ScreenResumed` means "the screen is visible again". The screen sends it to the ViewModel every time it comes back to the front.
+
+**Why it exists:**
+
+1. The user is on the "Verify your email" screen.
+2. They tap "Open email app", which opens Gmail, so your app goes to the background.
+3. In Gmail they click the verification link.
+4. They come back to your app.
+
+At step 4 the screen is visible again. Android calls that moment **ON_RESUME**, so the screen sends `ScreenResumed` to the ViewModel.
+
+**What the ViewModel does with it:**
+
+It quietly checks with Firebase whether the email is verified now:
+
+- **Verified:** it goes straight to Home or All set, without the user tapping anything.
+- **Not verified yet:** nothing happens and no error is shown. That's why it's a _silent_ check.
+
+**Where it's sent from (in the Screen):**
+
+```kotlin
+LifecycleResumeEffect(Unit) {
+    viewModel.onIntent(EmailVerificationIntent.ScreenResumed)
+    onPauseOrDispose { }
+}
+```
+
+This also runs the first time the screen opens.
+
+**In one sentence:** when the user comes back to the app after clicking the link, the app notices on its own and moves on, so they don't need to tap "I've verified".
+`UseAnotherAccountClicked` is the intent the screen sends when the user taps a **"Use a different account"** button.
+
+**When a user needs it:**
+
+- They signed up with the wrong email, or with an email they can't open.
+- They want to log in with another account they already have.
+
+Either way they're stuck on this screen, because the app won't let them reach Home without verifying. This button is their way out.
+
+**What the ViewModel does:**
+
+```kotlin
+EmailVerificationIntent.UseAnotherAccountClicked -> signOutAndLeave()
+```
+
+1. It sets `isSigningOut = true`, so the sign-out can't run twice.
+2. It signs the user out of Firebase.
+3. It sends `NavigateToAuthOptions`, which takes the user to the Welcome screen.
 
 ```kotlin
 package com.example.dukkanapp.features.auth.presentation.logic.emailverification
@@ -1171,6 +1239,42 @@ sealed interface EmailVerificationIntent {
 ```
 
 #### `EmailVerificationEffect.kt`
+`NavigateToAllSet` is the effect the ViewModel sends to tell the screen "go to the **All set** screen". It also carries the user's **first name**.
+
+**When it's sent:**
+
+When Firebase says the email is verified, and only for a **brand-new account**, meaning the user just signed up:
+
+```kotlin
+isVerified -> sendEffect(
+    if (emailJustSent) EmailVerificationEffect.NavigateToAllSet(firstName)
+    else EmailVerificationEffect.NavigateToHome
+)
+```
+
+- **New user** (just signed up): All set, then Home.
+- **Old user** (signed up before and is only verifying now): straight to Home.
+
+**What the All set screen is:**
+
+A welcome screen shown once after sign-up, like:
+
+> 🎉 **You're all set, Ahmed!** [Start shopping]
+
+**Why it carries `firstName`:**
+
+So the All set screen can greet the user by name. The ViewModel gets it from the full name entered at sign-up:
+
+```kotlin
+"Ahmed Ben Ali".substringBefore(" ")  // → "Ahmed"
+```
+
+**Why `data class` and not `data object`:**
+
+- `data object` is just a signal with no information, like `NavigateToHome`.
+- `data class` is a signal that also carries data, here the first name.
+
+**In one sentence:** once a new user verifies their email, it opens the welcome screen with their first name, before taking them to Home.
 
 **File:** `features/auth/presentation/logic/emailverification/EmailVerificationEffect.kt`
 
