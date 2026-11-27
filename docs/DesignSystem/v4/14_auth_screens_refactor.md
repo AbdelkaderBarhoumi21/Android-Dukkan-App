@@ -1106,98 +1106,334 @@ Figma now designs this screen in two states: **02.6 Verify your email** (just se
 
 Figma's own steps: link valid **24 hours**, "We'll take you to Home". Firebase's default verification link lifetime is set in the console; keep the copy in sync if you change it.
 
-### State, intent and effect changes (auth guide §11)
+### State, intent, effect, ViewModel and screen (full code)
 
-Only additions. Keep everything else in the guide's files as it is.
+These are the complete files: the auth guide §11 code with the Figma 02.6 / 02.7 changes already merged in. Copy them as they are, no need to open the guide.
 
-| Directive / Figma action | Guide name | Change |
+What changed compared to guide §11:
+
+| Directive / Figma action | Name | Change |
 |---|---|---|
 | Open email app | `OpenEmailAppClicked` | none |
-| I've verified | `CheckClicked` | when not verified, set `isNotVerified = true` instead of showing a message banner |
+| I've verified | `CheckClicked` | when not verified, set `isNotVerified = true` (shows the 02.7 card) instead of a message banner |
 | Resend | `ResendClicked` | also clears `isNotVerified` |
 | Change (email) | **new** `ChangeEmailClicked` | signs out, then `NavigateToSignUp` (a typo in the email can only be fixed by signing up again) |
 | Back | **new** `BackClicked` | same as `UseAnotherAccountClicked`: sign out, go to Welcome |
+| Verified | `NavigateToHome` / **new** `NavigateToAllSet` | a brand-new account (`emailJustSent == true`) goes to **All set** (§8) first; an older account goes straight to Home |
 | resend countdown | `resendCooldownSeconds` | none (it's the "resendSecondsLeft" of Figma) |
 
-`EmailVerificationUiState.kt`: add one field:
+#### `EmailVerificationUiState.kt`
+
+**File:** `features/auth/presentation/logic/emailverification/EmailVerificationUiState.kt`
 
 ```kotlin
-/** Figma 02.7: the user tapped "I've verified" but Firebase still says no. */
-val isNotVerified: Boolean = false,
+package com.example.dukkanapp.features.auth.presentation.logic.emailverification
+
+import com.example.dukkanapp.core.common.text.AppUiText
+
+data class EmailVerificationUiState(
+    val email: String = "",
+    val isChecking: Boolean = false,
+    val isResending: Boolean = false,
+    val isSigningOut: Boolean = false,
+    val resendCooldownSeconds: Int = 0,
+    /** Figma 02.7: the user tapped "I've verified" but Firebase still says no. */
+    val isNotVerified: Boolean = false,
+    val message: Message? = null,
+) {
+    /** Text and tone together, so an error tone can never exist without its text. */
+    data class Message(val text: AppUiText, val isError: Boolean)
+
+    val canResend: Boolean get() = !isResending && resendCooldownSeconds == 0
+}
 ```
 
-`EmailVerificationIntent.kt`: add two objects:
+#### `EmailVerificationIntent.kt`
+
+**File:** `features/auth/presentation/logic/emailverification/EmailVerificationIntent.kt`
 
 ```kotlin
-data object ChangeEmailClicked : EmailVerificationIntent
-data object BackClicked : EmailVerificationIntent
+package com.example.dukkanapp.features.auth.presentation.logic.emailverification
+
+sealed interface EmailVerificationIntent {
+    /** Sent on every ON_RESUME, e.g. when the user comes back from their mail app. */
+    data object ScreenResumed : EmailVerificationIntent
+    data object CheckClicked : EmailVerificationIntent
+    data object ResendClicked : EmailVerificationIntent
+    data object OpenEmailAppClicked : EmailVerificationIntent
+    /** The screen tried to open a mail app and the device has none. */
+    data object EmailAppUnavailable : EmailVerificationIntent
+    data object UseAnotherAccountClicked : EmailVerificationIntent
+    /** "Change" on the Sent-to card. */
+    data object ChangeEmailClicked : EmailVerificationIntent
+    data object BackClicked : EmailVerificationIntent
+}
 ```
 
-`EmailVerificationEffect.kt`: add one object:
+#### `EmailVerificationEffect.kt`
+
+**File:** `features/auth/presentation/logic/emailverification/EmailVerificationEffect.kt`
 
 ```kotlin
-data object NavigateToSignUp : EmailVerificationEffect
+package com.example.dukkanapp.features.auth.presentation.logic.emailverification
+
+sealed interface EmailVerificationEffect {
+    data object NavigateToHome : EmailVerificationEffect
+    /** Only for a brand-new account: All set (§8) is shown once, then Home. */
+    data class NavigateToAllSet(val firstName: String) : EmailVerificationEffect
+    data object NavigateToAuthOptions : EmailVerificationEffect
+    data object NavigateToSignUp : EmailVerificationEffect
+    /** Needs a Context, so the screen does it, not the ViewModel. */
+    data object OpenEmailApp : EmailVerificationEffect
+}
 ```
 
-`EmailVerificationViewModel.kt`: the changed lines only.
+#### `EmailVerificationViewModel.kt`
+
+**File:** `features/auth/presentation/logic/emailverification/EmailVerificationViewModel.kt`
 
 ```kotlin
-// onIntent: add the two new branches
-EmailVerificationIntent.ChangeEmailClicked -> signOutAndLeave(toSignUp = true)
-EmailVerificationIntent.BackClicked -> signOutAndLeave()
+package com.example.dukkanapp.features.auth.presentation.logic.emailverification
 
-// checkVerification: replace the "!silent -> showMessage(...)" line with
-!silent -> setState { copy(isNotVerified = true) }
+import androidx.annotation.StringRes
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.example.dukkanapp.R
+import com.example.dukkanapp.core.common.mvi.AppViewModel
+import com.example.dukkanapp.core.common.text.AppUiText
+import com.example.dukkanapp.core.error.AppFailure
+import com.example.dukkanapp.core.error.onFailure
+import com.example.dukkanapp.core.error.onSuccess
+import com.example.dukkanapp.core.error.ui.toUiText
+import com.example.dukkanapp.core.navigation.AppRoute
+import com.example.dukkanapp.features.auth.domain.usecase.CheckEmailVerificationUseCase
+import com.example.dukkanapp.features.auth.domain.usecase.GetCurrentUserUseCase
+import com.example.dukkanapp.features.auth.domain.usecase.SendEmailVerificationUseCase
+import com.example.dukkanapp.features.auth.domain.usecase.SignOutUseCase
+import com.example.dukkanapp.features.auth.presentation.logic.emailverification.EmailVerificationUiState.Message
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-// resend(): when it starts, clear the 02.7 state
-setState { copy(isResending = true, message = null, isNotVerified = false) }
+@HiltViewModel
+class EmailVerificationViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    getCurrentUser: GetCurrentUserUseCase,
+    private val checkEmailVerification: CheckEmailVerificationUseCase,
+    private val sendEmailVerification: SendEmailVerificationUseCase,
+    private val signOut: SignOutUseCase,
+) : AppViewModel<EmailVerificationUiState, EmailVerificationIntent, EmailVerificationEffect>(
+    initialState = EmailVerificationUiState(email = getCurrentUser()?.email.orEmpty())
+) {
+    /** True when sign-up has just sent the email, i.e. a brand-new account. */
+    private val emailJustSent =
+        savedStateHandle.toRoute<AppRoute.EmailVerificationScreen>().emailJustSent
 
-// signOutAndLeave: add the parameter and pick the effect
-private fun signOutAndLeave(toSignUp: Boolean = false) {
-    if (currentState.isSigningOut) return
-    setState { copy(isSigningOut = true) }
+    /** "Ahmed Ben Ali" -> "Ahmed", for the All set greeting. */
+    private val firstName =
+        getCurrentUser()?.displayName.orEmpty().substringBefore(" ")
 
-    viewModelScope.launch {
-        signOut()
-        sendEffect(
-            if (toSignUp) EmailVerificationEffect.NavigateToSignUp
-            else EmailVerificationEffect.NavigateToAuthOptions
-        )
+    private var checkJob: Job? = null
+    private var cooldownJob: Job? = null
+
+    init {
+        // Sign-up has just sent the email: resending right away would hit Firebase's rate limit.
+        if (emailJustSent) startResendCooldown()
+    }
+
+    override fun onIntent(intent: EmailVerificationIntent) {
+        when (intent) {
+            EmailVerificationIntent.ScreenResumed -> checkVerification(silent = true)
+            EmailVerificationIntent.CheckClicked -> checkVerification(silent = false)
+            EmailVerificationIntent.ResendClicked -> resend()
+            EmailVerificationIntent.OpenEmailAppClicked -> sendEffect(EmailVerificationEffect.OpenEmailApp)
+            EmailVerificationIntent.EmailAppUnavailable ->
+                showMessage(R.string.email_verification_no_email_app, isError = true)
+
+            EmailVerificationIntent.UseAnotherAccountClicked -> signOutAndLeave()
+            EmailVerificationIntent.ChangeEmailClicked -> signOutAndLeave(toSignUp = true)
+            EmailVerificationIntent.BackClicked -> signOutAndLeave()
+        }
+    }
+
+    /**
+     * [silent] = automatic check on resume: only navigates, never shows a message.
+     * One check at a time: a resume during a manual check doesn't start a second one.
+     */
+    private fun checkVerification(silent: Boolean) {
+        if (checkJob?.isActive == true) return
+        if (!silent) setState { copy(isChecking = true, message = null) }
+
+        checkJob = viewModelScope.launch {
+            checkEmailVerification()
+                .onSuccess { isVerified ->
+                    when {
+                        isVerified -> sendEffect(
+                            if (emailJustSent) EmailVerificationEffect.NavigateToAllSet(firstName)
+                            else EmailVerificationEffect.NavigateToHome
+                        )
+                        // Figma 02.7: show the "isn't verified yet" card, not a banner.
+                        !silent -> setState { copy(isNotVerified = true) }
+                    }
+                }
+                .onFailure { failure -> handleFailure(failure, silent) }
+            setState { copy(isChecking = false) }
+        }
+    }
+
+    private fun resend() {
+        if (!currentState.canResend) return
+        // A new link is on its way: go back from 02.7 to 02.6.
+        setState { copy(isResending = true, message = null, isNotVerified = false) }
+
+        viewModelScope.launch {
+            sendEmailVerification()
+                .onSuccess {
+                    showMessage(R.string.email_verification_resent_success, isError = false)
+                    startResendCooldown()
+                }
+                .onFailure { failure -> handleFailure(failure, silent = false) }
+            setState { copy(isResending = false) }
+        }
+    }
+
+    private fun handleFailure(failure: AppFailure, silent: Boolean) {
+        when {
+            failure.meansAccountIsGone -> signOutAndLeave()
+            !silent -> setState { copy(message = Message(failure.toUiText(), isError = true)) }
+        }
+    }
+
+    /** [toSignUp] = "Change" email: the only way to fix a typo is to sign up again. */
+    private fun signOutAndLeave(toSignUp: Boolean = false) {
+        if (currentState.isSigningOut) return
+        setState { copy(isSigningOut = true) }
+
+        viewModelScope.launch {
+            signOut()
+            sendEffect(
+                if (toSignUp) EmailVerificationEffect.NavigateToSignUp
+                else EmailVerificationEffect.NavigateToAuthOptions
+            )
+        }
+    }
+
+    private fun startResendCooldown() {
+        cooldownJob?.cancel()
+        cooldownJob = viewModelScope.launch {
+            for (seconds in RESEND_COOLDOWN_SECONDS downTo 1) {
+                setState { copy(resendCooldownSeconds = seconds) }
+                delay(ONE_SECOND_MS)
+            }
+            setState { copy(resendCooldownSeconds = 0) }
+        }
+    }
+
+    private fun showMessage(@StringRes textRes: Int, isError: Boolean) =
+        setState { copy(message = Message(AppUiText.Res(textRes), isError)) }
+
+    /**
+     * reload() on a deleted account fails with USER_NOT_FOUND, which the mapper reports as
+     * InvalidCredentials. On this screen (no credentials typed) all three mean "account gone":
+     * staying here could never succeed.
+     */
+    private val AppFailure.meansAccountIsGone: Boolean
+        get() = this == AppFailure.Auth.SessionExpired ||
+                this == AppFailure.Auth.UserDisabled ||
+                this == AppFailure.Auth.InvalidCredentials
+
+    private companion object {
+        const val RESEND_COOLDOWN_SECONDS = 60
+        const val ONE_SECOND_MS = 1_000L
     }
 }
 ```
 
-In `EmailVerificationScreen.kt`, handle `NavigateToSignUp` with a new `onNavigateToSignUp` callback, and in `AppNavHost` pass `navController.navigateAsRoot(AppRoute.SignUpScreen)`.
+#### `EmailVerificationScreen.kt`
 
-When verification succeeds, navigate to **All set** (§8) instead of Home, but only for a brand-new account (`emailJustSent == true`). A user who signed up long ago and is only verifying now goes straight to Home.
-
-`EmailVerificationEffect.kt`: add
+**File:** `features/auth/presentation/screens/EmailVerificationScreen.kt`
 
 ```kotlin
-data class NavigateToAllSet(val firstName: String) : EmailVerificationEffect
-```
+package com.example.dukkanapp.features.auth.presentation.screens
 
-`EmailVerificationViewModel.kt`: keep the route argument and the first name, then pick the effect.
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.dukkanapp.core.common.mvi.AppCollectEffect
+import com.example.dukkanapp.features.auth.presentation.components.emailverification.EmailVerificationScreenContent
+import com.example.dukkanapp.features.auth.presentation.logic.emailverification.EmailVerificationEffect
+import com.example.dukkanapp.features.auth.presentation.logic.emailverification.EmailVerificationIntent
+import com.example.dukkanapp.features.auth.presentation.logic.emailverification.EmailVerificationViewModel
 
-```kotlin
-// class body: replaces the toRoute() call inside init
-private val emailJustSent =
-    savedStateHandle.toRoute<AppRoute.EmailVerificationScreen>().emailJustSent
-private val firstName =
-    getCurrentUser()?.displayName.orEmpty().substringBefore(" ")
+@Composable
+fun EmailVerificationScreen(
+    onNavigateToHome: () -> Unit,
+    onNavigateToAllSet: (firstName: String) -> Unit,
+    onNavigateToAuthOptions: () -> Unit,
+    onNavigateToSignUp: () -> Unit,
+    viewModel: EmailVerificationViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-init {
-    if (emailJustSent) startResendCooldown()
+    // Re-check whenever the user comes back to the app (e.g. after tapping the link in the mail app).
+    LifecycleResumeEffect(Unit) {
+        viewModel.onIntent(EmailVerificationIntent.ScreenResumed)
+        onPauseOrDispose { }
+    }
+
+    AppCollectEffect(viewModel.effect) { effect ->
+        when (effect) {
+            EmailVerificationEffect.NavigateToHome -> onNavigateToHome()
+            is EmailVerificationEffect.NavigateToAllSet -> onNavigateToAllSet(effect.firstName)
+            EmailVerificationEffect.NavigateToAuthOptions -> onNavigateToAuthOptions()
+            EmailVerificationEffect.NavigateToSignUp -> onNavigateToSignUp()
+            EmailVerificationEffect.OpenEmailApp -> {
+                val intent = Intent.makeMainSelectorActivity(
+                    Intent.ACTION_MAIN,
+                    Intent.CATEGORY_APP_EMAIL
+                ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                try {
+                    context.startActivity(intent)
+                } catch (_: ActivityNotFoundException) {
+                    // No mail app installed: the ViewModel shows a message instead of crashing.
+                    viewModel.onIntent(EmailVerificationIntent.EmailAppUnavailable)
+                }
+            }
+        }
+    }
+
+    EmailVerificationScreenContent(
+        state = state,
+        onIntent = viewModel::onIntent
+    )
 }
-
-// checkVerification: replace the "isVerified -> ..." line
-isVerified -> sendEffect(
-    if (emailJustSent) EmailVerificationEffect.NavigateToAllSet(firstName)
-    else EmailVerificationEffect.NavigateToHome
-)
 ```
 
-In `EmailVerificationScreen.kt`, handle `NavigateToAllSet` with an `onNavigateToAllSet: (String) -> Unit` callback. In `AppNavHost`, pass `navController.navigateAsRoot(AppRoute.AllSetScreen(firstName))`.
+#### `AppNavHost.kt`
+
+```kotlin
+composable<AppRoute.EmailVerificationScreen> {
+    EmailVerificationScreen(
+        onNavigateToHome = { navController.navigateAsRoot(AppRoute.HomeScreen) },
+        onNavigateToAllSet = { firstName ->
+            navController.navigateAsRoot(AppRoute.AllSetScreen(firstName))
+        },
+        onNavigateToAuthOptions = { navController.navigateAsRoot(AppRoute.AuthOptionsScreen) },
+        onNavigateToSignUp = { navController.navigateAsRoot(AppRoute.SignUpScreen) },
+    )
+}
+```
+
+Use your real route names if they differ (`HomeScreen`, `AuthOptionsScreen`, `AllSetScreen` comes from §8).
 
 > **Back arrow on Sign up after "Change":** `navigateAsRoot` leaves Sign up as the only screen, so `popBackStack()` has nowhere to go. Navigate to Welcome instead when there is no previous screen.
 
